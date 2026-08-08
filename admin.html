@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modex.uz — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-box">
+      <p class="eyebrow">MODEX.UZ ADMIN</p>
+      <h1>Kirish</h1>
+      <p>Admin email va parolingiz bilan kiring.</p>
+      <label>Email
+        <input id="email" type="email" required placeholder="admin@email.com" />
+      </label>
+      <label>Parol
+        <input id="password" type="password" required placeholder="••••••••" />
+      </label>
+      <button class="btn primary full" type="submit">Kirish</button>
+      <p id="loginMessage" class="form-message"></p>
+      <a href="index.html" class="btn secondary full">Saytga qaytish</a>
+    </form>
+  </div>
+
+  <div id="adminView" class="hidden">
+    <header class="topbar">
+      <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
+      <div class="admin-actions">
+        <button id="refreshBtn" class="btn secondary">Yangilash</button>
+        <button id="logoutBtn" class="btn secondary">Chiqish</button>
+      </div>
+    </header>
+
+    <main class="admin-shell">
+      <div class="admin-head">
+        <div>
+          <p class="eyebrow">ADMIN PANEL</p>
+          <h2>Boshqaruv</h2>
+        </div>
+        <span id="adminEmail" class="muted"></span>
+      </div>
+
+      <div class="admin-grid">
+        <section class="panel">
+          <h2>Mahsulot qo‘shish</h2>
+          <form id="productForm" class="admin-form">
+            <label>Mahsulot nomi
+              <input id="pName" required maxlength="120" placeholder="Masalan: Qizlar komplekti" />
+            </label>
+            <label>Narxi (so‘m)
+              <input id="pPrice" required type="number" min="0" step="1000" placeholder="159000" />
+            </label>
+            <label>Tavsif
+              <textarea id="pDesc" maxlength="400" placeholder="Qisqa tavsif"></textarea>
+            </label>
+            <label>Mahsulot rasmi
+              <input id="pImage" required type="file" accept="image/*" />
+            </label>
+            <button class="btn primary" type="submit">Mahsulot qo‘shish</button>
+            <p id="productMessage" class="form-message"></p>
+          </form>
+
+          <div class="product-admin-list" id="adminProducts"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Buyurtmalar</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Vaqt</th><th>Ism</th><th>Telefon</th><th>Mahsulot</th><th>Soni</th><th>Status</th></tr>
+              </thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+          <p id="ordersMessage" class="form-message"></p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
