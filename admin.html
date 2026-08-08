@@ -1,87 +1,266 @@
 <!doctype html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Modex.uz — Admin</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modex.uz Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f2;color:#111}
+.hidden{display:none!important}.wrap{max-width:1100px;margin:auto;padding:20px}
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{background:#fff;border:1px solid #ddd;border-radius:18px;padding:22px;box-shadow:0 10px 35px rgba(0,0,0,.06)}
+.login{width:min(420px,100%)}h1,h2{margin:0 0 16px}label{display:block;font-weight:700;font-size:13px;margin:12px 0}
+input,textarea,select{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;margin-top:6px;font:inherit}
+button{border:0;border-radius:10px;padding:13px 16px;font-weight:800;cursor:pointer}
+.primary{background:#167b5a;color:#fff}.secondary{background:#e9e9e5;color:#111}.full{width:100%;margin-top:10px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0}
+.brand{font-size:22px;font-weight:900}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+.msg{min-height:20px;font-size:13px;font-weight:700;margin-top:10px}.err{color:#b12626}.ok{color:#167b5a}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;white-space:nowrap}
+.table{overflow:auto}.item{display:grid;grid-template-columns:50px 1fr auto;gap:8px;align-items:center;padding:8px;border:1px solid #eee;border-radius:10px;margin-top:8px}
+.item img{width:50px;height:50px;object-fit:cover;border-radius:8px;background:#eee}
+.small{padding:8px;background:#eee}.actions{display:flex;gap:8px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:12px}.top{padding:12px}}
+</style>
 </head>
 <body>
-  <div id="loginView" class="login-wrap">
-    <form id="loginForm" class="login-box">
-      <p class="eyebrow">MODEX.UZ ADMIN</p>
-      <h1>Kirish</h1>
-      <p>Admin email va parolingiz bilan kiring.</p>
-      <label>Email
-        <input id="email" type="email" required placeholder="admin@email.com" />
-      </label>
-      <label>Parol
-        <input id="password" type="password" required placeholder="••••••••" />
-      </label>
-      <button class="btn primary full" type="submit">Kirish</button>
-      <p id="loginMessage" class="form-message"></p>
-      <a href="index.html" class="btn secondary full">Saytga qaytish</a>
-    </form>
+
+<div id="loginView" class="login-wrap">
+  <form id="loginForm" class="card login">
+    <h1>Modex.uz Admin</h1>
+    <p>Admin email va parolingiz bilan kiring.</p>
+    <label>Email
+      <input id="email" type="email" autocomplete="username" required value="asadaktamov452@gmail.com">
+    </label>
+    <label>Parol
+      <input id="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button id="loginBtn" class="primary full" type="submit">Kirish</button>
+    <div id="loginMsg" class="msg"></div>
+  </form>
+</div>
+
+<div id="adminView" class="hidden">
+  <div class="top">
+    <div class="brand">MODEX.UZ</div>
+    <div class="actions">
+      <button id="refreshBtn" class="secondary">Yangilash</button>
+      <button id="logoutBtn" class="secondary">Chiqish</button>
+    </div>
   </div>
+  <div class="wrap">
+    <div class="grid">
+      <section class="card">
+        <h2>Mahsulot qo‘shish</h2>
+        <form id="productForm">
+          <label>Nomi<input id="pName" required></label>
+          <label>Narxi<input id="pPrice" type="number" min="0" required></label>
+          <label>Tavsif<textarea id="pDesc"></textarea></label>
+          <label>Rasm<input id="pImage" type="file" accept="image/*" required></label>
+          <button class="primary full" type="submit">Mahsulot qo‘shish</button>
+          <div id="productMsg" class="msg"></div>
+        </form>
+        <div id="products"></div>
+      </section>
 
-  <div id="adminView" class="hidden">
-    <header class="topbar">
-      <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
-      <div class="admin-actions">
-        <button id="refreshBtn" class="btn secondary">Yangilash</button>
-        <button id="logoutBtn" class="btn secondary">Chiqish</button>
-      </div>
-    </header>
-
-    <main class="admin-shell">
-      <div class="admin-head">
-        <div>
-          <p class="eyebrow">ADMIN PANEL</p>
-          <h2>Boshqaruv</h2>
+      <section class="card">
+        <h2>Buyurtmalar</h2>
+        <div class="table">
+          <table>
+            <thead><tr><th>Vaqt</th><th>Ism</th><th>Telefon</th><th>Mahsulot</th><th>Soni</th><th>Status</th></tr></thead>
+            <tbody id="orders"></tbody>
+          </table>
         </div>
-        <span id="adminEmail" class="muted"></span>
-      </div>
-
-      <div class="admin-grid">
-        <section class="panel">
-          <h2>Mahsulot qo‘shish</h2>
-          <form id="productForm" class="admin-form">
-            <label>Mahsulot nomi
-              <input id="pName" required maxlength="120" placeholder="Masalan: Qizlar komplekti" />
-            </label>
-            <label>Narxi (so‘m)
-              <input id="pPrice" required type="number" min="0" step="1000" placeholder="159000" />
-            </label>
-            <label>Tavsif
-              <textarea id="pDesc" maxlength="400" placeholder="Qisqa tavsif"></textarea>
-            </label>
-            <label>Mahsulot rasmi
-              <input id="pImage" required type="file" accept="image/*" />
-            </label>
-            <button class="btn primary" type="submit">Mahsulot qo‘shish</button>
-            <p id="productMessage" class="form-message"></p>
-          </form>
-
-          <div class="product-admin-list" id="adminProducts"></div>
-        </section>
-
-        <section class="panel">
-          <h2>Buyurtmalar</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Vaqt</th><th>Ism</th><th>Telefon</th><th>Mahsulot</th><th>Soni</th><th>Status</th></tr>
-              </thead>
-              <tbody id="ordersBody"></tbody>
-            </table>
-          </div>
-          <p id="ordersMessage" class="form-message"></p>
-        </section>
-      </div>
-    </main>
+        <div id="ordersMsg" class="msg"></div>
+      </section>
+    </div>
   </div>
+</div>
 
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+<script>
+const SUPABASE_URL = 'https://rkfohcbgqfjgwbybbnnv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_16dZVH9Coki-gAyf3T85Vw_yJlQ_EYj';
+const REST = SUPABASE_URL + "/rest/v1";
+let session = null;
+try { session = JSON.parse(localStorage.getItem("modex_session") || "null"); } catch(e) {}
+
+const loginView = document.getElementById("loginView");
+const adminView = document.getElementById("adminView");
+
+async function refreshSession(){
+  if(!session?.refresh_token) return false;
+  const r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({refresh_token:session.refresh_token})
+  });
+  if(!r.ok) return false;
+  session = await r.json();
+  localStorage.setItem("modex_session", JSON.stringify(session));
+  return true;
+}
+
+async function api(path, options={}){
+  let headers = {
+    "apikey":SUPABASE_KEY,
+    ...(session?.access_token ? {"Authorization":"Bearer " + session.access_token} : {}),
+    ...(options.headers||{})
+  };
+  let r = await fetch(REST + "/" + path, {...options, headers});
+  if(r.status === 401 && await refreshSession()){
+    headers["Authorization"] = "Bearer " + session.access_token;
+    r = await fetch(REST + "/" + path, {...options, headers});
+  }
+  if(!r.ok) throw new Error(await r.text());
+  if(r.status===204) return null;
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+
+function showAdmin(){
+  loginView.classList.add("hidden");
+  adminView.classList.remove("hidden");
+  loadAll();
+}
+function showLogin(){
+  adminView.classList.add("hidden");
+  loginView.classList.remove("hidden");
+}
+
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const msg = document.getElementById("loginMsg");
+  const btn = document.getElementById("loginBtn");
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  msg.textContent = "Kirilmoqda...";
+  msg.className = "msg";
+  btn.disabled = true;
+  try {
+    const r = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({email,password})
+    });
+    if(!r.ok) {
+      const t = await r.text();
+      throw new Error(t);
+    }
+    session = await r.json();
+    localStorage.setItem("modex_session", JSON.stringify(session));
+    msg.textContent = "";
+    showAdmin();
+  } catch(err) {
+    console.error(err);
+    msg.textContent = "Kira olmadi. Email/parolni tekshiring. Yozganlaringiz o‘chmaydi.";
+    msg.className = "msg err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("logoutBtn").onclick = ()=>{
+  localStorage.removeItem("modex_session");
+  session = null;
+  document.getElementById("password").value = "";
+  showLogin();
+};
+document.getElementById("refreshBtn").onclick = ()=>loadAll();
+
+async function loadOrders(){
+  const body = document.getElementById("orders");
+  const msg = document.getElementById("ordersMsg");
+  body.innerHTML = ""; msg.textContent = "";
+  try {
+    const rows = await api("orders?select=id,created_at,name,phone,product,quantity,status&order=created_at.desc");
+    if(!rows.length) { msg.textContent = "Hozircha buyurtma yo‘q."; return; }
+    rows.forEach(o=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${new Date(o.created_at).toLocaleString("uz-UZ")}</td>
+      <td>${o.name||""}</td><td><a href="tel:${o.phone||""}">${o.phone||""}</a></td>
+      <td>${o.product||""}</td><td>${o.quantity||1}</td>
+      <td><select data-id="${o.id}">
+        <option value="new" ${o.status==="new"?"selected":""}>Yangi</option>
+        <option value="called" ${o.status==="called"?"selected":""}>Qo‘ng‘iroq qilindi</option>
+        <option value="done" ${o.status==="done"?"selected":""}>Yakunlandi</option>
+      </select></td>`;
+      body.appendChild(tr);
+    });
+    body.querySelectorAll("select").forEach(s=>s.onchange=async()=>{
+      await api("orders?id=eq."+encodeURIComponent(s.dataset.id), {
+        method:"PATCH",
+        headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+        body:JSON.stringify({status:s.value})
+      });
+    });
+  } catch(err) {
+    console.error(err);
+    msg.textContent = "Buyurtmalarni yuklab bo‘lmadi.";
+    msg.className = "msg err";
+  }
+}
+
+async function uploadImage(file){
+  const ext = (file.name.split(".").pop()||"jpg").replace(/[^a-z0-9]/gi,"").toLowerCase();
+  const path = Date.now()+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
+  const r = await fetch(SUPABASE_URL + "/storage/v1/object/product-images/" + path, {
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+session.access_token,"Content-Type":file.type||"application/octet-stream"},
+    body:file
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return SUPABASE_URL + "/storage/v1/object/public/product-images/" + path;
+}
+
+document.getElementById("productForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const msg = document.getElementById("productMsg");
+  msg.textContent = "Yuklanmoqda...";
+  try {
+    const file = document.getElementById("pImage").files[0];
+    const image_url = await uploadImage(file);
+    await api("products", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({
+        name:document.getElementById("pName").value.trim(),
+        price:Number(document.getElementById("pPrice").value),
+        description:document.getElementById("pDesc").value.trim(),
+        image_url, active:true
+      })
+    });
+    e.target.reset();
+    msg.textContent = "Mahsulot qo‘shildi.";
+    msg.className = "msg ok";
+    loadProducts();
+  } catch(err) {
+    console.error(err);
+    msg.textContent = "Mahsulotni qo‘shib bo‘lmadi.";
+    msg.className = "msg err";
+  }
+});
+
+async function loadProducts(){
+  const wrap = document.getElementById("products");
+  wrap.innerHTML = "";
+  try {
+    const ps = await api("products?select=id,name,price,image_url&order=id.desc");
+    ps.forEach(p=>{
+      const d = document.createElement("div");
+      d.className = "item";
+      d.innerHTML = `<img src="${p.image_url||""}"><div><b>${p.name||""}</b><br><small>${Number(p.price||0).toLocaleString("uz-UZ")} so‘m</small></div><button class="small" data-id="${p.id}">O‘chirish</button>`;
+      wrap.appendChild(d);
+    });
+    wrap.querySelectorAll("button[data-id]").forEach(b=>b.onclick=async()=>{
+      if(!confirm("O‘chirilsinmi?")) return;
+      await api("products?id=eq."+encodeURIComponent(b.dataset.id), {method:"DELETE",headers:{"Prefer":"return=minimal"}});
+      loadProducts();
+    });
+  } catch(err) { console.error(err); }
+}
+
+function loadAll(){ loadOrders(); loadProducts(); }
+if(session?.access_token) showAdmin(); else showLogin();
+</script>
 </body>
 </html>
