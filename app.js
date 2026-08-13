@@ -4,33 +4,59 @@ const REST = `${SUPABASE_URL}/rest/v1`;
 let products = [];
 let filteredProducts = [];
 
-let cart = JSON.parse(localStorage.getItem("modex_cart") || "[]");
-let favorites = JSON.parse(localStorage.getItem("modex_favorites") || "[]");
+let cart = JSON.parse(
+  localStorage.getItem("modex_cart") || "[]"
+);
+
+let favorites = JSON.parse(
+  localStorage.getItem("modex_favorites") || "[]"
+);
 
 /* =========================
    ELEMENTLAR
 ========================= */
 
-const productsGrid = document.getElementById("productsGrid");
-const productCount = document.getElementById("productCount");
-const emptyState = document.getElementById("emptyState");
+const productsGrid =
+  document.getElementById("productsGrid");
 
-const searchInput = document.getElementById("searchInput");
-const mobileSearchInput = document.getElementById("mobileSearchInput");
+const productCount =
+  document.getElementById("productCount");
 
-const categoryList = document.getElementById("categoryList");
-const categoryFilter = document.getElementById("categoryFilter");
-const sortSelect = document.getElementById("sortSelect");
+const emptyState =
+  document.getElementById("emptyState");
 
-const orderDialog = document.getElementById("orderDialog");
-const orderForm = document.getElementById("orderForm");
+const searchInput =
+  document.getElementById("searchInput");
 
-const cartDrawer = document.getElementById("cartDrawer");
-const cartOverlay = document.getElementById("cartOverlay");
+const mobileSearchInput =
+  document.getElementById("mobileSearchInput");
 
-const favoritesDrawer = document.getElementById("favoritesDrawer");
-const favoritesOverlay = document.getElementById("favoritesOverlay");
+const categoryList =
+  document.getElementById("categoryList");
 
+const categoryFilter =
+  document.getElementById("categoryFilter");
+
+const sortSelect =
+  document.getElementById("sortSelect");
+
+const orderDialog =
+  document.getElementById("orderDialog");
+
+const orderForm =
+  document.getElementById("orderForm");
+
+const cartDrawer =
+  document.getElementById("cartDrawer");
+
+const cartOverlay =
+  document.getElementById("cartOverlay");
+
+const favoritesDrawer =
+  document.getElementById("favoritesDrawer");
+
+const favoritesOverlay =
+  document.getElementById("favoritesOverlay");
 
 /* =========================
    YORDAMCHI FUNKSIYALAR
@@ -38,54 +64,289 @@ const favoritesOverlay = document.getElementById("favoritesOverlay");
 
 function money(value) {
   return (
-    new Intl.NumberFormat("uz-UZ").format(Number(value || 0)) +
-    " so‘m"
+    new Intl.NumberFormat("uz-UZ").format(
+      Number(value || 0)
+    ) + " so‘m"
   );
 }
 
 function esc(value = "") {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
+  return String(value).replace(
+    /[&<>"']/g,
+    char =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]
+  );
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(`${REST}/${path}`, {
-    ...options,
-
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      ...(options.headers || {})
+  const response = await fetch(
+    `${REST}/${path}`,
+    {
+      ...options,
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization:
+          `Bearer ${SUPABASE_KEY}`,
+        ...(options.headers || {})
+      }
     }
-  });
+  );
 
   if (!response.ok) {
-    throw new Error(await response.text());
+    throw new Error(
+      await response.text()
+    );
   }
 
   if (response.status === 204) {
     return null;
   }
 
-  const text = await response.text();
+  const text =
+    await response.text();
 
-  return text ? JSON.parse(text) : null;
+  return text
+    ? JSON.parse(text)
+    : null;
 }
 
 function productLink(product) {
-  const base = `${location.origin}${location.pathname.replace(/index\.html.*$/, "")}`;
+  const base =
+    `${location.origin}` +
+    `${location.pathname.replace(/index\.html.*$/, "")}`;
 
-  return `${base}product.html?id=${product.id}`;
+  return (
+    `${base}product.html?id=${product.id}`
+  );
 }
 
+/* =========================
+   SITE SETTINGS
+========================= */
+
+async function loadSiteSettings() {
+  try {
+    const rows = await api(
+      "site_settings?select=*&order=id.asc&limit=1"
+    );
+
+    const settings = rows?.[0];
+
+    if (!settings) return;
+
+    /* SAYT NOMI */
+
+    document
+      .querySelectorAll(".brand")
+      .forEach(el => {
+        const name =
+          settings.site_name ||
+          "MODEX.UZ";
+
+        const safe =
+          esc(name);
+
+        if (
+          safe
+            .toUpperCase()
+            .endsWith(".UZ")
+        ) {
+          const main =
+            safe.slice(0, -3);
+
+          el.innerHTML =
+            `${main}<span>.UZ</span>`;
+        } else {
+          el.textContent =
+            name;
+        }
+      });
+
+    /* HERO */
+
+    const heroTitle =
+      document.querySelector(
+        ".hero-text h1"
+      );
+
+    if (
+      heroTitle &&
+      settings.hero_title
+    ) {
+      heroTitle.textContent =
+        settings.hero_title;
+    }
+
+    const heroText =
+      document.querySelector(
+        ".hero-text p"
+      );
+
+    if (
+      heroText &&
+      settings.hero_text
+    ) {
+      heroText.textContent =
+        settings.hero_text;
+    }
+
+    /* ASOSIY RANG */
+
+    if (
+      settings.primary_color
+    ) {
+      document.documentElement
+        .style
+        .setProperty(
+          "--brand",
+          settings.primary_color
+        );
+    }
+
+    /* FOOTER TELEFON */
+
+    if (settings.phone) {
+      const footer =
+        document.querySelector(
+          "footer"
+        );
+
+      if (footer) {
+        const phone =
+          document.createElement(
+            "a"
+          );
+
+        phone.href =
+          `tel:${settings.phone}`;
+
+        phone.textContent =
+          settings.phone;
+
+        phone.style.fontWeight =
+          "800";
+
+        footer.appendChild(phone);
+      }
+    }
+
+    /* INSTAGRAM / TELEGRAM */
+
+    const socialLinks = [];
+
+    if (
+      settings.instagram_url
+    ) {
+      socialLinks.push(
+        `<a href="${esc(settings.instagram_url)}" target="_blank" rel="noopener">Instagram</a>`
+      );
+    }
+
+    if (
+      settings.telegram_url
+    ) {
+      socialLinks.push(
+        `<a href="${esc(settings.telegram_url)}" target="_blank" rel="noopener">Telegram</a>`
+      );
+    }
+
+    if (
+      socialLinks.length
+    ) {
+      const footer =
+        document.querySelector(
+          "footer"
+        );
+
+      if (footer) {
+        const social =
+          document.createElement(
+            "div"
+          );
+
+        social.innerHTML =
+          socialLinks.join(" · ");
+
+        footer.appendChild(
+          social
+        );
+      }
+    }
+
+    /* TEXNIK ISHLAR */
+
+    if (
+      settings.maintenance_mode
+    ) {
+      document.body.innerHTML = `
+        <div
+          style="
+            min-height:100vh;
+            display:grid;
+            place-items:center;
+            padding:30px;
+            background:#f7f7fb;
+            text-align:center;
+            font-family:Inter,Arial,sans-serif;
+          "
+        >
+          <div>
+            <div
+              style="
+                font-size:14px;
+                font-weight:900;
+                color:${esc(settings.primary_color || "#6d3df0")};
+                margin-bottom:10px;
+              "
+            >
+              ${esc(settings.site_name || "MODEX.UZ")}
+            </div>
+
+            <h1
+              style="
+                margin:0 0 12px;
+                font-size:42px;
+              "
+            >
+              Texnik ishlar olib borilmoqda
+            </h1>
+
+            <p
+              style="
+                margin:0;
+                color:#777;
+                font-size:17px;
+              "
+            >
+              Tez orada qaytamiz.
+            </p>
+          </div>
+        </div>
+      `;
+
+      return true;
+    }
+
+    return false;
+
+  } catch (error) {
+    console.error(
+      "Site settings xatosi:",
+      error
+    );
+
+    return false;
+  }
+}
 
 /* =========================
-   MAHSULOTLARNI YUKLASH
+   MAHSULOTLAR
 ========================= */
 
 async function loadProducts() {
@@ -95,19 +356,19 @@ async function loadProducts() {
     );
 
     buildCategories();
-
     applyFilters();
 
   } catch (error) {
     console.error(error);
 
-    emptyState.classList.remove("hidden");
+    emptyState.classList.remove(
+      "hidden"
+    );
 
     emptyState.textContent =
       "Mahsulotlarni yuklab bo‘lmadi.";
   }
 }
-
 
 /* =========================
    KATEGORIYALAR
@@ -117,7 +378,10 @@ function buildCategories() {
   const categories = [
     ...new Set(
       products
-        .map(product => product.category)
+        .map(
+          product =>
+            product.category
+        )
         .filter(Boolean)
     )
   ];
@@ -128,10 +392,13 @@ function buildCategories() {
     '<option value="">Barcha kategoriyalar</option>';
 
   categories.forEach(category => {
+    const button =
+      document.createElement(
+        "button"
+      );
 
-    const button = document.createElement("button");
-
-    button.className = "category-card";
+    button.className =
+      "category-card";
 
     button.innerHTML = `
       <span class="category-icon">🛍️</span>
@@ -142,50 +409,64 @@ function buildCategories() {
     `;
 
     button.onclick = () => {
-      categoryFilter.value = category;
+      categoryFilter.value =
+        category;
 
       applyFilters();
 
       document
-        .getElementById("products")
+        .getElementById(
+          "products"
+        )
         .scrollIntoView({
           behavior: "smooth"
         });
     };
 
-    categoryList.appendChild(button);
+    categoryList.appendChild(
+      button
+    );
 
+    const option =
+      document.createElement(
+        "option"
+      );
 
-    const option = document.createElement("option");
+    option.value =
+      category;
 
-    option.value = category;
-    option.textContent = category;
+    option.textContent =
+      category;
 
-    categoryFilter.appendChild(option);
+    categoryFilter.appendChild(
+      option
+    );
   });
 }
-
 
 /* =========================
    QIDIRUV VA FILTER
 ========================= */
 
+function currentSearch() {
+  return (
+    searchInput?.value ||
+    mobileSearchInput?.value ||
+    ""
+  )
+    .toLowerCase()
+    .trim();
+}
+
 function applyFilters() {
   const search =
-    (
-      searchInput?.value ||
-      mobileSearchInput?.value ||
-      ""
-    )
-      .toLowerCase()
-      .trim();
+    currentSearch();
 
   const category =
     categoryFilter.value;
 
   filteredProducts =
     products.filter(product => {
-
       const text = `
         ${product.name || ""}
         ${product.category || ""}
@@ -197,14 +478,14 @@ function applyFilters() {
 
       const categoryOk =
         !category ||
-        product.category === category;
+        product.category ===
+          category;
 
       return (
         searchOk &&
         categoryOk
       );
     });
-
 
   const sort =
     sortSelect.value;
@@ -217,7 +498,9 @@ function applyFilters() {
     );
   }
 
-  else if (sort === "expensive") {
+  else if (
+    sort === "expensive"
+  ) {
     filteredProducts.sort(
       (a, b) =>
         Number(b.price) -
@@ -233,16 +516,15 @@ function applyFilters() {
     );
   }
 
-
   renderProducts();
 }
-
 
 searchInput?.addEventListener(
   "input",
   () => {
-
-    if (mobileSearchInput) {
+    if (
+      mobileSearchInput
+    ) {
       mobileSearchInput.value =
         searchInput.value;
     }
@@ -251,11 +533,9 @@ searchInput?.addEventListener(
   }
 );
 
-
 mobileSearchInput?.addEventListener(
   "input",
   () => {
-
     if (searchInput) {
       searchInput.value =
         mobileSearchInput.value;
@@ -265,77 +545,82 @@ mobileSearchInput?.addEventListener(
   }
 );
 
+document
+  .getElementById(
+    "searchBtn"
+  )
+  ?.addEventListener(
+    "click",
+    applyFilters
+  );
 
-document.getElementById(
-  "searchBtn"
-)?.addEventListener(
-  "click",
-  applyFilters
-);
-
-
-document.getElementById(
-  "mobileSearchBtn"
-)?.addEventListener(
-  "click",
-  applyFilters
-);
-
+document
+  .getElementById(
+    "mobileSearchBtn"
+  )
+  ?.addEventListener(
+    "click",
+    applyFilters
+  );
 
 categoryFilter.addEventListener(
   "change",
   applyFilters
 );
 
-
 sortSelect.addEventListener(
   "change",
   applyFilters
 );
 
+document
+  .getElementById(
+    "allCategoriesBtn"
+  )
+  ?.addEventListener(
+    "click",
+    () => {
+      categoryFilter.value =
+        "";
 
-document.getElementById(
-  "allCategoriesBtn"
-)?.addEventListener(
-  "click",
-  () => {
-
-    categoryFilter.value = "";
-
-    applyFilters();
-  }
-);
-
+      applyFilters();
+    }
+  );
 
 /* =========================
-   KATALOG TUGMALARI
+   KATALOG
 ========================= */
 
 function scrollToCategories() {
   document
-    .querySelector(".market-section")
+    .querySelector(
+      ".market-section"
+    )
     ?.scrollIntoView({
       behavior: "smooth"
     });
 }
 
-document.getElementById(
-  "catalogBtn"
-)?.addEventListener(
-  "click",
-  scrollToCategories
-);
+document
+  .getElementById(
+    "catalogBtn"
+  )
+  ?.addEventListener(
+    "click",
+    scrollToCategories
+  );
 
-document.getElementById(
-  "mobileCatalogBtn"
-)?.addEventListener(
-  "click",
-  scrollToCategories
-);
-
+document
+  .getElementById(
+    "mobileCatalogBtn"
+  )
+  ?.addEventListener(
+    "click",
+    scrollToCategories
+  );
 
 /* =========================
-   MAHSULOT KARTALARI
+   PRODUCT CARDS
 ========================= */
 
 function renderProducts() {
@@ -349,197 +634,185 @@ function renderProducts() {
     filteredProducts.length > 0
   );
 
+  filteredProducts.forEach(
+    product => {
+      const isFavorite =
+        favorites.some(
+          item =>
+            Number(item.id) ===
+            Number(product.id)
+        );
 
-  filteredProducts.forEach(product => {
+      const card =
+        document.createElement(
+          "article"
+        );
 
-    const isFavorite =
-      favorites.some(
-        item =>
-          Number(item.id) ===
-          Number(product.id)
-      );
+      card.className =
+        "market-product-card";
 
+      card.innerHTML = `
+        <div class="product-image-box">
 
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "market-product-card";
-
-
-    card.innerHTML = `
-
-      <div class="product-image-box">
-
-        <a href="product.html?id=${product.id}">
-
-          <img
-            src="${esc(product.image_url || "")}"
-            alt="${esc(product.name || "")}"
-            loading="lazy"
-          >
-
-        </a>
-
-
-        <button
-          class="favorite-button ${
-            isFavorite
-              ? "favorite-active"
-              : ""
-          }"
-          type="button"
-          title="Sevimlilar"
-        >
-          ${
-            isFavorite
-              ? "♥"
-              : "♡"
-          }
-        </button>
-
-      </div>
-
-
-      <div class="market-product-info">
-
-        <span class="market-category">
-          ${esc(product.category || "Mahsulot")}
-        </span>
-
-
-        <a
-          href="product.html?id=${product.id}"
-          class="market-product-title"
-        >
-          ${esc(product.name || "")}
-        </a>
-
-
-        <p class="market-description">
-          ${esc(product.description || "")}
-        </p>
-
-
-        <div class="market-price">
-          ${money(product.price)}
-        </div>
-
-
-        <div class="market-card-buttons">
+          <a href="product.html?id=${product.id}">
+            <img
+              src="${esc(product.image_url || "")}"
+              alt="${esc(product.name || "")}"
+              loading="lazy"
+            >
+          </a>
 
           <button
-            class="main-btn quick-order"
+            class="favorite-button ${
+              isFavorite
+                ? "favorite-active"
+                : ""
+            }"
             type="button"
           >
-            Buyurtma
-          </button>
-
-
-          <button
-            class="cart-circle add-cart"
-            type="button"
-            title="Savatga qo‘shish"
-          >
-            🛒
+            ${
+              isFavorite
+                ? "♥"
+                : "♡"
+            }
           </button>
 
         </div>
 
+        <div class="market-product-info">
 
-        <button
-          class="copy-product-link"
-          type="button"
-        >
-          🔗 Linkni nusxalash
-        </button>
+          <span class="market-category">
+            ${esc(product.category || "Mahsulot")}
+          </span>
 
-      </div>
-    `;
+          <a
+            href="product.html?id=${product.id}"
+            class="market-product-title"
+          >
+            ${esc(product.name || "")}
+          </a>
 
+          <p class="market-description">
+            ${esc(product.description || "")}
+          </p>
 
-    /* BUYURTMA */
+          <div class="market-price">
+            ${money(product.price)}
+          </div>
 
-    card
-      .querySelector(".quick-order")
-      .onclick = () => {
+          <div class="market-card-buttons">
 
-        openOrder(product);
-      };
+            <button
+              class="main-btn quick-order"
+              type="button"
+            >
+              Buyurtma
+            </button>
 
+            <button
+              class="cart-circle add-cart"
+              type="button"
+            >
+              🛒
+            </button>
 
-    /* SAVAT */
+          </div>
 
-    card
-      .querySelector(".add-cart")
-      .onclick = () => {
+          <button
+            class="copy-product-link"
+            type="button"
+          >
+            🔗 Linkni nusxalash
+          </button>
 
-        addToCart(product);
-      };
+        </div>
+      `;
 
+      card
+        .querySelector(
+          ".quick-order"
+        )
+        .onclick =
+        () => openOrder(
+          product
+        );
 
-    /* SEVIMLILAR */
+      card
+        .querySelector(
+          ".add-cart"
+        )
+        .onclick =
+        () => addToCart(
+          product
+        );
 
-    card
-      .querySelector(".favorite-button")
-      .onclick = event => {
+      card
+        .querySelector(
+          ".favorite-button"
+        )
+        .onclick =
+        event => {
+          event.preventDefault();
 
-        event.preventDefault();
-
-        toggleFavorite(product);
-
-        renderProducts();
-      };
-
-
-    /* LINK */
-
-    card
-      .querySelector(".copy-product-link")
-      .onclick = async event => {
-
-        const button =
-          event.currentTarget;
-
-        const link =
-          productLink(product);
-
-        try {
-
-          await navigator.clipboard.writeText(
-            link
+          toggleFavorite(
+            product
           );
 
-          const old =
-            button.textContent;
+          renderProducts();
+        };
 
-          button.textContent =
-            "Nusxalandi ✅";
+      card
+        .querySelector(
+          ".copy-product-link"
+        )
+        .onclick =
+        async event => {
+          const button =
+            event.currentTarget;
 
-          setTimeout(() => {
+          const link =
+            productLink(
+              product
+            );
+
+          try {
+            await navigator
+              .clipboard
+              .writeText(
+                link
+              );
+
+            const old =
+              button.textContent;
 
             button.textContent =
-              old;
+              "Nusxalandi ✅";
 
-          }, 1500);
+            setTimeout(
+              () => {
+                button.textContent =
+                  old;
+              },
+              1500
+            );
 
-        } catch {
+          } catch {
+            prompt(
+              "Mahsulot linki:",
+              link
+            );
+          }
+        };
 
-          prompt(
-            "Mahsulot linki:",
-            link
-          );
-        }
-      };
-
-
-    productsGrid.appendChild(card);
-  });
+      productsGrid.appendChild(
+        card
+      );
+    }
+  );
 }
 
-
 /* =========================
-   TEZ BUYURTMA
+   ORDER
 ========================= */
 
 function openOrder(product) {
@@ -564,19 +837,15 @@ function openOrder(product) {
   orderDialog.showModal();
 }
 
-
 document.getElementById(
   "closeDialog"
-).onclick = () => {
-
-  orderDialog.close();
-};
-
+).onclick =
+  () =>
+    orderDialog.close();
 
 orderDialog.addEventListener(
   "click",
   event => {
-
     if (
       event.target ===
       orderDialog
@@ -586,10 +855,8 @@ orderDialog.addEventListener(
   }
 );
 
-
 orderForm.onsubmit =
   async event => {
-
     event.preventDefault();
 
     const button =
@@ -650,16 +917,16 @@ orderForm.onsubmit =
         .value
         .trim();
 
-
     const digits =
-      phone.replace(/\D/g, "");
-
+      phone.replace(
+        /\D/g,
+        ""
+      );
 
     if (
       name.length < 2 ||
       digits.length < 9
     ) {
-
       message.textContent =
         "Ism va telefon raqamini to‘g‘ri kiriting.";
 
@@ -669,20 +936,16 @@ orderForm.onsubmit =
       return;
     }
 
-
     button.disabled = true;
 
     button.textContent =
       "Yuborilmoqda...";
 
-
     try {
-
       const urlParams =
         new URLSearchParams(
           location.search
         );
-
 
       await api(
         "orders",
@@ -699,21 +962,13 @@ orderForm.onsubmit =
 
           body:
             JSON.stringify({
-
               name,
-
               phone,
-
               product,
-
               quantity,
-
               size,
-
               color,
-
-              status:
-                "new",
+              status: "new",
 
               utm_source:
                 urlParams.get(
@@ -730,25 +985,22 @@ orderForm.onsubmit =
         }
       );
 
-
       message.textContent =
         "Buyurtmangiz qabul qilindi ✅";
 
       message.className =
         "form-message success";
 
-
       orderForm.reset();
 
-
       setTimeout(
-        () =>
-          orderDialog.close(),
+        () => {
+          orderDialog.close();
+        },
         1500
       );
 
     } catch (error) {
-
       console.error(error);
 
       message.textContent =
@@ -758,7 +1010,6 @@ orderForm.onsubmit =
         "form-message error";
 
     } finally {
-
       button.disabled =
         false;
 
@@ -767,13 +1018,11 @@ orderForm.onsubmit =
     }
   };
 
-
 /* =========================
-   SAVAT
+   CART
 ========================= */
 
 function addToCart(product) {
-
   const existing =
     cart.find(
       item =>
@@ -781,44 +1030,27 @@ function addToCart(product) {
         Number(product.id)
     );
 
-
   if (existing) {
-
     existing.quantity += 1;
 
   } else {
-
     cart.push({
-
-      id:
-        product.id,
-
-      name:
-        product.name,
-
+      id: product.id,
+      name: product.name,
       price:
         Number(product.price),
-
       image_url:
         product.image_url,
-
-      quantity:
-        1
+      quantity: 1
     });
   }
 
-
   saveCart();
-
   renderCart();
-
-
   openCart();
 }
 
-
 function saveCart() {
-
   localStorage.setItem(
     "modex_cart",
     JSON.stringify(cart)
@@ -827,30 +1059,260 @@ function saveCart() {
   updateCounters();
 }
 
-
 function renderCart() {
-
   const container =
     document.getElementById(
       "cartItems"
     );
 
-
   if (!cart.length) {
-
     container.innerHTML = `
       <div class="drawer-empty">
         Savatingiz hozircha bo‘sh.
       </div>
     `;
+  }
 
-  } else {
-
+  else {
     container.innerHTML =
       cart
         .map(
           (item, index) => `
+            <div class="drawer-product">
 
+              <img
+                src="${esc(item.image_url || "")}"
+                alt=""
+              >
+
+              <div class="drawer-product-info">
+
+                <strong>
+                  ${esc(item.name)}
+                </strong>
+
+                <span>
+                  ${money(item.price)}
+                </span>
+
+                <div class="quantity-buttons">
+
+                  <button
+                    class="minus-cart"
+                    data-index="${index}"
+                  >
+                    −
+                  </button>
+
+                  <b>
+                    ${item.quantity}
+                  </b>
+
+                  <button
+                    class="plus-cart"
+                    data-index="${index}"
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+
+              <button
+                class="remove-cart"
+                data-index="${index}"
+              >
+                ×
+              </button>
+
+            </div>
+          `
+        )
+        .join("");
+  }
+
+  container
+    .querySelectorAll(
+      ".plus-cart"
+    )
+    .forEach(button => {
+      button.onclick =
+        () => {
+          cart[
+            Number(
+              button.dataset.index
+            )
+          ].quantity++;
+
+          saveCart();
+          renderCart();
+        };
+    });
+
+  container
+    .querySelectorAll(
+      ".minus-cart"
+    )
+    .forEach(button => {
+      button.onclick =
+        () => {
+          const index =
+            Number(
+              button.dataset.index
+            );
+
+          cart[index].quantity--;
+
+          if (
+            cart[index].quantity <= 0
+          ) {
+            cart.splice(
+              index,
+              1
+            );
+          }
+
+          saveCart();
+          renderCart();
+        };
+    });
+
+  container
+    .querySelectorAll(
+      ".remove-cart"
+    )
+    .forEach(button => {
+      button.onclick =
+        () => {
+          cart.splice(
+            Number(
+              button.dataset.index
+            ),
+            1
+          );
+
+          saveCart();
+          renderCart();
+        };
+    });
+
+  const total =
+    cart.reduce(
+      (sum, item) =>
+        sum +
+        item.price *
+        item.quantity,
+      0
+    );
+
+  document.getElementById(
+    "cartTotal"
+  ).textContent =
+    money(total);
+}
+
+function openCart() {
+  cartDrawer.classList.remove(
+    "hidden"
+  );
+
+  cartOverlay.classList.remove(
+    "hidden"
+  );
+
+  renderCart();
+}
+
+function closeCart() {
+  cartDrawer.classList.add(
+    "hidden"
+  );
+
+  cartOverlay.classList.add(
+    "hidden"
+  );
+}
+
+document.getElementById(
+  "cartBtn"
+).onclick =
+  openCart;
+
+document.getElementById(
+  "mobileCartBtn"
+).onclick =
+  openCart;
+
+document.getElementById(
+  "closeCart"
+).onclick =
+  closeCart;
+
+cartOverlay.onclick =
+  closeCart;
+
+/* =========================
+   FAVORITES
+========================= */
+
+function toggleFavorite(
+  product
+) {
+  const index =
+    favorites.findIndex(
+      item =>
+        Number(item.id) ===
+        Number(product.id)
+    );
+
+  if (index >= 0) {
+    favorites.splice(
+      index,
+      1
+    );
+  }
+
+  else {
+    favorites.push({
+      id: product.id,
+      name: product.name,
+      price:
+        Number(product.price),
+      image_url:
+        product.image_url
+    });
+  }
+
+  localStorage.setItem(
+    "modex_favorites",
+    JSON.stringify(favorites)
+  );
+
+  updateCounters();
+  renderFavorites();
+}
+
+function renderFavorites() {
+  const container =
+    document.getElementById(
+      "favoriteItems"
+    );
+
+  if (!favorites.length) {
+    container.innerHTML = `
+      <div class="drawer-empty">
+        Sevimlilar hozircha bo‘sh.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    favorites
+      .map(
+        (item, index) => `
           <div class="drawer-product">
 
             <img
@@ -868,34 +1330,17 @@ function renderCart() {
                 ${money(item.price)}
               </span>
 
-
-              <div class="quantity-buttons">
-
-                <button
-                  class="minus-cart"
-                  data-index="${index}"
-                >
-                  −
-                </button>
-
-                <b>
-                  ${item.quantity}
-                </b>
-
-                <button
-                  class="plus-cart"
-                  data-index="${index}"
-                >
-                  +
-                </button>
-
-              </div>
+              <a
+                class="drawer-open-product"
+                href="product.html?id=${item.id}"
+              >
+                Ko‘rish
+              </a>
 
             </div>
 
-
             <button
-              class="remove-cart"
+              class="remove-favorite"
               data-index="${index}"
             >
               ×
@@ -903,302 +1348,38 @@ function renderCart() {
 
           </div>
         `
-        )
-        .join("");
-  }
-
-
-  container
-    .querySelectorAll(
-      ".plus-cart"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        cart[
-          Number(
-            button.dataset.index
-          )
-        ].quantity++;
-
-        saveCart();
-
-        renderCart();
-      };
-    });
-
-
-  container
-    .querySelectorAll(
-      ".minus-cart"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        const index =
-          Number(
-            button.dataset.index
-          );
-
-        cart[index].quantity--;
-
-        if (
-          cart[index].quantity <= 0
-        ) {
-          cart.splice(
-            index,
-            1
-          );
-        }
-
-        saveCart();
-
-        renderCart();
-      };
-    });
-
-
-  container
-    .querySelectorAll(
-      ".remove-cart"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        cart.splice(
-          Number(
-            button.dataset.index
-          ),
-          1
-        );
-
-        saveCart();
-
-        renderCart();
-      };
-    });
-
-
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        item.price *
-        item.quantity,
-      0
-    );
-
-
-  document.getElementById(
-    "cartTotal"
-  ).textContent =
-    money(total);
-}
-
-
-function openCart() {
-
-  cartDrawer.classList.remove(
-    "hidden"
-  );
-
-  cartOverlay.classList.remove(
-    "hidden"
-  );
-
-  renderCart();
-}
-
-
-function closeCart() {
-
-  cartDrawer.classList.add(
-    "hidden"
-  );
-
-  cartOverlay.classList.add(
-    "hidden"
-  );
-}
-
-
-document.getElementById(
-  "cartBtn"
-).onclick =
-  openCart;
-
-
-document.getElementById(
-  "mobileCartBtn"
-).onclick =
-  openCart;
-
-
-document.getElementById(
-  "closeCart"
-).onclick =
-  closeCart;
-
-
-cartOverlay.onclick =
-  closeCart;
-
-
-/* =========================
-   SEVIMLILAR
-========================= */
-
-function toggleFavorite(product) {
-
-  const index =
-    favorites.findIndex(
-      item =>
-        Number(item.id) ===
-        Number(product.id)
-    );
-
-
-  if (index >= 0) {
-
-    favorites.splice(
-      index,
-      1
-    );
-
-  } else {
-
-    favorites.push({
-
-      id:
-        product.id,
-
-      name:
-        product.name,
-
-      price:
-        Number(product.price),
-
-      image_url:
-        product.image_url
-    });
-  }
-
-
-  localStorage.setItem(
-    "modex_favorites",
-    JSON.stringify(favorites)
-  );
-
-
-  updateCounters();
-
-  renderFavorites();
-}
-
-
-function renderFavorites() {
-
-  const container =
-    document.getElementById(
-      "favoriteItems"
-    );
-
-
-  if (!favorites.length) {
-
-    container.innerHTML = `
-      <div class="drawer-empty">
-        Sevimlilar hozircha bo‘sh.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    favorites
-      .map(
-        (item, index) => `
-
-        <div class="drawer-product">
-
-          <img
-            src="${esc(item.image_url || "")}"
-            alt=""
-          >
-
-          <div class="drawer-product-info">
-
-            <strong>
-              ${esc(item.name)}
-            </strong>
-
-            <span>
-              ${money(item.price)}
-            </span>
-
-
-            <a
-              class="drawer-open-product"
-              href="product.html?id=${item.id}"
-            >
-              Ko‘rish
-            </a>
-
-          </div>
-
-
-          <button
-            class="remove-favorite"
-            data-index="${index}"
-          >
-            ×
-          </button>
-
-        </div>
-      `
       )
       .join("");
-
 
   container
     .querySelectorAll(
       ".remove-favorite"
     )
     .forEach(button => {
+      button.onclick =
+        () => {
+          favorites.splice(
+            Number(
+              button.dataset.index
+            ),
+            1
+          );
 
-      button.onclick = () => {
+          localStorage.setItem(
+            "modex_favorites",
+            JSON.stringify(
+              favorites
+            )
+          );
 
-        favorites.splice(
-          Number(
-            button.dataset.index
-          ),
-          1
-        );
-
-        localStorage.setItem(
-          "modex_favorites",
-          JSON.stringify(
-            favorites
-          )
-        );
-
-        updateCounters();
-
-        renderFavorites();
-
-        renderProducts();
-      };
+          updateCounters();
+          renderFavorites();
+          renderProducts();
+        };
     });
 }
 
-
 function openFavorites() {
-
   favoritesDrawer.classList.remove(
     "hidden"
   );
@@ -1210,9 +1391,7 @@ function openFavorites() {
   renderFavorites();
 }
 
-
 function closeFavorites() {
-
   favoritesDrawer.classList.add(
     "hidden"
   );
@@ -1222,35 +1401,29 @@ function closeFavorites() {
   );
 }
 
-
 document.getElementById(
   "favoritesBtn"
 ).onclick =
   openFavorites;
-
 
 document.getElementById(
   "mobileFavoritesBtn"
 ).onclick =
   openFavorites;
 
-
 document.getElementById(
   "closeFavorites"
 ).onclick =
   closeFavorites;
 
-
 favoritesOverlay.onclick =
   closeFavorites;
 
-
 /* =========================
-   COUNTER
+   COUNTERS
 ========================= */
 
 function updateCounters() {
-
   document.getElementById(
     "cartCount"
   ).textContent =
@@ -1261,23 +1434,20 @@ function updateCounters() {
       0
     );
 
-
   document.getElementById(
     "favoriteCount"
   ).textContent =
     favorites.length;
 }
 
-
 /* =========================
-   YORDAM XIZMATI
+   SUPPORT
 ========================= */
 
 document.getElementById(
   "supportForm"
 ).onsubmit =
   async event => {
-
     event.preventDefault();
 
     const message =
@@ -1285,9 +1455,7 @@ document.getElementById(
         "supportFormMessage"
       );
 
-
     try {
-
       await api(
         "support_requests",
         {
@@ -1303,7 +1471,6 @@ document.getElementById(
 
           body:
             JSON.stringify({
-
               name:
                 document
                   .getElementById(
@@ -1334,18 +1501,15 @@ document.getElementById(
         }
       );
 
-
       message.textContent =
         "Murojaatingiz yuborildi ✅";
 
       message.className =
         "form-message success";
 
-
       event.target.reset();
 
     } catch (error) {
-
       console.error(error);
 
       message.textContent =
@@ -1356,94 +1520,22 @@ document.getElementById(
     }
   };
 
-
 /* =========================
    START
 ========================= */
 
-updateCounters();
+async function startApp() {
+  const maintenance =
+    await loadSiteSettings();
 
-renderCart();
-
-renderFavorites();
-
-loadProducts();async function loadSiteSettings() {
-  try {
-    const rows = await api(
-      "site_settings?select=*&order=id.asc&limit=1"
-    );
-
-    const settings = rows?.[0];
-    if (!settings) return;
-
-    /* Sayt nomi */
-    document.querySelectorAll(".brand").forEach(el => {
-      el.innerHTML =
-        esc(settings.site_name || "MODEX.UZ")
-          .replace(".UZ", "<span>.UZ</span>");
-    });
-
-    /* Hero sarlavha */
-    const heroTitle =
-      document.querySelector(".hero-text h1");
-
-    if (heroTitle && settings.hero_title) {
-      heroTitle.textContent =
-        settings.hero_title;
-    }
-
-    /* Hero matn */
-    const heroText =
-      document.querySelector(".hero-text p");
-
-    if (heroText && settings.hero_text) {
-      heroText.textContent =
-        settings.hero_text;
-    }
-
-    /* Asosiy rang */
-    if (settings.primary_color) {
-      document.documentElement.style.setProperty(
-        "--brand",
-        settings.primary_color
-      );
-    }
-
-    /* Texnik ishlar rejimi */
-    if (settings.maintenance_mode) {
-      document.body.innerHTML = `
-        <div style="
-          min-height:100vh;
-          display:grid;
-          place-items:center;
-          padding:30px;
-          text-align:center;
-          font-family:Arial,sans-serif;
-          background:#f7f7fb;
-        ">
-          <div>
-            <h1 style="font-size:42px;margin-bottom:10px">
-              ${esc(settings.site_name || "MODEX.UZ")}
-            </h1>
-
-            <p style="color:#777;font-size:18px">
-              Saytda hozir texnik ishlar olib borilmoqda.
-            </p>
-
-            <p style="color:#777">
-              Tez orada qaytamiz.
-            </p>
-          </div>
-        </div>
-      `;
-
-      return;
-    }
-  } catch (error) {
-    console.error(
-      "Site settings yuklanmadi:",
-      error
-    );
+  if (maintenance) {
+    return;
   }
-   
+
+  updateCounters();
+  renderCart();
+  renderFavorites();
+  await loadProducts();
 }
+
+startApp();
