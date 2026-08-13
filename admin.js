@@ -1,54 +1,106 @@
 const { SUPABASE_URL, SUPABASE_KEY } = window.MODEX_CONFIG;
 const REST = `${SUPABASE_URL}/rest/v1`;
 
-let session = JSON.parse(localStorage.getItem('modex_session') || 'null');
+let session = JSON.parse(
+  localStorage.getItem("modex_session") || "null"
+);
+
 let ordersCache = [];
 let productsCache = [];
 
-const loginView = document.getElementById('loginView');
-const adminView = document.getElementById('adminView');
+/* =========================
+   ELEMENTLAR
+========================= */
 
-function money(v) {
-  return new Intl.NumberFormat('uz-UZ').format(Number(v || 0)) + " so‘m";
+const loginView = document.getElementById("loginView");
+const adminView = document.getElementById("adminView");
+
+const productForm = document.getElementById("productForm");
+const editProductId = document.getElementById("editProductId");
+const productSubmitBtn = document.getElementById("productSubmitBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+
+/* =========================
+   YORDAMCHI FUNKSIYALAR
+========================= */
+
+function money(value) {
+  return (
+    new Intl.NumberFormat("uz-UZ").format(
+      Number(value || 0)
+    ) + " so‘m"
+  );
 }
 
-function esc(s = '') {
-  return String(s).replace(/[&<>"']/g, m => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  }[m]));
+function esc(text = "") {
+  return String(text).replace(
+    /[&<>"']/g,
+    char =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]
+  );
 }
 
-async function request(url, options = {}, token = session?.access_token) {
-  const r = await fetch(url, {
+
+/* =========================
+   SUPABASE REQUEST
+========================= */
+
+async function request(
+  url,
+  options = {},
+  token = session?.access_token
+) {
+  const response = await fetch(url, {
     ...options,
+
     headers: {
       apikey: SUPABASE_KEY,
+
       ...(token
-        ? { Authorization: `Bearer ${token}` }
-        : { Authorization: `Bearer ${SUPABASE_KEY}` }),
+        ? {
+            Authorization: `Bearer ${token}`
+          }
+        : {
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }),
+
       ...(options.headers || {})
     }
   });
 
-  if (!r.ok) {
-    throw new Error(await r.text());
+  if (!response.ok) {
+    throw new Error(await response.text());
   }
 
-  if (r.status === 204) return null;
+  if (response.status === 204) {
+    return null;
+  }
 
-  const t = await r.text();
-  return t ? JSON.parse(t) : null;
+  const text = await response.text();
+
+  return text ? JSON.parse(text) : null;
 }
 
 async function api(path, options = {}) {
-  return request(`${REST}/${path}`, options);
+  return request(
+    `${REST}/${path}`,
+    options
+  );
 }
 
-async function getRole() {
+
+/* =========================
+   ADMIN ROLINI TEKSHIRISH
+========================= */
+
+async function getProfile() {
   const rows = await api(
     `profiles?select=role,name,active&id=eq.${session.user.id}&limit=1`
   );
@@ -58,87 +110,146 @@ async function getRole() {
 
 async function showAdmin() {
   try {
-    const p = await getRole();
+    const profile = await getProfile();
 
-    if (p?.role !== 'admin' || p?.active === false) {
-      throw new Error('Admin emas');
+    if (
+      profile?.role !== "admin" ||
+      profile?.active === false
+    ) {
+      throw new Error("Admin huquqi yo‘q");
     }
 
-    loginView.classList.add('hidden');
-    adminView.classList.remove('hidden');
+    loginView.classList.add("hidden");
+    adminView.classList.remove("hidden");
 
-    document.getElementById('adminEmail').textContent =
-      session?.user?.email || '';
+    document.getElementById(
+      "adminEmail"
+    ).textContent = session.user.email || "";
 
     await loadAll();
 
-  } catch (e) {
-    localStorage.removeItem('modex_session');
+  } catch (error) {
+    console.error(error);
+
+    localStorage.removeItem("modex_session");
+
     session = null;
+
     showLogin();
 
-    document.getElementById('loginMessage').textContent =
-      'Bu akkaunt administrator emas.';
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "Bu akkaunt administrator emas.";
   }
 }
 
 function showLogin() {
-  loginView.classList.remove('hidden');
-  adminView.classList.add('hidden');
+  loginView.classList.remove("hidden");
+  adminView.classList.add("hidden");
 }
 
-document.getElementById('loginForm').onsubmit = async e => {
-  e.preventDefault();
 
-  const message = document.getElementById('loginMessage');
+/* =========================
+   LOGIN
+========================= */
 
-  message.textContent = 'Kirilmoqda...';
-  message.className = 'form-message';
+document.getElementById(
+  "loginForm"
+).onsubmit = async event => {
+
+  event.preventDefault();
+
+  const message =
+    document.getElementById(
+      "loginMessage"
+    );
+
+  message.textContent =
+    "Kirilmoqda...";
+
+  message.className =
+    "form-message";
 
   try {
-    const r = await fetch(
+    const response = await fetch(
       `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
       {
-        method: 'POST',
+        method: "POST",
+
         headers: {
           apikey: SUPABASE_KEY,
-          'Content-Type': 'application/json'
+          "Content-Type":
+            "application/json"
         },
+
         body: JSON.stringify({
-          email: document.getElementById('email').value.trim(),
-          password: document.getElementById('password').value
+          email:
+            document
+              .getElementById("email")
+              .value
+              .trim(),
+
+          password:
+            document
+              .getElementById("password")
+              .value
         })
       }
     );
 
-    if (!r.ok) throw new Error(await r.text());
+    if (!response.ok) {
+      throw new Error(
+        await response.text()
+      );
+    }
 
-    session = await r.json();
+    session = await response.json();
 
     localStorage.setItem(
-      'modex_session',
+      "modex_session",
       JSON.stringify(session)
     );
 
     await showAdmin();
 
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
 
     message.textContent =
-      'Login, parol yoki admin huquqi noto‘g‘ri.';
+      "Email, parol yoki admin huquqi noto‘g‘ri.";
 
-    message.className = 'form-message error';
+    message.className =
+      "form-message error";
   }
 };
 
-document.getElementById('logoutBtn').onclick = () => {
-  localStorage.removeItem('modex_session');
+
+/* =========================
+   LOGOUT
+========================= */
+
+document.getElementById(
+  "logoutBtn"
+).onclick = () => {
+
+  localStorage.removeItem(
+    "modex_session"
+  );
+
   session = null;
+
   showLogin();
 };
 
-document.getElementById('refreshBtn').onclick = loadAll;
+
+/* =========================
+   YANGILASH
+========================= */
+
+document.getElementById(
+  "refreshBtn"
+).onclick = loadAll;
 
 async function loadAll() {
   await Promise.all([
@@ -149,326 +260,537 @@ async function loadAll() {
   ]);
 }
 
-/* BUYURTMALAR */
+
+/* =========================
+   BUYURTMALAR
+========================= */
 
 async function loadOrders() {
-  const ordersMessage =
-    document.getElementById('ordersMessage');
+  const message =
+    document.getElementById(
+      "ordersMessage"
+    );
 
   try {
     ordersCache = await api(
-      'orders?select=*&order=created_at.desc'
+      "orders?select=*&order=created_at.desc"
     );
+
+    document.getElementById(
+      "aOrders"
+    ).textContent =
+      ordersCache.length;
+
+    document.getElementById(
+      "aNew"
+    ).textContent =
+      ordersCache.filter(
+        order =>
+          order.status === "new"
+      ).length;
+
+    message.textContent = "";
 
     renderOrders();
 
-    document.getElementById('aOrders').textContent =
-      ordersCache.length;
+  } catch (error) {
+    console.error(error);
 
-    document.getElementById('aNew').textContent =
-      ordersCache.filter(o => o.status === 'new').length;
+    message.textContent =
+      "Buyurtmalarni yuklab bo‘lmadi.";
 
-    ordersMessage.textContent = '';
-
-  } catch (e) {
-    console.error(e);
-
-    ordersMessage.textContent =
-      'Buyurtmalarni yuklab bo‘lmadi.';
-
-    ordersMessage.className = 'form-message error';
+    message.className =
+      "form-message error";
   }
 }
 
+function statusText(status) {
+  const statuses = {
+    new: "Yangi",
+
+    called:
+      "Qo‘ng‘iroq qilindi",
+
+    confirmed:
+      "Tasdiqlandi",
+
+    done:
+      "Yakunlandi",
+
+    cancelled:
+      "Bekor qilindi"
+  };
+
+  return (
+    statuses[status] ||
+    status ||
+    "Yangi"
+  );
+}
+
 function renderOrders() {
-  const q =
-    document.getElementById('adminOrderSearch')
+  const search =
+    document
+      .getElementById(
+        "adminOrderSearch"
+      )
       .value
       .toLowerCase()
       .trim();
 
-  const body = document.getElementById('ordersBody');
+  const body =
+    document.getElementById(
+      "ordersBody"
+    );
 
-  body.innerHTML = '';
+  body.innerHTML = "";
 
-  const filtered = ordersCache.filter(o => {
-    const text = `
-      ${o.name || ''}
-      ${o.surname || ''}
-      ${o.phone || ''}
-      ${o.product || ''}
-      ${o.region || ''}
-      ${o.address || ''}
-    `.toLowerCase();
+  const filtered =
+    ordersCache.filter(order => {
 
-    return text.includes(q);
-  });
+      const text = `
+        ${order.name || ""}
+        ${order.surname || ""}
+        ${order.phone || ""}
+        ${order.product || ""}
+        ${order.region || ""}
+        ${order.address || ""}
+      `.toLowerCase();
 
-  filtered.forEach(o => {
-    const tr = document.createElement('tr');
+      return text.includes(search);
+    });
 
-    tr.innerHTML = `
-      <td>#${esc(o.id)}</td>
-      <td>${new Date(o.created_at).toLocaleString('uz-UZ')}</td>
-      <td>${esc(o.name || '')} ${esc(o.surname || '')}</td>
+  filtered.forEach(order => {
+
+    const row =
+      document.createElement("tr");
+
+    row.innerHTML = `
+      <td>#${esc(order.id)}</td>
 
       <td>
-        <a href="tel:${esc(o.phone || '')}">
-          ${esc(o.phone || '')}
+        ${
+          new Date(
+            order.created_at
+          ).toLocaleString("uz-UZ")
+        }
+      </td>
+
+      <td>
+        ${esc(order.name || "")}
+        ${esc(order.surname || "")}
+      </td>
+
+      <td>
+        <a href="tel:${esc(order.phone || "")}">
+          ${esc(order.phone || "")}
         </a>
       </td>
 
-      <td>${esc(o.product || '')}</td>
-      <td>${esc(o.region || '-')}</td>
-      <td>${esc(o.utm_source || 'sayt')}</td>
+      <td>
+        ${esc(order.product || "")}
+      </td>
 
       <td>
-        <span class="badge ${esc(o.status || 'new')}">
-          ${statusText(o.status)}
+        ${esc(order.region || "-")}
+      </td>
+
+      <td>
+        ${esc(order.utm_source || "sayt")}
+      </td>
+
+      <td>
+        <span class="badge ${esc(order.status || "new")}">
+          ${statusText(order.status)}
         </span>
       </td>
     `;
 
-    body.appendChild(tr);
+    body.appendChild(row);
   });
 }
 
-function statusText(status) {
-  const map = {
-    new: 'Yangi',
-    called: 'Qo‘ng‘iroq qilindi',
-    confirmed: 'Tasdiqlandi',
-    done: 'Yakunlandi',
-    cancelled: 'Bekor qilindi'
-  };
+document.getElementById(
+  "adminOrderSearch"
+).oninput = renderOrders;
 
-  return map[status] || status || 'Yangi';
-}
 
-document.getElementById('adminOrderSearch').oninput = renderOrders;
-
-/* RASM */
+/* =========================
+   RASM YUKLASH
+========================= */
 
 async function uploadImage(file) {
+
   if (!file) return null;
 
-  const ext =
-    (file.name.split('.').pop() || 'jpg')
+  const extension =
+    (
+      file.name
+        .split(".")
+        .pop() ||
+      "jpg"
+    )
       .toLowerCase()
-      .replace(/[^a-z0-9]/g, '');
+      .replace(
+        /[^a-z0-9]/g,
+        ""
+      );
 
   const path =
-    `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    `${Date.now()}-` +
+    `${Math.random()
+      .toString(36)
+      .slice(2, 8)}.` +
+    extension;
 
   await request(
     `${SUPABASE_URL}/storage/v1/object/product-images/${path}`,
     {
-      method: 'POST',
+      method: "POST",
+
       headers: {
-        'Content-Type':
-          file.type || 'application/octet-stream'
+        "Content-Type":
+          file.type ||
+          "application/octet-stream"
       },
+
       body: file
     }
   );
 
-  return `${SUPABASE_URL}/storage/v1/object/public/product-images/${path}`;
+  return (
+    `${SUPABASE_URL}` +
+    `/storage/v1/object/public/` +
+    `product-images/${path}`
+  );
 }
 
-/* MAHSULOT QO‘SHISH / TAHRIRLASH */
 
-const productForm = document.getElementById('productForm');
-const editProductId = document.getElementById('editProductId');
-const productSubmitBtn = document.getElementById('productSubmitBtn');
-const cancelEditBtn = document.getElementById('cancelEditBtn');
+/* =========================
+   MAHSULOT QO‘SHISH
+   VA TAHRIRLASH
+========================= */
 
-productForm.onsubmit = async e => {
-  e.preventDefault();
+productForm.onsubmit =
+  async event => {
 
-  const message = document.getElementById('productMessage');
-  const id = editProductId.value;
+    event.preventDefault();
 
-  productSubmitBtn.disabled = true;
-  productSubmitBtn.textContent =
-    id ? 'Saqlanmoqda...' : 'Qo‘shilmoqda...';
-
-  try {
-    let imageUrl = null;
-
-    const file = document.getElementById('pImage').files[0];
-
-    if (file) {
-      imageUrl = await uploadImage(file);
-    }
-
-    const data = {
-      name: document.getElementById('pName').value.trim(),
-      category: document.getElementById('pCategory').value.trim(),
-      price: Number(document.getElementById('pPrice').value),
-      description: document.getElementById('pDesc').value.trim(),
-      active: true
-    };
-
-    if (imageUrl) {
-      data.image_url = imageUrl;
-    }
-
-    if (id) {
-      await api(
-        `products?id=eq.${encodeURIComponent(id)}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal'
-          },
-          body: JSON.stringify(data)
-        }
+    const message =
+      document.getElementById(
+        "productMessage"
       );
 
-      message.textContent =
-        'Mahsulot muvaffaqiyatli yangilandi.';
+    const id =
+      editProductId.value;
 
-    } else {
-      if (!imageUrl) {
-        throw new Error('Rasm tanlang');
-      }
-
-      data.image_url = imageUrl;
-
-      await api('products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal'
-        },
-        body: JSON.stringify(data)
-      });
-
-      message.textContent =
-        'Mahsulot muvaffaqiyatli qo‘shildi.';
-    }
-
-    message.className = 'form-message success';
-
-    resetProductForm();
-    await loadProductsAdmin();
-
-  } catch (err) {
-    console.error(err);
-
-    message.textContent =
-      id
-        ? 'Mahsulotni yangilab bo‘lmadi.'
-        : 'Mahsulotni qo‘shib bo‘lmadi.';
-
-    message.className = 'form-message error';
-
-  } finally {
-    productSubmitBtn.disabled = false;
+    productSubmitBtn.disabled =
+      true;
 
     productSubmitBtn.textContent =
-      editProductId.value
-        ? 'O‘zgarishlarni saqlash'
-        : 'Mahsulot qo‘shish';
-  }
-};
+      id
+        ? "Saqlanmoqda..."
+        : "Qo‘shilmoqda...";
+
+    try {
+      const file =
+        document.getElementById(
+          "pImage"
+        ).files[0];
+
+      let imageUrl = null;
+
+      if (file) {
+        imageUrl =
+          await uploadImage(file);
+      }
+
+      const data = {
+        name:
+          document
+            .getElementById("pName")
+            .value
+            .trim(),
+
+        category:
+          document
+            .getElementById(
+              "pCategory"
+            )
+            .value
+            .trim(),
+
+        price:
+          Number(
+            document
+              .getElementById(
+                "pPrice"
+              )
+              .value
+          ),
+
+        description:
+          document
+            .getElementById(
+              "pDesc"
+            )
+            .value
+            .trim(),
+
+        active: true
+      };
+
+      if (imageUrl) {
+        data.image_url =
+          imageUrl;
+      }
+
+      /* TAHRIRLASH */
+
+      if (id) {
+
+        await api(
+          `products?id=eq.${encodeURIComponent(id)}`,
+          {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(data)
+          }
+        );
+
+        message.textContent =
+          "Mahsulot yangilandi.";
+
+      }
+
+      /* YANGI MAHSULOT */
+
+      else {
+
+        if (!imageUrl) {
+          throw new Error(
+            "Rasm tanlanmagan"
+          );
+        }
+
+        data.image_url =
+          imageUrl;
+
+        await api(
+          "products",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(data)
+          }
+        );
+
+        message.textContent =
+          "Mahsulot qo‘shildi.";
+      }
+
+      message.className =
+        "form-message success";
+
+      resetProductForm();
+
+      await loadProductsAdmin();
+
+    } catch (error) {
+      console.error(error);
+
+      message.textContent =
+        id
+          ? "Mahsulotni yangilab bo‘lmadi."
+          : "Mahsulotni qo‘shib bo‘lmadi.";
+
+      message.className =
+        "form-message error";
+
+    } finally {
+
+      productSubmitBtn.disabled =
+        false;
+
+      productSubmitBtn.textContent =
+        editProductId.value
+          ? "O‘zgarishlarni saqlash"
+          : "Mahsulot qo‘shish";
+    }
+  };
+
+
+/* =========================
+   TAHRIRLASHNI BOSHLASH
+========================= */
 
 function startEditProduct(product) {
-  editProductId.value = product.id;
 
-  document.getElementById('pName').value =
-    product.name || '';
+  editProductId.value =
+    product.id;
 
-  document.getElementById('pCategory').value =
-    product.category || '';
+  document.getElementById(
+    "pName"
+  ).value =
+    product.name || "";
 
-  document.getElementById('pPrice').value =
+  document.getElementById(
+    "pCategory"
+  ).value =
+    product.category || "";
+
+  document.getElementById(
+    "pPrice"
+  ).value =
     product.price || 0;
 
-  document.getElementById('pDesc').value =
-    product.description || '';
+  document.getElementById(
+    "pDesc"
+  ).value =
+    product.description || "";
 
-  document.getElementById('pImage').required = false;
+  document.getElementById(
+    "pImage"
+  ).required = false;
 
-  document.getElementById('productFormTitle').textContent =
-    'Mahsulotni tahrirlash';
+  document.getElementById(
+    "productFormTitle"
+  ).textContent =
+    "Mahsulotni tahrirlash";
 
   productSubmitBtn.textContent =
-    'O‘zgarishlarni saqlash';
+    "O‘zgarishlarni saqlash";
 
-  cancelEditBtn.classList.remove('hidden');
+  cancelEditBtn.classList.remove(
+    "hidden"
+  );
 
-  document.getElementById('productMessage').textContent =
-    'Rasmni o‘zgartirmasangiz, yangi rasm tanlamang.';
+  document.getElementById(
+    "productMessage"
+  ).textContent =
+    "Rasmni almashtirmasangiz, yangi rasm tanlamang.";
 
   window.scrollTo({
     top: 0,
-    behavior: 'smooth'
+    behavior: "smooth"
   });
 }
 
+
+/* =========================
+   FORM RESET
+========================= */
+
 function resetProductForm() {
+
   productForm.reset();
 
-  editProductId.value = '';
+  editProductId.value = "";
 
-  document.getElementById('pImage').required = false;
+  document.getElementById(
+    "pImage"
+  ).required = false;
 
-  document.getElementById('productFormTitle').textContent =
-    'Mahsulot qo‘shish';
+  document.getElementById(
+    "productFormTitle"
+  ).textContent =
+    "Mahsulot qo‘shish";
 
   productSubmitBtn.textContent =
-    'Mahsulot qo‘shish';
+    "Mahsulot qo‘shish";
 
-  cancelEditBtn.classList.add('hidden');
+  cancelEditBtn.classList.add(
+    "hidden"
+  );
 }
 
 cancelEditBtn.onclick = () => {
+
   resetProductForm();
 
-  document.getElementById('productMessage').textContent = '';
+  document.getElementById(
+    "productMessage"
+  ).textContent = "";
 };
 
-/* MAHSULOTLAR */
+
+/* =========================
+   MAHSULOTLAR
+========================= */
 
 async function loadProductsAdmin() {
+
   try {
+
     productsCache = await api(
-      'products?select=id,name,price,description,image_url,category,active&order=id.desc'
+      "products?select=id,name,price,description,image_url,category,active&order=id.desc"
     );
 
-    document.getElementById('aProducts').textContent =
+    document.getElementById(
+      "aProducts"
+    ).textContent =
       productsCache.length;
 
-    const wrap = document.getElementById('adminProducts');
+    const wrap =
+      document.getElementById(
+        "adminProducts"
+      );
 
-    wrap.innerHTML = '';
+    wrap.innerHTML = "";
 
-    productsCache.forEach(p => {
-      const el = document.createElement('div');
+    productsCache.forEach(product => {
 
-      el.className = 'product-admin-item';
+      const item =
+        document.createElement(
+          "div"
+        );
 
-      el.innerHTML = `
+      item.className =
+        "product-admin-item";
+
+      item.innerHTML = `
+
         <img
-          src="${esc(p.image_url || '')}"
-          alt="${esc(p.name || '')}"
+          src="${esc(product.image_url || "")}"
+          alt="${esc(product.name || "")}"
         >
 
         <div class="product-admin-info">
-          <strong>${esc(p.name)}</strong>
+
+          <strong>
+            ${esc(product.name || "")}
+          </strong>
 
           <span>
-            ${esc(p.category || 'Kategoriyasiz')}
+            ${esc(product.category || "Kategoriyasiz")}
             ·
-            ${money(p.price)}
+            ${money(product.price)}
           </span>
 
           <small class="target-link">
-            product.html?id=${p.id}
+            product.html?id=${product.id}
           </small>
+
         </div>
+
 
         <div class="product-admin-actions">
 
@@ -477,6 +799,13 @@ async function loadProductsAdmin() {
             type="button"
           >
             Tahrirlash
+          </button>
+
+          <button
+            class="small-btn copy-product-link"
+            type="button"
+          >
+            🔗 Linkni nusxalash
           </button>
 
           <button
@@ -489,256 +818,417 @@ async function loadProductsAdmin() {
         </div>
       `;
 
-      el.querySelector('.edit-product').onclick = () => {
-        startEditProduct(p);
+
+      /* TAHRIRLASH */
+
+      item.querySelector(
+        ".edit-product"
+      ).onclick = () => {
+
+        startEditProduct(
+          product
+        );
       };
 
-      el.querySelector('.delete-product').onclick =
-        async () => {
-          const ok = confirm(
-            `"${p.name}" mahsuloti o‘chirilsinmi?`
+
+      /* TARGET LINK */
+
+      item.querySelector(
+        ".copy-product-link"
+      ).onclick = async () => {
+
+        const link =
+          `${location.origin}` +
+          `${location.pathname.replace(/admin\.html.*$/, "")}` +
+          `product.html?id=${product.id}`;
+
+        const button =
+          item.querySelector(
+            ".copy-product-link"
           );
 
-          if (!ok) return;
+        try {
 
-          try {
-            await api(
-              `products?id=eq.${encodeURIComponent(p.id)}`,
-              {
-                method: 'DELETE',
-                headers: {
-                  Prefer: 'return=minimal'
-                }
+          await navigator.clipboard.writeText(
+            link
+          );
+
+          button.textContent =
+            "Nusxalandi ✅";
+
+          setTimeout(() => {
+            button.textContent =
+              "🔗 Linkni nusxalash";
+          }, 1500);
+
+        } catch (error) {
+
+          prompt(
+            "Target linkni nusxalang:",
+            link
+          );
+        }
+      };
+
+
+      /* O‘CHIRISH */
+
+      item.querySelector(
+        ".delete-product"
+      ).onclick = async () => {
+
+        const confirmDelete =
+          confirm(
+            `"${product.name}" o‘chirilsinmi?`
+          );
+
+        if (!confirmDelete) return;
+
+        try {
+
+          await api(
+            `products?id=eq.${encodeURIComponent(product.id)}`,
+            {
+              method: "DELETE",
+
+              headers: {
+                Prefer:
+                  "return=minimal"
               }
-            );
+            }
+          );
 
-            await loadProductsAdmin();
+          await loadProductsAdmin();
 
-          } catch (err) {
-            console.error(err);
-            alert('Mahsulotni o‘chirib bo‘lmadi.');
-          }
-        };
+        } catch (error) {
 
-      wrap.appendChild(el);
+          console.error(error);
+
+          alert(
+            "Mahsulotni o‘chirib bo‘lmadi."
+          );
+        }
+      };
+
+
+      wrap.appendChild(item);
     });
 
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+
+    console.error(error);
   }
 }
 
-/* OPERATOR YARATISH */
 
-document.getElementById('operatorCreateForm').onsubmit =
-  async e => {
+/* =========================
+   OPERATOR YARATISH
+========================= */
 
-    e.preventDefault();
+document.getElementById(
+  "operatorCreateForm"
+).onsubmit =
+  async event => {
+
+    event.preventDefault();
 
     const message =
-      document.getElementById('operatorCreateMessage');
+      document.getElementById(
+        "operatorCreateMessage"
+      );
 
     message.textContent =
-      'Operator yaratilmoqda...';
+      "Operator yaratilmoqda...";
 
-    message.className = 'form-message';
+    message.className =
+      "form-message";
 
     try {
 
-      const r = await fetch(
-        `${SUPABASE_URL}/functions/v1/smart-endpoint`,
-        {
-          method: 'POST',
+      const response =
+        await fetch(
+          `${SUPABASE_URL}/functions/v1/smart-endpoint`,
+          {
+            method: "POST",
 
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          },
+            headers: {
+              apikey:
+                SUPABASE_KEY,
 
-          body: JSON.stringify({
-            name:
-              document.getElementById('opName')
-                .value.trim(),
+              Authorization:
+                `Bearer ${session.access_token}`,
 
-            email:
-              document.getElementById('newOpEmail')
-                .value.trim(),
+              "Content-Type":
+                "application/json"
+            },
 
-            password:
-              document.getElementById('newOpPassword')
-                .value
-          })
-        }
-      );
+            body:
+              JSON.stringify({
+                name:
+                  document
+                    .getElementById(
+                      "opName"
+                    )
+                    .value
+                    .trim(),
 
-      const result = await r.json().catch(() => ({}));
+                email:
+                  document
+                    .getElementById(
+                      "newOpEmail"
+                    )
+                    .value
+                    .trim(),
 
-      if (!r.ok) {
+                password:
+                  document
+                    .getElementById(
+                      "newOpPassword"
+                    )
+                    .value
+              })
+          }
+        );
+
+      const result =
+        await response
+          .json()
+          .catch(
+            () => ({})
+          );
+
+      if (!response.ok) {
+
         throw new Error(
           result.error ||
           result.message ||
-          'Operator yaratilmadi'
+          "Operator yaratilmadi"
         );
       }
 
       message.textContent =
-        'Operator muvaffaqiyatli yaratildi.';
+        "Operator yaratildi ✅";
 
       message.className =
-        'form-message success';
+        "form-message success";
 
-      e.target.reset();
+      event.target.reset();
 
       await loadOperators();
 
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+
+      console.error(error);
 
       message.textContent =
-        'Operator yaratilmadi: ' + err.message;
+        "Operator yaratilmadi: " +
+        error.message;
 
       message.className =
-        'form-message error';
+        "form-message error";
     }
   };
 
-/* OPERATORLAR */
+
+/* =========================
+   OPERATORLAR
+========================= */
 
 async function loadOperators() {
-  try {
-    const ops = await api(
-      'profiles?select=id,name,role,active,created_at&role=eq.operator&order=created_at.desc'
-    );
 
-    document.getElementById('aOperators').textContent =
-      ops.length;
+  try {
+
+    const operators =
+      await api(
+        "profiles?select=id,name,role,active,created_at&role=eq.operator&order=created_at.desc"
+      );
+
+    document.getElementById(
+      "aOperators"
+    ).textContent =
+      operators.length;
 
     const list =
-      document.getElementById('operatorsList');
+      document.getElementById(
+        "operatorsList"
+      );
 
-    if (!ops.length) {
+    if (!operators.length) {
+
       list.innerHTML =
         '<p class="muted">Hozircha operator yo‘q.</p>';
+
       return;
     }
 
-    list.innerHTML = ops.map(o => `
-      <div class="support-item">
+    list.innerHTML =
+      operators
+        .map(
+          operator => `
 
-        <div>
-          <strong>
-            ${esc(o.name || 'Operator')}
-          </strong>
+          <div class="support-item">
 
-          <span>
-            ${o.active ? 'Faol' : 'Bloklangan'}
-          </span>
-        </div>
+            <div>
 
-        <button
-          class="small-btn toggle-op"
-          data-id="${esc(o.id)}"
-          data-active="${o.active}"
-        >
-          ${o.active
-            ? 'Bloklash'
-            : 'Faollashtirish'}
-        </button>
+              <strong>
+                ${esc(operator.name || "Operator")}
+              </strong>
 
-      </div>
-    `).join('');
+              <span>
+                ${
+                  operator.active
+                    ? "Faol"
+                    : "Bloklangan"
+                }
+              </span>
+
+            </div>
+
+            <button
+              class="small-btn toggle-op"
+              data-id="${esc(operator.id)}"
+              data-active="${operator.active}"
+            >
+
+              ${
+                operator.active
+                  ? "Bloklash"
+                  : "Faollashtirish"
+              }
+
+            </button>
+
+          </div>
+        `
+        )
+        .join("");
+
 
     list
-      .querySelectorAll('.toggle-op')
-      .forEach(btn => {
+      .querySelectorAll(
+        ".toggle-op"
+      )
+      .forEach(button => {
 
-        btn.onclick = async () => {
+        button.onclick =
+          async () => {
 
-          try {
-            await api(
-              `profiles?id=eq.${encodeURIComponent(btn.dataset.id)}`,
-              {
-                method: 'PATCH',
+            try {
 
-                headers: {
-                  'Content-Type': 'application/json',
-                  Prefer: 'return=minimal'
-                },
+              await api(
+                `profiles?id=eq.${encodeURIComponent(button.dataset.id)}`,
+                {
+                  method: "PATCH",
 
-                body: JSON.stringify({
-                  active:
-                    btn.dataset.active !== 'true'
-                })
-              }
-            );
+                  headers: {
+                    "Content-Type":
+                      "application/json",
 
-            await loadOperators();
+                    Prefer:
+                      "return=minimal"
+                  },
 
-          } catch (err) {
-            console.error(err);
+                  body:
+                    JSON.stringify({
+                      active:
+                        button.dataset.active !==
+                        "true"
+                    })
+                }
+              );
 
-            alert(
-              'Operator holatini o‘zgartirib bo‘lmadi.'
-            );
-          }
-        };
+              await loadOperators();
+
+            } catch (error) {
+
+              console.error(error);
+
+              alert(
+                "Operator holatini o‘zgartirib bo‘lmadi."
+              );
+            }
+          };
       });
 
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+
+    console.error(error);
   }
 }
 
-/* YORDAM XIZMATI */
+
+/* =========================
+   YORDAM MUROJAATLARI
+========================= */
 
 async function loadSupport() {
-  const list =
-    document.getElementById('adminSupportList');
 
-  try {
-    const xs = await api(
-      'support_requests?select=*&order=created_at.desc&limit=50'
+  const list =
+    document.getElementById(
+      "adminSupportList"
     );
 
-    if (!xs.length) {
+  try {
+
+    const requests =
+      await api(
+        "support_requests?select=*&order=created_at.desc&limit=50"
+      );
+
+    if (!requests.length) {
+
       list.innerHTML =
         '<p class="muted">Hozircha murojaat yo‘q.</p>';
+
       return;
     }
 
-    list.innerHTML = xs.map(x => `
-      <div class="support-item">
+    list.innerHTML =
+      requests
+        .map(
+          item => `
 
-        <div>
-          <strong>
-            ${esc(x.name || '')}
-            ·
-            <a href="tel:${esc(x.phone || '')}">
-              ${esc(x.phone || '')}
-            </a>
-          </strong>
+          <div class="support-item">
 
-          <span>
-            ${esc(x.message || '')}
-          </span>
-        </div>
+            <div>
 
-        <span class="badge">
-          ${esc(x.status || 'new')}
-        </span>
+              <strong>
+                ${esc(item.name || "")}
+                ·
+                <a href="tel:${esc(item.phone || "")}">
+                  ${esc(item.phone || "")}
+                </a>
+              </strong>
 
-      </div>
-    `).join('');
+              <span>
+                ${esc(item.message || "")}
+              </span>
 
-  } catch (e) {
-    console.error(e);
+            </div>
+
+            <span class="badge">
+              ${esc(item.status || "new")}
+            </span>
+
+          </div>
+        `
+        )
+        .join("");
+
+  } catch (error) {
+
+    console.error(error);
   }
 }
 
-/* START */
 
-if (session?.access_token) {
+/* =========================
+   START
+========================= */
+
+if (
+  session?.access_token
+) {
   showAdmin();
 } else {
   showLogin();
