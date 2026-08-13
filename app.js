@@ -1,107 +1,17 @@
-
 const { SUPABASE_URL, SUPABASE_KEY } = window.MODEX_CONFIG;
 const REST = `${SUPABASE_URL}/rest/v1`;
-
-const grid = document.getElementById('productsGrid');
-const empty = document.getElementById('emptyState');
-const count = document.getElementById('productCount');
-const dialog = document.getElementById('orderDialog');
-const form = document.getElementById('orderForm');
-const msg = document.getElementById('formMessage');
-
-function money(v){
-  return new Intl.NumberFormat('uz-UZ').format(Number(v || 0)) + " so‘m";
-}
-function escapeHtml(s=''){
-  return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
-}
-
-async function api(path, options={}){
-  const headers = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    ...(options.headers || {})
-  };
-  const res = await fetch(`${REST}/${path}`, {...options, headers});
-  if(!res.ok) throw new Error(await res.text());
-  if(res.status === 204) return null;
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-}
-
-async function loadProducts(){
-  try{
-    const products = await api('products?select=id,name,price,description,image_url,active&active=eq.true&order=id.desc');
-    grid.innerHTML = '';
-    count.textContent = `${products.length} ta mahsulot`;
-    empty.classList.toggle('hidden', products.length > 0);
-    products.forEach(p=>{
-      const card = document.createElement('article');
-      card.className = 'product-card';
-      const img = p.image_url || 'https://placehold.co/800x600?text=MODEX.UZ';
-      card.innerHTML = `
-        <img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)}" loading="lazy">
-        <div class="product-body">
-          <h3>${escapeHtml(p.name)}</h3>
-          <div class="desc">${escapeHtml(p.description || '')}</div>
-          <div class="price">${money(p.price)}</div>
-          <button class="btn primary order-btn">Buyurtma berish</button>
-        </div>`;
-      card.querySelector('.order-btn').addEventListener('click', ()=>openOrder(p));
-      grid.appendChild(card);
-    });
-  }catch(e){
-    empty.classList.remove('hidden');
-    empty.textContent = 'Mahsulotlarni yuklab bo‘lmadi. Admin paneldan mahsulot qo‘shilganini tekshiring.';
-    console.error(e);
-  }
-}
-
-function openOrder(product){
-  document.getElementById('selectedProductTitle').textContent = product.name;
-  document.getElementById('productInput').value = product.name;
-  document.getElementById('quantityInput').value = 1;
-  msg.textContent = '';
-  msg.className = 'form-message';
-  dialog.showModal();
-}
-document.getElementById('closeDialog').addEventListener('click', ()=>dialog.close());
-dialog.addEventListener('click', (e)=>{ if(e.target === dialog) dialog.close(); });
-
-form.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const btn = document.getElementById('submitOrder');
-  const name = document.getElementById('nameInput').value.trim();
-  const phone = document.getElementById('phoneInput').value.trim();
-  const product = document.getElementById('productInput').value;
-  const quantity = Number(document.getElementById('quantityInput').value || 1);
-
-  const digits = phone.replace(/\D/g,'');
-  if(name.length < 2 || digits.length < 9){
-    msg.textContent = 'Ism va telefon raqamini to‘g‘ri kiriting.';
-    msg.className = 'form-message error';
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Yuborilmoqda...';
-  try{
-    await api('orders', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({name, phone, product, quantity})
-    });
-    msg.textContent = 'Buyurtmangiz qabul qilindi. Tez orada siz bilan bog‘lanamiz.';
-    msg.className = 'form-message success';
-    form.reset();
-    setTimeout(()=>dialog.close(), 1800);
-  }catch(err){
-    console.error(err);
-    msg.textContent = 'Xatolik yuz berdi. Keyinroq qayta urinib ko‘ring.';
-    msg.className = 'form-message error';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Buyurtma yuborish';
-  }
-});
-
+const grid = document.getElementById('productsGrid'), empty = document.getElementById('emptyState'), count = document.getElementById('productCount');
+const dialog = document.getElementById('orderDialog'), form = document.getElementById('orderForm'), msg = document.getElementById('formMessage');
+let allProducts=[];
+function money(v){return new Intl.NumberFormat('uz-UZ').format(Number(v||0))+" so‘m"}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+async function api(path,options={}){const headers={'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,...(options.headers||{})};const r=await fetch(`${REST}/${path}`,{...options,headers});if(!r.ok)throw new Error(await r.text());if(r.status===204)return null;const t=await r.text();return t?JSON.parse(t):null}
+function getTracking(){const p=new URLSearchParams(location.search);return {utm_source:p.get('utm_source')||'',utm_campaign:p.get('utm_campaign')||'',utm_content:p.get('utm_content')||''}}
+async function loadProducts(){try{allProducts=await api('products?select=id,name,price,description,image_url,active,category&active=eq.true&order=id.desc');renderCategories();renderProducts()}catch(e){empty.classList.remove('hidden');empty.textContent='Mahsulotlarni yuklab bo‘lmadi.';console.error(e)}}
+function renderCategories(){const cats=[...new Set(allProducts.map(p=>p.category).filter(Boolean))];const cg=document.getElementById('categoryGrid'),sel=document.getElementById('categorySelect');cg.innerHTML=`<button class="category-card active" data-cat="">Barchasi <span>${allProducts.length}</span></button>`;sel.innerHTML='<option value="">Barcha kategoriyalar</option>';cats.forEach(c=>{const n=allProducts.filter(p=>p.category===c).length;cg.insertAdjacentHTML('beforeend',`<button class="category-card" data-cat="${esc(c)}">${esc(c)} <span>${n}</span></button>`);sel.insertAdjacentHTML('beforeend',`<option value="${esc(c)}">${esc(c)}</option>`)});cg.querySelectorAll('.category-card').forEach(b=>b.onclick=()=>{sel.value=b.dataset.cat;cg.querySelectorAll('.category-card').forEach(x=>x.classList.toggle('active',x===b));renderProducts();document.getElementById('products').scrollIntoView({behavior:'smooth'})})}
+function renderProducts(){const q=document.getElementById('searchInput').value.trim().toLowerCase(),cat=document.getElementById('categorySelect').value,sort=document.getElementById('sortSelect').value;let list=allProducts.filter(p=>(!cat||p.category===cat)&&(!q||`${p.name} ${p.description||''} ${p.category||''}`.toLowerCase().includes(q)));if(sort==='price_asc')list.sort((a,b)=>a.price-b.price);if(sort==='price_desc')list.sort((a,b)=>b.price-a.price);grid.innerHTML='';count.textContent=`${list.length} ta mahsulot`;empty.classList.toggle('hidden',list.length>0);list.forEach(p=>{const card=document.createElement('article');card.className='product-card';card.innerHTML=`<a href="product.html?id=${encodeURIComponent(p.id)}" class="product-image-link"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy"></a><div class="product-body"><span class="product-cat">${esc(p.category||'Boshqa')}</span><h3><a href="product.html?id=${encodeURIComponent(p.id)}">${esc(p.name)}</a></h3><div class="desc">${esc(p.description||'')}</div><div class="price">${money(p.price)}</div><div class="card-actions"><a class="btn secondary" href="product.html?id=${encodeURIComponent(p.id)}">Ko‘rish</a><button class="btn primary order-btn">Buyurtma</button></div></div>`;card.querySelector('.order-btn').onclick=()=>openOrder(p);grid.appendChild(card)})}
+function openOrder(p){document.getElementById('selectedProductTitle').textContent=p.name;document.getElementById('productInput').value=p.name;document.getElementById('productIdInput').value=p.id;document.getElementById('quantityInput').value=1;msg.textContent='';dialog.showModal()}
+document.getElementById('closeDialog').onclick=()=>dialog.close();dialog.onclick=e=>{if(e.target===dialog)dialog.close()};['searchInput','categorySelect','sortSelect'].forEach(id=>document.getElementById(id).addEventListener(id==='searchInput'?'input':'change',renderProducts));
+form.addEventListener('submit',async e=>{e.preventDefault();const btn=document.getElementById('submitOrder'),name=document.getElementById('nameInput').value.trim(),phone=document.getElementById('phoneInput').value.trim(),product=document.getElementById('productInput').value,product_id=document.getElementById('productIdInput').value,quantity=Number(document.getElementById('quantityInput').value||1);if(name.length<2||phone.replace(/\D/g,'').length<9){msg.textContent='Ism va telefon raqamini to‘g‘ri kiriting.';msg.className='form-message error';return}btn.disabled=true;try{await api('orders',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({name,phone,product,product_id,quantity,status:'new',...getTracking()})});msg.textContent='Buyurtmangiz qabul qilindi. Operatorimiz siz bilan bog‘lanadi.';msg.className='form-message success';form.reset();setTimeout(()=>dialog.close(),1800)}catch(err){console.error(err);msg.textContent='Xatolik yuz berdi.';msg.className='form-message error'}finally{btn.disabled=false}});
+document.getElementById('supportForm').addEventListener('submit',async e=>{e.preventDefault();const s=document.getElementById('supportStatus');try{await api('support_requests',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({name:document.getElementById('supportName').value.trim(),phone:document.getElementById('supportPhone').value.trim(),message:document.getElementById('supportMessage').value.trim()})});s.textContent='Murojaatingiz yuborildi.';s.className='form-message success';e.target.reset()}catch(err){s.textContent='Murojaatni yuborib bo‘lmadi.';s.className='form-message error'}});
 loadProducts();
