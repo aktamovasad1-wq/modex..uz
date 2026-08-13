@@ -1367,4 +1367,83 @@ renderCart();
 
 renderFavorites();
 
-loadProducts();
+loadProducts();async function loadSiteSettings() {
+  try {
+    const rows = await api(
+      "site_settings?select=*&order=id.asc&limit=1"
+    );
+
+    const settings = rows?.[0];
+    if (!settings) return;
+
+    /* Sayt nomi */
+    document.querySelectorAll(".brand").forEach(el => {
+      el.innerHTML =
+        esc(settings.site_name || "MODEX.UZ")
+          .replace(".UZ", "<span>.UZ</span>");
+    });
+
+    /* Hero sarlavha */
+    const heroTitle =
+      document.querySelector(".hero-text h1");
+
+    if (heroTitle && settings.hero_title) {
+      heroTitle.textContent =
+        settings.hero_title;
+    }
+
+    /* Hero matn */
+    const heroText =
+      document.querySelector(".hero-text p");
+
+    if (heroText && settings.hero_text) {
+      heroText.textContent =
+        settings.hero_text;
+    }
+
+    /* Asosiy rang */
+    if (settings.primary_color) {
+      document.documentElement.style.setProperty(
+        "--brand",
+        settings.primary_color
+      );
+    }
+
+    /* Texnik ishlar rejimi */
+    if (settings.maintenance_mode) {
+      document.body.innerHTML = `
+        <div style="
+          min-height:100vh;
+          display:grid;
+          place-items:center;
+          padding:30px;
+          text-align:center;
+          font-family:Arial,sans-serif;
+          background:#f7f7fb;
+        ">
+          <div>
+            <h1 style="font-size:42px;margin-bottom:10px">
+              ${esc(settings.site_name || "MODEX.UZ")}
+            </h1>
+
+            <p style="color:#777;font-size:18px">
+              Saytda hozir texnik ishlar olib borilmoqda.
+            </p>
+
+            <p style="color:#777">
+              Tez orada qaytamiz.
+            </p>
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+  } catch (error) {
+    console.error(
+      "Site settings yuklanmadi:",
+      error
+    );
+  }
+   
+}
