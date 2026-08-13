@@ -1,81 +1,243 @@
 <!doctype html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Modex.uz — Internet do‘kon</title>
-  <meta name="description" content="Modex.uz internet do‘koni. Katalogdan mahsulot tanlang va buyurtma qoldiring." />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Modex.uz internet do‘koni">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
-    <nav class="navlinks">
-      <a href="#catalog">Katalog</a><a href="#products">Mahsulotlar</a><a href="#help">Yordam</a>
-    </nav>
-    <a class="admin-link" href="admin.html">Kirish</a>
-  </header>
 
-  <main>
-    <section class="hero">
-      <div>
-        <p class="eyebrow">MODEX.UZ</p>
-        <h1>Keraklisini toping. Tez buyurtma bering.</h1>
-        <p class="hero-copy">Katalogdan tanlang, qidiring va telefon raqamingizni qoldiring — operatorimiz siz bilan bog‘lanadi.</p>
+<header class="topbar">
+  <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
+
+  <div class="header-actions">
+    <button id="favoritesBtn" class="icon-btn">♡</button>
+    <button id="cartBtn" class="icon-btn">
+      Savatcha <span id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div>
+      <p class="eyebrow">MODEX.UZ</p>
+      <h1>O‘zingizga mos mahsulotni toping</h1>
+      <p class="hero-copy">
+        Katalogdan tanlang, tez buyurtma bering va operatorimiz bilan bog‘laning.
+      </p>
+
+      <div class="hero-actions">
         <a class="btn primary" href="#products">Mahsulotlarni ko‘rish</a>
+        <a class="btn secondary" href="#categories">Kataloglar</a>
       </div>
-      <div class="hero-card">
-        <div class="hero-badge">QULAY</div>
-        <strong>Telefon orqali tasdiqlash</strong>
-        <span>Buyurtma yuborilgach operatorimiz siz bilan bog‘lanadi.</span>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-badge">MODEX.UZ</div>
+      <strong>Tez buyurtma</strong>
+      <span>Telefon raqamingizni qoldiring, operatorimiz siz bilan bog‘lanadi.</span>
+    </div>
+  </section>
+
+  <section class="section" id="categories">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">KATALOG</p>
+        <h2>Kategoriyalar</h2>
       </div>
-    </section>
+    </div>
 
-    <section class="section" id="catalog">
-      <div class="section-head"><div><p class="eyebrow">KATALOG</p><h2>Kategoriyalar</h2></div></div>
-      <div id="categoryGrid" class="category-grid"></div>
-    </section>
+    <div id="categoryList" class="category-list"></div>
+  </section>
 
-    <section class="section" id="products">
-      <div class="section-head"><div><p class="eyebrow">DO‘KON</p><h2>Mahsulotlar</h2></div><span id="productCount" class="muted"></span></div>
-      <div class="shop-tools">
-        <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Mahsulot qidirish..." /></label>
-        <select id="categorySelect"><option value="">Barcha kategoriyalar</option></select>
-        <select id="sortSelect"><option value="new">Yangi avval</option><option value="price_asc">Narx: arzon</option><option value="price_desc">Narx: qimmat</option></select>
+  <section class="section">
+    <div class="shop-toolbar">
+      <input
+        id="searchInput"
+        class="shop-search"
+        placeholder="Mahsulot qidirish..."
+      >
+
+      <select id="categoryFilter">
+        <option value="">Barcha kategoriyalar</option>
+      </select>
+
+      <select id="sortSelect">
+        <option value="new">Yangi mahsulotlar</option>
+        <option value="cheap">Arzonidan</option>
+        <option value="expensive">Qimmatidan</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="section" id="products">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">MAHSULOTLAR</p>
+        <h2>Mahsulotlar</h2>
       </div>
-      <div id="productsGrid" class="product-grid"></div>
-      <div id="emptyState" class="empty hidden">Mahsulot topilmadi.</div>
-    </section>
 
-    <section class="section" id="help">
-      <div class="help-card">
-        <div><p class="eyebrow">YORDAM XIZMATI</p><h2>Savolingiz bormi?</h2><p class="muted">Telefon raqamingizni va savolingizni qoldiring. Operator siz bilan bog‘lanadi.</p></div>
-        <form id="supportForm" class="support-form">
-          <input id="supportName" required maxlength="80" placeholder="Ismingiz" />
-          <input id="supportPhone" required inputmode="tel" maxlength="30" placeholder="+998 90 123 45 67" />
-          <textarea id="supportMessage" required maxlength="600" placeholder="Savolingiz"></textarea>
-          <button class="btn primary" type="submit">Yuborish</button>
-          <p id="supportStatus" class="form-message"></p>
-        </form>
-      </div>
-    </section>
-  </main>
+      <span id="productCount" class="muted"></span>
+    </div>
 
-  <footer><strong>MODEX.UZ</strong><span>© 2026. Barcha huquqlar himoyalangan.</span></footer>
+    <div id="productsGrid" class="product-grid"></div>
 
-  <dialog id="orderDialog">
-    <form id="orderForm" class="order-form">
-      <button class="close" type="button" id="closeDialog" aria-label="Yopish">×</button>
-      <p class="eyebrow">BUYURTMA</p><h3 id="selectedProductTitle">Mahsulot</h3>
-      <input type="hidden" id="productInput" /><input type="hidden" id="productIdInput" />
-      <label>Ismingiz<input id="nameInput" required maxlength="80" placeholder="Masalan: Asad" /></label>
-      <label>Telefon raqamingiz<input id="phoneInput" required inputmode="tel" maxlength="30" placeholder="+998 90 123 45 67" /></label>
-      <label>Soni<input id="quantityInput" required type="number" min="1" max="20" value="1" /></label>
-      <button class="btn primary full" type="submit" id="submitOrder">Buyurtma yuborish</button>
-      <p id="formMessage" class="form-message"></p>
-      <p class="privacy">Telefon raqamingiz faqat buyurtma bo‘yicha bog‘lanish uchun ishlatiladi.</p>
+    <div id="emptyState" class="empty hidden">
+      Mahsulot topilmadi.
+    </div>
+  </section>
+
+  <section class="section features-section">
+    <div class="feature-card">
+      <strong>Tez buyurtma</strong>
+      <span>Bir necha soniyada zayavka qoldiring.</span>
+    </div>
+
+    <div class="feature-card">
+      <strong>Operator yordam beradi</strong>
+      <span>Buyurtmangiz telefon orqali tasdiqlanadi.</span>
+    </div>
+
+    <div class="feature-card">
+      <strong>Qulay katalog</strong>
+      <span>Kerakli mahsulotni tez toping.</span>
+    </div>
+  </section>
+
+  <section class="section support-section">
+    <div>
+      <p class="eyebrow">YORDAM</p>
+      <h2>Yordam xizmati</h2>
+      <p class="muted">
+        Savolingiz bo‘lsa, telefon raqamingizni qoldiring.
+      </p>
+    </div>
+
+    <form id="supportForm" class="support-form">
+      <input id="supportName" required placeholder="Ismingiz">
+      <input id="supportPhone" required placeholder="+998 90 123 45 67">
+      <textarea id="supportMessage" required placeholder="Savolingiz"></textarea>
+
+      <button class="btn primary" type="submit">
+        Yuborish
+      </button>
+
+      <p id="supportFormMessage" class="form-message"></p>
     </form>
-  </dialog>
+  </section>
 
-  <script src="config.js"></script><script src="app.js"></script>
-</body></html>
+</main>
+
+<footer>
+  <strong>MODEX.UZ</strong>
+  <span>© 2026. Barcha huquqlar himoyalangan.</span>
+</footer>
+
+<dialog id="orderDialog">
+  <form id="orderForm" class="order-form">
+
+    <button
+      class="close"
+      type="button"
+      id="closeDialog"
+    >
+      ×
+    </button>
+
+    <p class="eyebrow">TEZ BUYURTMA</p>
+
+    <h3 id="selectedProductTitle">
+      Mahsulot
+    </h3>
+
+    <input
+      type="hidden"
+      id="productInput"
+    >
+
+    <label>
+      Ismingiz
+      <input
+        id="nameInput"
+        required
+        maxlength="80"
+      >
+    </label>
+
+    <label>
+      Telefon raqamingiz
+      <input
+        id="phoneInput"
+        required
+        inputmode="tel"
+        placeholder="+998 90 123 45 67"
+      >
+    </label>
+
+    <label>
+      Soni
+      <input
+        id="quantityInput"
+        type="number"
+        min="1"
+        max="20"
+        value="1"
+        required
+      >
+    </label>
+
+    <label>
+      O‘lcham
+      <select id="sizeInput">
+        <option value="">Tanlanmagan</option>
+        <option>S</option>
+        <option>M</option>
+        <option>L</option>
+        <option>XL</option>
+      </select>
+    </label>
+
+    <label>
+      Rang
+      <input
+        id="colorInput"
+        placeholder="Masalan: qora"
+      >
+    </label>
+
+    <button
+      class="btn primary full"
+      type="submit"
+      id="submitOrder"
+    >
+      Buyurtma yuborish
+    </button>
+
+    <p id="formMessage" class="form-message"></p>
+
+  </form>
+</dialog>
+
+<div id="cartDrawer" class="cart-drawer hidden">
+  <div class="cart-head">
+    <h3>Savatcha</h3>
+    <button id="closeCart" class="small-btn">Yopish</button>
+  </div>
+
+  <div id="cartItems"></div>
+
+  <div class="cart-total">
+    Jami:
+    <strong id="cartTotal">0 so‘m</strong>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
