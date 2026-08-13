@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MODEX.UZ — Sozlamalar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loginView" class="login-wrap">
+  <form id="loginForm" class="login-box">
+    <p class="eyebrow">MODEX.UZ ADMIN</p>
+    <h1>Kirish</h1>
+    <p>Faqat administrator.</p>
+    <label>Email<input id="email" type="email" required></label>
+    <label>Parol<input id="password" type="password" required></label>
+    <button class="btn primary full" type="submit">Kirish</button>
+    <p id="loginMessage" class="form-message"></p>
+    <a href="admin.html" class="btn secondary full">Admin panelga qaytish</a>
+  </form>
+</div>
+
+<div id="settingsView" class="hidden">
+  <header class="topbar">
+    <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
+    <div class="admin-actions">
+      <a class="btn secondary" href="admin.html">Admin panel</a>
+      <a class="btn secondary" href="index.html">Sayt</a>
+      <button id="logoutBtn" class="btn secondary" type="button">Chiqish</button>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <div class="admin-head">
+      <div><p class="eyebrow">SUPER ADMIN</p><h2>Sayt sozlamalari</h2></div>
+      <span id="adminEmail" class="muted"></span>
+    </div>
+
+    <section class="panel wide-panel">
+      <form id="settingsForm" class="admin-form">
+        <label>Sayt nomi<input id="siteName" maxlength="80" required placeholder="MODEX.UZ"></label>
+        <label>Telefon raqami<input id="phone" maxlength="40" placeholder="+998 90 123 45 67"></label>
+        <label>Instagram link<input id="instagramUrl" type="url" placeholder="https://instagram.com/..."></label>
+        <label>Telegram link<input id="telegramUrl" type="url" placeholder="https://t.me/..."></label>
+        <label>Bosh banner sarlavhasi<input id="heroTitle" maxlength="180" required></label>
+        <label>Bosh banner matni<textarea id="heroText" maxlength="500"></textarea></label>
+        <label>Yetkazib berish matni<textarea id="deliveryText" maxlength="500"></textarea></label>
+        <label>Asosiy rang<input id="primaryColor" type="color" value="#6f35e8"></label>
+        <label style="display:flex;align-items:center;gap:10px">
+          <input id="maintenanceMode" type="checkbox" style="width:auto;margin:0">
+          Texnik ishlar rejimini yoqish
+        </label>
+        <button id="saveSettingsBtn" class="btn primary" type="submit">Sozlamalarni saqlash</button>
+        <p id="settingsMessage" class="form-message"></p>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>
