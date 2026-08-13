@@ -71,6 +71,7 @@ async function showAdmin() {
       session?.user?.email || '';
 
     await loadAll();
+
   } catch (e) {
     localStorage.removeItem('modex_session');
     session = null;
@@ -120,6 +121,7 @@ document.getElementById('loginForm').onsubmit = async e => {
     );
 
     await showAdmin();
+
   } catch (err) {
     console.error(err);
 
@@ -147,9 +149,7 @@ async function loadAll() {
   ]);
 }
 
-/* =========================
-   BUYURTMALAR
-========================= */
+/* BUYURTMALAR */
 
 async function loadOrders() {
   const ordersMessage =
@@ -169,10 +169,13 @@ async function loadOrders() {
       ordersCache.filter(o => o.status === 'new').length;
 
     ordersMessage.textContent = '';
+
   } catch (e) {
     console.error(e);
+
     ordersMessage.textContent =
       'Buyurtmalarni yuklab bo‘lmadi.';
+
     ordersMessage.className = 'form-message error';
   }
 }
@@ -184,8 +187,7 @@ function renderOrders() {
       .toLowerCase()
       .trim();
 
-  const body =
-    document.getElementById('ordersBody');
+  const body = document.getElementById('ordersBody');
 
   body.innerHTML = '';
 
@@ -207,15 +209,8 @@ function renderOrders() {
 
     tr.innerHTML = `
       <td>#${esc(o.id)}</td>
-
-      <td>
-        ${new Date(o.created_at).toLocaleString('uz-UZ')}
-      </td>
-
-      <td>
-        ${esc(o.name || '')}
-        ${esc(o.surname || '')}
-      </td>
+      <td>${new Date(o.created_at).toLocaleString('uz-UZ')}</td>
+      <td>${esc(o.name || '')} ${esc(o.surname || '')}</td>
 
       <td>
         <a href="tel:${esc(o.phone || '')}">
@@ -224,9 +219,7 @@ function renderOrders() {
       </td>
 
       <td>${esc(o.product || '')}</td>
-
       <td>${esc(o.region || '-')}</td>
-
       <td>${esc(o.utm_source || 'sayt')}</td>
 
       <td>
@@ -252,12 +245,9 @@ function statusText(status) {
   return map[status] || status || 'Yangi';
 }
 
-document.getElementById('adminOrderSearch').oninput =
-  renderOrders;
+document.getElementById('adminOrderSearch').oninput = renderOrders;
 
-/* =========================
-   RASM YUKLASH
-========================= */
+/* RASM */
 
 async function uploadImage(file) {
   if (!file) return null;
@@ -268,9 +258,7 @@ async function uploadImage(file) {
       .replace(/[^a-z0-9]/g, '');
 
   const path =
-    `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}.${ext}`;
+    `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   await request(
     `${SUPABASE_URL}/storage/v1/object/product-images/${path}`,
@@ -287,63 +275,37 @@ async function uploadImage(file) {
   return `${SUPABASE_URL}/storage/v1/object/public/product-images/${path}`;
 }
 
-/* =========================
-   MAHSULOT QO‘SHISH / TAHRIRLASH
-========================= */
+/* MAHSULOT QO‘SHISH / TAHRIRLASH */
 
-const productForm =
-  document.getElementById('productForm');
-
-const editProductId =
-  document.getElementById('editProductId');
-
-const productSubmitBtn =
-  document.getElementById('productSubmitBtn');
-
-const cancelEditBtn =
-  document.getElementById('cancelEditBtn');
+const productForm = document.getElementById('productForm');
+const editProductId = document.getElementById('editProductId');
+const productSubmitBtn = document.getElementById('productSubmitBtn');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
 
 productForm.onsubmit = async e => {
   e.preventDefault();
 
-  const message =
-    document.getElementById('productMessage');
-
+  const message = document.getElementById('productMessage');
   const id = editProductId.value;
 
   productSubmitBtn.disabled = true;
-
   productSubmitBtn.textContent =
     id ? 'Saqlanmoqda...' : 'Qo‘shilmoqda...';
 
   try {
     let imageUrl = null;
 
-    const file =
-      document.getElementById('pImage').files[0];
+    const file = document.getElementById('pImage').files[0];
 
     if (file) {
       imageUrl = await uploadImage(file);
     }
 
     const data = {
-      name:
-        document.getElementById('pName')
-          .value.trim(),
-
-      category:
-        document.getElementById('pCategory')
-          .value.trim(),
-
-      price:
-        Number(
-          document.getElementById('pPrice').value
-        ),
-
-      description:
-        document.getElementById('pDesc')
-          .value.trim(),
-
+      name: document.getElementById('pName').value.trim(),
+      category: document.getElementById('pCategory').value.trim(),
+      price: Number(document.getElementById('pPrice').value),
+      description: document.getElementById('pDesc').value.trim(),
       active: true
     };
 
@@ -356,18 +318,17 @@ productForm.onsubmit = async e => {
         `products?id=eq.${encodeURIComponent(id)}`,
         {
           method: 'PATCH',
-
           headers: {
             'Content-Type': 'application/json',
             Prefer: 'return=minimal'
           },
-
           body: JSON.stringify(data)
         }
       );
 
       message.textContent =
         'Mahsulot muvaffaqiyatli yangilandi.';
+
     } else {
       if (!imageUrl) {
         throw new Error('Rasm tanlang');
@@ -377,12 +338,10 @@ productForm.onsubmit = async e => {
 
       await api('products', {
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json',
           Prefer: 'return=minimal'
         },
-
         body: JSON.stringify(data)
       });
 
@@ -390,22 +349,21 @@ productForm.onsubmit = async e => {
         'Mahsulot muvaffaqiyatli qo‘shildi.';
     }
 
-    message.className =
-      'form-message success';
+    message.className = 'form-message success';
 
     resetProductForm();
-
     await loadProductsAdmin();
+
   } catch (err) {
     console.error(err);
 
     message.textContent =
-      editProductId.value
+      id
         ? 'Mahsulotni yangilab bo‘lmadi.'
         : 'Mahsulotni qo‘shib bo‘lmadi.';
 
-    message.className =
-      'form-message error';
+    message.className = 'form-message error';
+
   } finally {
     productSubmitBtn.disabled = false;
 
@@ -433,19 +391,16 @@ function startEditProduct(product) {
 
   document.getElementById('pImage').required = false;
 
-  document.getElementById(
-    'productFormTitle'
-  ).textContent = 'Mahsulotni tahrirlash';
+  document.getElementById('productFormTitle').textContent =
+    'Mahsulotni tahrirlash';
 
   productSubmitBtn.textContent =
     'O‘zgarishlarni saqlash';
 
   cancelEditBtn.classList.remove('hidden');
 
-  document.getElementById(
-    'productMessage'
-  ).textContent =
-    'Rasmni o‘zgartirmoqchi bo‘lmasangiz, yangi rasm tanlamang.';
+  document.getElementById('productMessage').textContent =
+    'Rasmni o‘zgartirmasangiz, yangi rasm tanlamang.';
 
   window.scrollTo({
     top: 0,
@@ -460,9 +415,8 @@ function resetProductForm() {
 
   document.getElementById('pImage').required = false;
 
-  document.getElementById(
-    'productFormTitle'
-  ).textContent = 'Mahsulot qo‘shish';
+  document.getElementById('productFormTitle').textContent =
+    'Mahsulot qo‘shish';
 
   productSubmitBtn.textContent =
     'Mahsulot qo‘shish';
@@ -473,14 +427,10 @@ function resetProductForm() {
 cancelEditBtn.onclick = () => {
   resetProductForm();
 
-  document.getElementById(
-    'productMessage'
-  ).textContent = '';
+  document.getElementById('productMessage').textContent = '';
 };
 
-/* =========================
-   MAHSULOTLAR RO‘YXATI
-========================= */
+/* MAHSULOTLAR */
 
 async function loadProductsAdmin() {
   try {
@@ -491,8 +441,7 @@ async function loadProductsAdmin() {
     document.getElementById('aProducts').textContent =
       productsCache.length;
 
-    const wrap =
-      document.getElementById('adminProducts');
+    const wrap = document.getElementById('adminProducts');
 
     wrap.innerHTML = '';
 
@@ -522,6 +471,7 @@ async function loadProductsAdmin() {
         </div>
 
         <div class="product-admin-actions">
+
           <button
             class="small-btn edit-product"
             type="button"
@@ -535,6 +485,7 @@ async function loadProductsAdmin() {
           >
             O‘chirish
           </button>
+
         </div>
       `;
 
@@ -561,11 +512,8 @@ async function loadProductsAdmin() {
               }
             );
 
-            if (String(editProductId.value) === String(p.id)) {
-              resetProductForm();
-            }
-
             await loadProductsAdmin();
+
           } catch (err) {
             console.error(err);
             alert('Mahsulotni o‘chirib bo‘lmadi.');
@@ -574,87 +522,88 @@ async function loadProductsAdmin() {
 
       wrap.appendChild(el);
     });
+
   } catch (e) {
     console.error(e);
   }
 }
 
-/* =========================
-   OPERATOR YARATISH
-========================= */
+/* OPERATOR YARATISH */
 
-document.getElementById(
-  'operatorCreateForm'
-).onsubmit = async e => {
-  e.preventDefault();
+document.getElementById('operatorCreateForm').onsubmit =
+  async e => {
 
-  const message =
-    document.getElementById(
-      'operatorCreateMessage'
-    );
+    e.preventDefault();
 
-  message.textContent =
-    'Operator yaratilmoqda...';
+    const message =
+      document.getElementById('operatorCreateMessage');
 
-  message.className =
-    'form-message';
+    message.textContent =
+      'Operator yaratilmoqda...';
 
-  try {
-    const r = await fetch(
-      `${SUPABASE_URL}/functions/v1/create-operator`,
-      {
-        method: 'POST',
+    message.className = 'form-message';
 
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization:
-            `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        },
+    try {
 
-        body: JSON.stringify({
-          name:
-            document.getElementById('opName')
-              .value.trim(),
+      const r = await fetch(
+        `${SUPABASE_URL}/functions/v1/smart-endpoint`,
+        {
+          method: 'POST',
 
-          email:
-            document.getElementById('newOpEmail')
-              .value.trim(),
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
 
-          password:
-            document.getElementById('newOpPassword')
-              .value
-        })
+          body: JSON.stringify({
+            name:
+              document.getElementById('opName')
+                .value.trim(),
+
+            email:
+              document.getElementById('newOpEmail')
+                .value.trim(),
+
+            password:
+              document.getElementById('newOpPassword')
+                .value
+          })
+        }
+      );
+
+      const result = await r.json().catch(() => ({}));
+
+      if (!r.ok) {
+        throw new Error(
+          result.error ||
+          result.message ||
+          'Operator yaratilmadi'
+        );
       }
-    );
 
-    if (!r.ok) {
-      throw new Error(await r.text());
+      message.textContent =
+        'Operator muvaffaqiyatli yaratildi.';
+
+      message.className =
+        'form-message success';
+
+      e.target.reset();
+
+      await loadOperators();
+
+    } catch (err) {
+      console.error(err);
+
+      message.textContent =
+        'Operator yaratilmadi: ' + err.message;
+
+      message.className =
+        'form-message error';
     }
+  };
 
-    message.textContent =
-      'Operator muvaffaqiyatli yaratildi.';
-
-    message.className =
-      'form-message success';
-
-    e.target.reset();
-
-    await loadOperators();
-  } catch (err) {
-    console.error(err);
-
-    message.textContent =
-      'Operator yaratilmadi. Edge Function sozlanganini tekshiring.';
-
-    message.className =
-      'form-message error';
-  }
-};
-
-/* =========================
-   OPERATORLAR
-========================= */
+/* OPERATORLAR */
 
 async function loadOperators() {
   try {
@@ -676,6 +625,7 @@ async function loadOperators() {
 
     list.innerHTML = ops.map(o => `
       <div class="support-item">
+
         <div>
           <strong>
             ${esc(o.name || 'Operator')}
@@ -695,13 +645,16 @@ async function loadOperators() {
             ? 'Bloklash'
             : 'Faollashtirish'}
         </button>
+
       </div>
     `).join('');
 
     list
       .querySelectorAll('.toggle-op')
       .forEach(btn => {
+
         btn.onclick = async () => {
+
           try {
             await api(
               `profiles?id=eq.${encodeURIComponent(btn.dataset.id)}`,
@@ -709,8 +662,7 @@ async function loadOperators() {
                 method: 'PATCH',
 
                 headers: {
-                  'Content-Type':
-                    'application/json',
+                  'Content-Type': 'application/json',
                   Prefer: 'return=minimal'
                 },
 
@@ -722,22 +674,23 @@ async function loadOperators() {
             );
 
             await loadOperators();
+
           } catch (err) {
             console.error(err);
+
             alert(
               'Operator holatini o‘zgartirib bo‘lmadi.'
             );
           }
         };
       });
+
   } catch (e) {
     console.error(e);
   }
 }
 
-/* =========================
-   YORDAM XIZMATI
-========================= */
+/* YORDAM XIZMATI */
 
 async function loadSupport() {
   const list =
@@ -756,6 +709,7 @@ async function loadSupport() {
 
     list.innerHTML = xs.map(x => `
       <div class="support-item">
+
         <div>
           <strong>
             ${esc(x.name || '')}
@@ -773,16 +727,16 @@ async function loadSupport() {
         <span class="badge">
           ${esc(x.status || 'new')}
         </span>
+
       </div>
     `).join('');
+
   } catch (e) {
     console.error(e);
   }
 }
 
-/* =========================
-   START
-========================= */
+/* START */
 
 if (session?.access_token) {
   showAdmin();
