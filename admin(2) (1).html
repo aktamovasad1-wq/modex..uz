@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Modex.uz — Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+<div id="loginView" class="login-wrap">
+  <form id="loginForm" class="login-box">
+    <p class="eyebrow">MODEX.UZ ADMIN</p>
+    <h1>Kirish</h1>
+    <p>Faqat administrator.</p>
+    <label>Email<input id="email" type="email" required autocomplete="username"></label>
+    <label>Parol<input id="password" type="password" required autocomplete="current-password"></label>
+    <button class="btn primary full">Kirish</button>
+    <p id="loginMessage" class="form-message"></p>
+    <a href="index.html" class="btn secondary full">Saytga qaytish</a>
+  </form>
+</div>
+
+<div id="adminView" class="hidden">
+  <header class="topbar admin-topbar">
+    <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
+    <div class="admin-actions">
+      <a class="btn secondary" href="operator.html">Operator paneli</a>
+      <button id="refreshBtn" class="btn secondary" type="button">Yangilash</button>
+      <button id="logoutBtn" class="btn secondary" type="button">Chiqish</button>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <div class="admin-head">
+      <div><p class="eyebrow">SUPER ADMIN</p><h2>Boshqaruv</h2></div>
+      <span id="adminEmail" class="muted"></span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><b id="aProducts">0</b><span>Mahsulot</span></div>
+      <div class="stat"><b id="aOrders">0</b><span>Buyurtma</span></div>
+      <div class="stat"><b id="aNew">0</b><span>Yangi</span></div>
+      <div class="stat"><b id="aOperators">0</b><span>Operator</span></div>
+    </div>
+
+    <div class="admin-grid">
+      <section class="panel product-panel">
+        <div class="panel-title-row">
+          <h2 id="productFormTitle">Mahsulot qo‘shish</h2>
+          <span id="editBadge" class="edit-badge hidden">TAHRIR</span>
+        </div>
+        <form id="productForm" class="admin-form">
+          <input id="pEditId" type="hidden">
+          <input id="pExistingImage" type="hidden">
+          <label>Mahsulot nomi<input id="pName" required maxlength="120"></label>
+          <label>Kategoriya<input id="pCategory" required maxlength="80" placeholder="Masalan: Qizlar kiyimi"></label>
+          <label>Narxi (so‘m)<input id="pPrice" required type="number" min="0" step="1000" inputmode="numeric"></label>
+          <label>Tavsif<textarea id="pDesc" maxlength="500"></textarea></label>
+          <label>Mahsulot rasmi
+            <input id="pImage" type="file" accept="image/*">
+            <small id="imageHint" class="field-hint">Yangi mahsulot uchun rasm tanlang.</small>
+          </label>
+          <div id="editImagePreview" class="edit-image-preview hidden"></div>
+          <button id="productSubmitBtn" class="btn primary" type="submit">Mahsulot qo‘shish</button>
+          <button id="cancelEditBtn" class="btn secondary hidden" type="button">Tahrirlashni bekor qilish</button>
+          <p id="productMessage" class="form-message"></p>
+        </form>
+        <div class="product-admin-list" id="adminProducts"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Operator yaratish</h2>
+        <form id="operatorCreateForm" class="admin-form">
+          <label>Ism<input id="opName" required></label>
+          <label>Email<input id="newOpEmail" type="email" required></label>
+          <label>Vaqtinchalik parol<input id="newOpPassword" type="password" minlength="8" required></label>
+          <button class="btn primary">Operator yaratish</button>
+          <p id="operatorCreateMessage" class="form-message"></p>
+        </form>
+        <div id="operatorsList" class="support-list"></div>
+      </section>
+    </div>
+
+    <section class="panel wide-panel">
+      <div class="section-head compact admin-section-head">
+        <div><h2>Buyurtmalar</h2></div>
+        <input id="adminOrderSearch" class="inline-search" placeholder="Ism, telefon, mahsulot...">
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>№</th><th>Vaqt</th><th>Mijoz</th><th>Telefon</th><th>Mahsulot</th><th>Viloyat</th><th>Manba</th><th>Status</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+      <p id="ordersMessage" class="form-message"></p>
+    </section>
+
+    <section class="panel wide-panel">
+      <h2>Yordam murojaatlari</h2>
+      <div id="adminSupportList" class="support-list"></div>
+    </section>
+  </main>
+</div>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
