@@ -1,5 +1,316 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mahsulot — Modex.uz</title><link rel="stylesheet" href="style.css"></head><body>
-<header class="topbar"><a class="brand" href="index.html">MODEX<span>.UZ</span></a><a class="admin-link" href="index.html">← Katalog</a></header>
-<main><section id="productView" class="product-detail"><div class="detail-image-wrap"><img id="detailImage" alt=""></div><div class="detail-info"><p id="detailCategory" class="eyebrow"></p><h1 id="detailName">Yuklanmoqda...</h1><p id="detailDesc" class="detail-desc"></p><div id="detailPrice" class="detail-price"></div><button id="detailOrderBtn" class="btn primary">Buyurtma berish</button><p id="detailError" class="form-message error"></p></div></section></main>
-<dialog id="orderDialog"><form id="orderForm" class="order-form"><button class="close" type="button" id="closeDialog">×</button><p class="eyebrow">BUYURTMA</p><h3 id="selectedProductTitle">Mahsulot</h3><input type="hidden" id="productInput"><input type="hidden" id="productIdInput"><label>Ismingiz<input id="nameInput" required maxlength="80"></label><label>Telefon raqamingiz<input id="phoneInput" required inputmode="tel" placeholder="+998 90 123 45 67"></label><label>Soni<input id="quantityInput" required type="number" min="1" max="20" value="1"></label><button class="btn primary full" id="submitOrder">Buyurtma yuborish</button><p id="formMessage" class="form-message"></p></form></dialog>
-<script src="config.js"></script><script src="product.js"></script></body></html>
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MODEX.UZ — Mahsulot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="market-header">
+  <div class="header-inner">
+
+    <a href="index.html" class="brand">
+      MODEX<span>.UZ</span>
+    </a>
+
+    <a href="index.html" class="catalog-btn">
+      ← Bosh sahifa
+    </a>
+
+    <div class="header-search">
+      <input
+        type="search"
+        placeholder="Mahsulot qidirish..."
+        onclick="location.href='index.html'"
+      >
+      <button type="button" onclick="location.href='index.html'">
+        🔍
+      </button>
+    </div>
+
+    <div class="header-buttons">
+      <a href="index.html" class="header-btn">
+        🛍️ <span>Katalog</span>
+      </a>
+    </div>
+
+  </div>
+</header>
+
+
+<main>
+
+  <section class="product-page">
+
+    <div class="product-page-image">
+
+      <img
+        id="productImage"
+        src=""
+        alt="Mahsulot"
+      >
+
+    </div>
+
+
+    <div class="product-page-info">
+
+      <span
+        id="productCategory"
+        class="market-category"
+      >
+        Mahsulot
+      </span>
+
+      <h1 id="productName">
+        Mahsulot nomi
+      </h1>
+
+      <div
+        id="productPrice"
+        class="product-page-price"
+      >
+        0 so‘m
+      </div>
+
+      <p
+        id="productDescription"
+        class="product-page-description"
+      ></p>
+
+
+      <div class="product-options">
+
+        <label>
+          O‘lcham
+
+          <input
+            id="productSize"
+            placeholder="Masalan: 110 yoki M"
+          >
+        </label>
+
+
+        <label>
+          Rang
+
+          <input
+            id="productColor"
+            placeholder="Masalan: qora"
+          >
+        </label>
+
+
+        <label>
+          Soni
+
+          <input
+            id="productQuantity"
+            type="number"
+            min="1"
+            max="20"
+            value="1"
+          >
+        </label>
+
+      </div>
+
+
+      <div class="product-page-actions">
+
+        <button
+          id="buyNowBtn"
+          class="main-btn"
+          type="button"
+        >
+          Buyurtma berish
+        </button>
+
+        <button
+          id="addCartBtn"
+          class="product-secondary-btn"
+          type="button"
+        >
+          🛒 Savatga
+        </button>
+
+        <button
+          id="favoriteProductBtn"
+          class="product-secondary-btn"
+          type="button"
+        >
+          ♡ Sevimlilar
+        </button>
+
+        <button
+          id="copyProductLinkBtn"
+          class="product-secondary-btn"
+          type="button"
+        >
+          🔗 Linkni nusxalash
+        </button>
+
+      </div>
+
+
+      <div class="product-delivery-box">
+
+        <div>
+          <span>📦</span>
+
+          <div>
+            <strong>Yetkazib berish</strong>
+            <p id="deliveryText">
+              Buyurtmadan keyin operator siz bilan bog‘lanadi.
+            </p>
+          </div>
+        </div>
+
+
+        <div>
+          <span>📞</span>
+
+          <div>
+            <strong>Operator yordami</strong>
+            <p>
+              Buyurtma tafsilotlarini telefon orqali aniqlashtiramiz.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="market-section">
+
+    <div class="section-title">
+      <h2>Yana mahsulotlar</h2>
+    </div>
+
+    <div
+      id="relatedProducts"
+      class="market-products"
+    ></div>
+
+  </section>
+
+</main>
+
+
+<dialog id="orderDialog">
+
+  <form
+    id="orderForm"
+    class="order-modal"
+  >
+
+    <button
+      id="closeDialog"
+      class="modal-close"
+      type="button"
+    >
+      ×
+    </button>
+
+    <span class="modal-label">
+      TEZ BUYURTMA
+    </span>
+
+    <h2 id="selectedProductTitle">
+      Mahsulot
+    </h2>
+
+    <input
+      id="productInput"
+      type="hidden"
+    >
+
+    <label>
+      Ismingiz
+      <input
+        id="nameInput"
+        required
+        maxlength="80"
+      >
+    </label>
+
+    <label>
+      Telefon raqamingiz
+      <input
+        id="phoneInput"
+        required
+        inputmode="tel"
+        placeholder="+998 90 123 45 67"
+      >
+    </label>
+
+    <label>
+      O‘lcham
+      <input id="sizeInput">
+    </label>
+
+    <label>
+      Rang
+      <input id="colorInput">
+    </label>
+
+    <label>
+      Soni
+      <input
+        id="quantityInput"
+        type="number"
+        min="1"
+        max="20"
+        value="1"
+      >
+    </label>
+
+    <button
+      id="submitOrder"
+      class="main-btn full-btn"
+      type="submit"
+    >
+      Buyurtma berish
+    </button>
+
+    <p
+      id="formMessage"
+      class="form-message"
+    ></p>
+
+  </form>
+
+</dialog>
+
+
+<div class="mobile-product-bar">
+
+  <div>
+    <span>Narxi</span>
+    <strong id="mobileProductPrice">
+      0 so‘m
+    </strong>
+  </div>
+
+  <button
+    id="mobileBuyBtn"
+    class="main-btn"
+  >
+    Buyurtma
+  </button>
+
+</div>
+
+
+<script src="config.js"></script>
+<script src="product.js"></script>
+
+</body>
+</html>
