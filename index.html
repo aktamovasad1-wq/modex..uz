@@ -2,174 +2,385 @@
 <html lang="uz">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Modex.uz — Internet do‘kon</title>
-  <meta name="description" content="Modex.uz internet do‘koni">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MODEX.UZ — Internet do‘kon</title>
+
+  <meta
+    name="description"
+    content="MODEX.UZ internet do‘koni. Mahsulotlarni toping va tez buyurtma bering."
+  >
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header class="topbar">
-  <a class="brand" href="index.html">MODEX<span>.UZ</span></a>
+<!-- ================= HEADER ================= -->
 
-  <div class="header-actions">
-    <button id="favoritesBtn" class="icon-btn">♡</button>
-    <button id="cartBtn" class="icon-btn">
-      Savatcha <span id="cartCount">0</span>
+<header class="market-header">
+
+  <div class="header-inner">
+
+    <a href="index.html" class="brand">
+      MODEX<span>.UZ</span>
+    </a>
+
+    <button id="catalogBtn" class="catalog-btn">
+      ☰ Katalog
     </button>
+
+    <div class="header-search">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Mahsulotlar va kategoriyalarni qidirish"
+        autocomplete="off"
+      >
+
+      <button id="searchBtn" type="button">
+        🔍
+      </button>
+    </div>
+
+    <div class="header-buttons">
+
+      <button id="favoritesBtn" class="header-btn">
+        ♡
+        <span>Sevimlilar</span>
+        <b id="favoriteCount">0</b>
+      </button>
+
+      <button id="cartBtn" class="header-btn">
+        🛒
+        <span>Savat</span>
+        <b id="cartCount">0</b>
+      </button>
+
+    </div>
+
   </div>
+
 </header>
+
+
+<!-- ================= MOBILE SEARCH ================= -->
+
+<div class="mobile-search">
+  <input
+    id="mobileSearchInput"
+    placeholder="Mahsulot qidirish..."
+  >
+  <button id="mobileSearchBtn">🔍</button>
+</div>
+
+
+<!-- ================= MAIN ================= -->
 
 <main>
 
-  <section class="hero">
-    <div>
-      <p class="eyebrow">MODEX.UZ</p>
-      <h1>O‘zingizga mos mahsulotni toping</h1>
-      <p class="hero-copy">
-        Katalogdan tanlang, tez buyurtma bering va operatorimiz bilan bog‘laning.
+  <!-- HERO -->
+
+  <section class="market-hero">
+
+    <div class="hero-main">
+
+      <div class="hero-text">
+
+        <span class="hero-label">
+          MODEX.UZ
+        </span>
+
+        <h1>
+          Kerakli mahsulotni tez va oson toping
+        </h1>
+
+        <p>
+          Katalogdan tanlang, buyurtma qoldiring —
+          operatorimiz siz bilan bog‘lanadi.
+        </p>
+
+        <a href="#products" class="hero-button">
+          Xaridni boshlash
+        </a>
+
+      </div>
+
+    </div>
+
+    <div class="hero-side">
+
+      <span>TEZ BUYURTMA</span>
+
+      <strong>
+        Telefon raqamingizni qoldiring
+      </strong>
+
+      <p>
+        Operatorimiz buyurtmangizni tasdiqlaydi.
       </p>
 
-      <div class="hero-actions">
-        <a class="btn primary" href="#products">Mahsulotlarni ko‘rish</a>
-        <a class="btn secondary" href="#categories">Kataloglar</a>
-      </div>
     </div>
 
-    <div class="hero-card">
-      <div class="hero-badge">MODEX.UZ</div>
-      <strong>Tez buyurtma</strong>
-      <span>Telefon raqamingizni qoldiring, operatorimiz siz bilan bog‘lanadi.</span>
-    </div>
   </section>
 
-  <section class="section" id="categories">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">KATALOG</p>
-        <h2>Kategoriyalar</h2>
-      </div>
-    </div>
 
-    <div id="categoryList" class="category-list"></div>
-  </section>
+  <!-- CATEGORIES -->
 
-  <section class="section">
-    <div class="shop-toolbar">
-      <input
-        id="searchInput"
-        class="shop-search"
-        placeholder="Mahsulot qidirish..."
+  <section class="market-section">
+
+    <div class="section-title">
+
+      <h2>Kategoriyalar</h2>
+
+      <button
+        id="allCategoriesBtn"
+        class="text-btn"
       >
+        Barchasi
+      </button>
+
+    </div>
+
+    <div
+      id="categoryList"
+      class="category-grid"
+    ></div>
+
+  </section>
+
+
+  <!-- FILTER -->
+
+  <section class="filter-section">
+
+    <div class="filter-row">
 
       <select id="categoryFilter">
-        <option value="">Barcha kategoriyalar</option>
+        <option value="">
+          Barcha kategoriyalar
+        </option>
       </select>
 
       <select id="sortSelect">
-        <option value="new">Yangi mahsulotlar</option>
-        <option value="cheap">Arzonidan</option>
-        <option value="expensive">Qimmatidan</option>
+        <option value="new">
+          Avval yangilari
+        </option>
+
+        <option value="cheap">
+          Narxi arzon
+        </option>
+
+        <option value="expensive">
+          Narxi qimmat
+        </option>
       </select>
+
     </div>
+
   </section>
 
-  <section class="section" id="products">
-    <div class="section-head">
+
+  <!-- PRODUCTS -->
+
+  <section
+    id="products"
+    class="market-section"
+  >
+
+    <div class="section-title">
+
       <div>
-        <p class="eyebrow">MAHSULOTLAR</p>
         <h2>Mahsulotlar</h2>
+        <span
+          id="productCount"
+          class="product-count"
+        ></span>
       </div>
 
-      <span id="productCount" class="muted"></span>
     </div>
 
-    <div id="productsGrid" class="product-grid"></div>
 
-    <div id="emptyState" class="empty hidden">
+    <div
+      id="productsGrid"
+      class="market-products"
+    ></div>
+
+
+    <div
+      id="emptyState"
+      class="empty-state hidden"
+    >
       Mahsulot topilmadi.
     </div>
+
   </section>
 
-  <section class="section features-section">
-    <div class="feature-card">
+
+  <!-- ADVANTAGES -->
+
+  <section class="advantages">
+
+    <article>
+      <div class="adv-icon">📱</div>
       <strong>Tez buyurtma</strong>
-      <span>Bir necha soniyada zayavka qoldiring.</span>
-    </div>
+      <span>Telefon orqali tasdiqlash</span>
+    </article>
 
-    <div class="feature-card">
-      <strong>Operator yordam beradi</strong>
-      <span>Buyurtmangiz telefon orqali tasdiqlanadi.</span>
-    </div>
-
-    <div class="feature-card">
+    <article>
+      <div class="adv-icon">📦</div>
       <strong>Qulay katalog</strong>
-      <span>Kerakli mahsulotni tez toping.</span>
-    </div>
+      <span>Kerakli mahsulotni tez toping</span>
+    </article>
+
+    <article>
+      <div class="adv-icon">💬</div>
+      <strong>Operator yordami</strong>
+      <span>Savollaringizga yordam beramiz</span>
+    </article>
+
+    <article>
+      <div class="adv-icon">🔎</div>
+      <strong>Qidiruv</strong>
+      <span>Mahsulotlarni osongina qidiring</span>
+    </article>
+
   </section>
 
-  <section class="section support-section">
-    <div>
-      <p class="eyebrow">YORDAM</p>
-      <h2>Yordam xizmati</h2>
-      <p class="muted">
-        Savolingiz bo‘lsa, telefon raqamingizni qoldiring.
+
+  <!-- SUPPORT -->
+
+  <section class="support-section">
+
+    <div class="support-info">
+
+      <span>MODEX YORDAM</span>
+
+      <h2>
+        Savolingiz bormi?
+      </h2>
+
+      <p>
+        Telefon raqamingizni qoldiring.
+        Operatorimiz siz bilan bog‘lanadi.
       </p>
+
     </div>
 
-    <form id="supportForm" class="support-form">
-      <input id="supportName" required placeholder="Ismingiz">
-      <input id="supportPhone" required placeholder="+998 90 123 45 67">
-      <textarea id="supportMessage" required placeholder="Savolingiz"></textarea>
 
-      <button class="btn primary" type="submit">
+    <form
+      id="supportForm"
+      class="support-form"
+    >
+
+      <input
+        id="supportName"
+        required
+        maxlength="80"
+        placeholder="Ismingiz"
+      >
+
+      <input
+        id="supportPhone"
+        required
+        inputmode="tel"
+        placeholder="+998 90 123 45 67"
+      >
+
+      <textarea
+        id="supportMessage"
+        required
+        maxlength="500"
+        placeholder="Savolingiz..."
+      ></textarea>
+
+      <button
+        class="main-btn"
+        type="submit"
+      >
         Yuborish
       </button>
 
-      <p id="supportFormMessage" class="form-message"></p>
+      <p
+        id="supportFormMessage"
+        class="form-message"
+      ></p>
+
     </form>
+
   </section>
 
 </main>
 
+
+<!-- ================= FOOTER ================= -->
+
 <footer>
-  <strong>MODEX.UZ</strong>
-  <span>© 2026. Barcha huquqlar himoyalangan.</span>
+
+  <div>
+    <strong>MODEX.UZ</strong>
+
+    <p>
+      Internet do‘kon
+    </p>
+  </div>
+
+  <span>
+    © 2026 MODEX.UZ
+  </span>
+
 </footer>
 
+
+<!-- ================= ORDER MODAL ================= -->
+
 <dialog id="orderDialog">
-  <form id="orderForm" class="order-form">
+
+  <form
+    id="orderForm"
+    class="order-modal"
+  >
 
     <button
-      class="close"
-      type="button"
       id="closeDialog"
+      class="modal-close"
+      type="button"
     >
       ×
     </button>
 
-    <p class="eyebrow">TEZ BUYURTMA</p>
 
-    <h3 id="selectedProductTitle">
+    <span class="modal-label">
+      TEZ BUYURTMA
+    </span>
+
+
+    <h2 id="selectedProductTitle">
       Mahsulot
-    </h3>
+    </h2>
+
 
     <input
-      type="hidden"
       id="productInput"
+      type="hidden"
     >
+
 
     <label>
       Ismingiz
+
       <input
         id="nameInput"
         required
         maxlength="80"
+        placeholder="Ismingiz"
       >
     </label>
 
+
     <label>
       Telefon raqamingiz
+
       <input
         id="phoneInput"
         required
@@ -178,8 +389,10 @@
       >
     </label>
 
+
     <label>
       Soni
+
       <input
         id="quantityInput"
         type="number"
@@ -190,51 +403,170 @@
       >
     </label>
 
+
     <label>
       O‘lcham
-      <select id="sizeInput">
-        <option value="">Tanlanmagan</option>
-        <option>S</option>
-        <option>M</option>
-        <option>L</option>
-        <option>XL</option>
-      </select>
+
+      <input
+        id="sizeInput"
+        placeholder="Masalan: 110, 116 yoki M"
+      >
     </label>
+
 
     <label>
       Rang
+
       <input
         id="colorInput"
         placeholder="Masalan: qora"
       >
     </label>
 
+
     <button
-      class="btn primary full"
-      type="submit"
       id="submitOrder"
+      class="main-btn full-btn"
+      type="submit"
     >
-      Buyurtma yuborish
+      Buyurtma berish
     </button>
 
-    <p id="formMessage" class="form-message"></p>
+
+    <p
+      id="formMessage"
+      class="form-message"
+    ></p>
 
   </form>
+
 </dialog>
 
-<div id="cartDrawer" class="cart-drawer hidden">
-  <div class="cart-head">
-    <h3>Savatcha</h3>
-    <button id="closeCart" class="small-btn">Yopish</button>
+
+<!-- ================= CART ================= -->
+
+<div
+  id="cartOverlay"
+  class="drawer-overlay hidden"
+></div>
+
+
+<aside
+  id="cartDrawer"
+  class="market-drawer hidden"
+>
+
+  <div class="drawer-header">
+
+    <div>
+      <span>SAVAT</span>
+      <h2>Mahsulotlar</h2>
+    </div>
+
+    <button
+      id="closeCart"
+      class="drawer-close"
+    >
+      ×
+    </button>
+
   </div>
+
 
   <div id="cartItems"></div>
 
-  <div class="cart-total">
-    Jami:
-    <strong id="cartTotal">0 so‘m</strong>
+
+  <div class="drawer-total">
+
+    <span>Jami</span>
+
+    <strong id="cartTotal">
+      0 so‘m
+    </strong>
+
   </div>
-</div>
+
+</aside>
+
+
+<!-- ================= FAVORITES ================= -->
+
+<div
+  id="favoritesOverlay"
+  class="drawer-overlay hidden"
+></div>
+
+
+<aside
+  id="favoritesDrawer"
+  class="market-drawer hidden"
+>
+
+  <div class="drawer-header">
+
+    <div>
+      <span>SEVIMLILAR</span>
+      <h2>Saqlanganlar</h2>
+    </div>
+
+    <button
+      id="closeFavorites"
+      class="drawer-close"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div id="favoriteItems"></div>
+
+</aside>
+
+
+<!-- ================= MOBILE NAV ================= -->
+
+<nav class="mobile-bottom-nav">
+
+  <a
+    href="index.html"
+    class="mobile-nav-item active"
+  >
+    <span>⌂</span>
+    <small>Bosh sahifa</small>
+  </a>
+
+
+  <button
+    id="mobileCatalogBtn"
+    class="mobile-nav-item"
+  >
+    <span>☰</span>
+    <small>Katalog</small>
+  </button>
+
+
+  <button
+    id="mobileFavoritesBtn"
+    class="mobile-nav-item"
+  >
+    <span>♡</span>
+    <small>Sevimlilar</small>
+  </button>
+
+
+  <button
+    id="mobileCartBtn"
+    class="mobile-nav-item"
+  >
+    <span>🛒</span>
+    <small>Savat</small>
+  </button>
+
+</nav>
+
+
+<!-- ================= SCRIPT ================= -->
 
 <script src="config.js"></script>
 <script src="app.js"></script>
