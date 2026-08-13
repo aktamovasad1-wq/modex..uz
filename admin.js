@@ -1,358 +1,1487 @@
-<!doctype html>
-<html lang="uz">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MODEX.UZ — Admin Panel</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+const { SUPABASE_URL, SUPABASE_KEY } = window.MODEX_CONFIG;
 
-<body>
+const REST = `${SUPABASE_URL}/rest/v1`;
+const AUTH = `${SUPABASE_URL}/auth/v1`;
 
-  <!-- LOGIN -->
-  <section id="loginView" class="login-wrap">
-    <div class="login-box">
-      <h2>Admin kirish</h2>
+let accessToken = "";
+let currentUser = null;
 
-      <form id="loginForm">
-        <label>
-          Email
-          <input
-            id="email"
-            type="email"
-            required
-            placeholder="admin@email.com"
-          >
-        </label>
+let products = [];
+let orders = [];
+let operators = [];
+let supportRequests = [];
 
-        <label>
-          Parol
-          <input
-            id="password"
-            type="password"
-            required
-            placeholder="Parol"
-          >
-        </label>
+/* =========================
+   ELEMENTLAR
+========================= */
 
-        <button class="main-btn full-btn" type="submit">
-          Kirish
+const loginView = document.getElementById("loginView");
+const adminView = document.getElementById("adminView");
+
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+
+const logoutBtn = document.getElementById("logoutBtn");
+const refreshAdminBtn = document.getElementById("refreshAdminBtn");
+
+const adminEmail = document.getElementById("adminEmail");
+
+const productForm = document.getElementById("productForm");
+const productFormTitle = document.getElementById("productFormTitle");
+
+const editProductId = document.getElementById("editProductId");
+const pName = document.getElementById("pName");
+const pCategory = document.getElementById("pCategory");
+const pPrice = document.getElementById("pPrice");
+const pOldPrice = document.getElementById("pOldPrice");
+const pDiscount = document.getElementById("pDiscount");
+const pDesc = document.getElementById("pDesc");
+const pImage = document.getElementById("pImage");
+
+const productSubmitBtn = document.getElementById("productSubmitBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const productMessage = document.getElementById("productMessage");
+const adminProducts = document.getElementById("adminProducts");
+
+const operatorCreateForm = document.getElementById("operatorCreateForm");
+const opName = document.getElementById("opName");
+const newOpEmail = document.getElementById("newOpEmail");
+const newOpPassword = document.getElementById("newOpPassword");
+const operatorCreateMessage = document.getElementById("operatorCreateMessage");
+const operatorsList = document.getElementById("operatorsList");
+
+const adminOrderSearch = document.getElementById("adminOrderSearch");
+const ordersBody = document.getElementById("ordersBody");
+const ordersMessage = document.getElementById("ordersMessage");
+
+const adminSupportList = document.getElementById("adminSupportList");
+
+const aProducts = document.getElementById("aProducts");
+const aOrders = document.getElementById("aOrders");
+const aNew = document.getElementById("aNew");
+const aOperators = document.getElementById("aOperators");
+
+/* =========================
+   YORDAMCHI
+========================= */
+
+function esc(value = "") {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function money(value) {
+  return (
+    new Intl.NumberFormat("uz-UZ").format(
+      Number(value || 0)
+    ) + " so‘m"
+  );
+}
+
+function setMessage(element, text, type = "") {
+  element.textContent = text;
+
+  element.className =
+    `form-message ${type}`.trim();
+}
+
+function productLink(id) {
+  const path = location.pathname.replace(
+    /admin\.html.*$/,
+    ""
+  );
+
+  return `${location.origin}${path}product.html?id=${id}`;
+}
+
+/* =========================
+   REST API
+========================= */
+
+async function api(path, options = {}) {
+  const response = await fetch(
+    `${REST}/${path}`,
+    {
+      ...options,
+      headers: {
+        apikey: SUPABASE_KEY,
+
+        Authorization:
+          `Bearer ${accessToken || SUPABASE_KEY}`,
+
+        ...(options.headers || {})
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      await response.text()
+    );
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const text = await response.text();
+
+  return text
+    ? JSON.parse(text)
+    : null;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+async function signIn(email, password) {
+  const response = await fetch(
+    `${AUTH}/token?grant_type=password`,
+    {
+      method: "POST",
+
+      headers: {
+        apikey: SUPABASE_KEY,
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        email,
+        password
+      })
+    }
+  );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error_description ||
+      data.msg ||
+      "Kirishda xatolik"
+    );
+  }
+
+  return data;
+}
+
+async function getCurrentUser() {
+  const response = await fetch(
+    `${AUTH}/user`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization:
+          `Bearer ${accessToken}`
+      }
+    }
+  );
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      "Sessiya topilmadi"
+    );
+  }
+
+  return data;
+}
+
+async function checkAdminRole(userId) {
+  const rows = await api(
+    `profiles?select=id,name,role,active&id=eq.${encodeURIComponent(userId)}&limit=1`
+  );
+
+  const profile = rows?.[0];
+
+  return (
+    profile &&
+    profile.role === "admin" &&
+    profile.active === true
+  );
+}
+
+function saveSession(token) {
+  localStorage.setItem(
+    "modex_admin_token",
+    token
+  );
+}
+
+function clearSession() {
+  localStorage.removeItem(
+    "modex_admin_token"
+  );
+
+  accessToken = "";
+  currentUser = null;
+}
+
+function showLogin() {
+  loginView.classList.remove("hidden");
+  adminView.classList.add("hidden");
+}
+
+function showAdmin() {
+  loginView.classList.add("hidden");
+  adminView.classList.remove("hidden");
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+loginForm.onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+    setMessage(
+      loginMessage,
+      "Tekshirilmoqda..."
+    );
+
+    try {
+      const auth =
+        await signIn(
+          emailInput.value.trim(),
+          passwordInput.value
+        );
+
+      accessToken =
+        auth.access_token;
+
+      currentUser =
+        auth.user;
+
+      const isAdmin =
+        await checkAdminRole(
+          currentUser.id
+        );
+
+      if (!isAdmin) {
+        throw new Error(
+          "Bu akkauntda admin huquqi yo‘q."
+        );
+      }
+
+      saveSession(
+        accessToken
+      );
+
+      adminEmail.textContent =
+        currentUser.email || "";
+
+      setMessage(
+        loginMessage,
+        ""
+      );
+
+      showAdmin();
+
+      await loadAdminData();
+
+    } catch (error) {
+      console.error(error);
+
+      clearSession();
+
+      setMessage(
+        loginMessage,
+        error.message ||
+        "Kirishda xatolik",
+        "error"
+      );
+    }
+  };
+
+/* =========================
+   SESSION START
+========================= */
+
+async function restoreSession() {
+  accessToken =
+    localStorage.getItem(
+      "modex_admin_token"
+    ) || "";
+
+  if (!accessToken) {
+    showLogin();
+    return;
+  }
+
+  try {
+    currentUser =
+      await getCurrentUser();
+
+    const isAdmin =
+      await checkAdminRole(
+        currentUser.id
+      );
+
+    if (!isAdmin) {
+      throw new Error(
+        "Admin huquqi yo‘q"
+      );
+    }
+
+    adminEmail.textContent =
+      currentUser.email || "";
+
+    showAdmin();
+
+    await loadAdminData();
+
+  } catch (error) {
+    console.error(error);
+
+    clearSession();
+    showLogin();
+  }
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+logoutBtn.onclick = () => {
+  clearSession();
+  showLogin();
+
+  emailInput.value = "";
+  passwordInput.value = "";
+};
+
+/* =========================
+   ADMIN DATA
+========================= */
+
+async function loadAdminData() {
+  await Promise.all([
+    loadProducts(),
+    loadOrders(),
+    loadOperators(),
+    loadSupport()
+  ]);
+
+  updateStats();
+}
+
+refreshAdminBtn.onclick =
+  async () => {
+    refreshAdminBtn.disabled = true;
+
+    refreshAdminBtn.textContent =
+      "Yangilanmoqda...";
+
+    try {
+      await loadAdminData();
+
+    } finally {
+      refreshAdminBtn.disabled = false;
+
+      refreshAdminBtn.textContent =
+        "Yangilash";
+    }
+  };
+
+/* =========================
+   STATISTIKA
+========================= */
+
+function updateStats() {
+  aProducts.textContent =
+    products.length;
+
+  aOrders.textContent =
+    orders.length;
+
+  aNew.textContent =
+    orders.filter(
+      order =>
+        order.status === "new"
+    ).length;
+
+  aOperators.textContent =
+    operators.length;
+}
+
+/* =========================
+   RASM YUKLASH
+========================= */
+
+async function uploadImage(file) {
+  if (!file) {
+    return null;
+  }
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const filename =
+    `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}.${extension}`;
+
+  const bucket = "products";
+
+  const response = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/${bucket}/${filename}`,
+    {
+      method: "POST",
+
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization:
+          `Bearer ${accessToken}`,
+        "Content-Type":
+          file.type || "application/octet-stream",
+        "x-upsert": "false"
+      },
+
+      body: file
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      await response.text()
+    );
+  }
+
+  return (
+    `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filename}`
+  );
+}
+
+/* =========================
+   PRODUCTS LOAD
+========================= */
+
+async function loadProducts() {
+  try {
+    products = await api(
+      "products?select=*&order=id.desc"
+    );
+
+    renderAdminProducts();
+
+  } catch (error) {
+    console.error(error);
+
+    setMessage(
+      productMessage,
+      "Mahsulotlarni yuklab bo‘lmadi.",
+      "error"
+    );
+  }
+}
+
+/* =========================
+   PRODUCT FORM
+========================= */
+
+productForm.onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+    const editingId =
+      editProductId.value.trim();
+
+    const name =
+      pName.value.trim();
+
+    const category =
+      pCategory.value.trim();
+
+    const price =
+      Number(pPrice.value || 0);
+
+    const oldPrice =
+      pOldPrice.value
+        ? Number(pOldPrice.value)
+        : null;
+
+    let discount =
+      Number(
+        pDiscount.value || 0
+      );
+
+    if (
+      oldPrice &&
+      oldPrice > price &&
+      !discount
+    ) {
+      discount =
+        Math.round(
+          ((oldPrice - price) /
+            oldPrice) *
+          100
+        );
+
+      pDiscount.value =
+        discount;
+    }
+
+    if (
+      discount < 0 ||
+      discount > 100
+    ) {
+      setMessage(
+        productMessage,
+        "Chegirma 0 dan 100 gacha bo‘lishi kerak.",
+        "error"
+      );
+
+      return;
+    }
+
+    productSubmitBtn.disabled =
+      true;
+
+    productSubmitBtn.textContent =
+      editingId
+        ? "Saqlanmoqda..."
+        : "Qo‘shilmoqda...";
+
+    setMessage(
+      productMessage,
+      ""
+    );
+
+    try {
+      let imageUrl = null;
+
+      if (pImage.files?.[0]) {
+        imageUrl =
+          await uploadImage(
+            pImage.files[0]
+          );
+      }
+
+      const payload = {
+        name,
+        category,
+        price,
+        old_price: oldPrice,
+        discount_percent: discount,
+        description:
+          pDesc.value.trim(),
+        active: true
+      };
+
+      if (imageUrl) {
+        payload.image_url =
+          imageUrl;
+      }
+
+      if (editingId) {
+        await api(
+          `products?id=eq.${encodeURIComponent(editingId)}`,
+          {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              )
+          }
+        );
+
+        setMessage(
+          productMessage,
+          "Mahsulot yangilandi ✅",
+          "success"
+        );
+
+      } else {
+        await api(
+          "products",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              )
+          }
+        );
+
+        setMessage(
+          productMessage,
+          "Mahsulot qo‘shildi ✅",
+          "success"
+        );
+      }
+
+      resetProductForm();
+
+      await loadProducts();
+
+      updateStats();
+
+    } catch (error) {
+      console.error(error);
+
+      setMessage(
+        productMessage,
+        "Mahsulotni saqlab bo‘lmadi.",
+        "error"
+      );
+
+    } finally {
+      productSubmitBtn.disabled =
+        false;
+
+      productSubmitBtn.textContent =
+        editProductId.value
+          ? "Saqlash"
+          : "Mahsulot qo‘shish";
+    }
+  };
+
+/* =========================
+   PRODUCT RESET
+========================= */
+
+function resetProductForm() {
+  productForm.reset();
+
+  editProductId.value = "";
+
+  productFormTitle.textContent =
+    "Mahsulot qo‘shish";
+
+  productSubmitBtn.textContent =
+    "Mahsulot qo‘shish";
+
+  cancelEditBtn.classList.add(
+    "hidden"
+  );
+}
+
+cancelEditBtn.onclick = () => {
+  resetProductForm();
+
+  setMessage(
+    productMessage,
+    ""
+  );
+};
+
+/* =========================
+   PRODUCT EDIT
+========================= */
+
+function editProduct(id) {
+  const product =
+    products.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+  if (!product) {
+    return;
+  }
+
+  editProductId.value =
+    product.id;
+
+  pName.value =
+    product.name || "";
+
+  pCategory.value =
+    product.category || "";
+
+  pPrice.value =
+    product.price || "";
+
+  pOldPrice.value =
+    product.old_price || "";
+
+  pDiscount.value =
+    product.discount_percent || "";
+
+  pDesc.value =
+    product.description || "";
+
+  productFormTitle.textContent =
+    "Mahsulotni tahrirlash";
+
+  productSubmitBtn.textContent =
+    "Saqlash";
+
+  cancelEditBtn.classList.remove(
+    "hidden"
+  );
+
+  productForm.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+/* =========================
+   PRODUCT DELETE
+========================= */
+
+async function deleteProduct(id) {
+  const product =
+    products.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+  if (!product) return;
+
+  const ok =
+    confirm(
+      `"${product.name}" mahsulotini o‘chirasizmi?`
+    );
+
+  if (!ok) {
+    return;
+  }
+
+  try {
+    await api(
+      `products?id=eq.${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+
+        headers: {
+          Prefer:
+            "return=minimal"
+        }
+      }
+    );
+
+    await loadProducts();
+
+    updateStats();
+
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      "Mahsulotni o‘chirib bo‘lmadi."
+    );
+  }
+}
+
+/* =========================
+   PRODUCT RENDER
+========================= */
+
+function renderAdminProducts() {
+  adminProducts.innerHTML = "";
+
+  if (!products.length) {
+    adminProducts.innerHTML = `
+      <p class="drawer-empty">
+        Hozircha mahsulot yo‘q.
+      </p>
+    `;
+
+    return;
+  }
+
+  products.forEach(product => {
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "product-admin-item";
+
+    let priceHtml = `
+      <strong>
+        ${money(product.price)}
+      </strong>
+    `;
+
+    if (
+      product.old_price &&
+      Number(product.old_price) >
+      Number(product.price)
+    ) {
+      priceHtml += `
+        <span
+          style="
+            text-decoration:line-through;
+            color:#888;
+          "
+        >
+          ${money(product.old_price)}
+        </span>
+      `;
+    }
+
+    if (
+      Number(product.discount_percent) >
+      0
+    ) {
+      priceHtml += `
+        <span
+          style="
+            color:#6d3df0;
+            font-weight:900;
+          "
+        >
+          -${Number(product.discount_percent)}%
+        </span>
+      `;
+    }
+
+    item.innerHTML = `
+      <img
+        src="${esc(product.image_url || "")}"
+        alt="${esc(product.name || "")}"
+      >
+
+      <div class="product-admin-info">
+
+        <strong>
+          ${esc(product.name || "")}
+        </strong>
+
+        <span>
+          ${esc(product.category || "")}
+        </span>
+
+        ${priceHtml}
+
+        <span>
+          ${
+            product.active === false
+              ? "Faol emas"
+              : "Faol"
+          }
+        </span>
+
+      </div>
+
+      <div class="product-admin-actions">
+
+        <button
+          class="small-btn edit-product-btn"
+          data-id="${product.id}"
+        >
+          Tahrirlash
         </button>
 
-        <p id="loginMessage" class="form-message"></p>
-      </form>
-    </div>
-  </section>
+        <button
+          class="small-btn copy-target-btn"
+          data-id="${product.id}"
+        >
+          🔗 Linkni nusxalash
+        </button>
 
-
-  <!-- ADMIN -->
-  <section id="adminView" class="hidden">
-
-    <div class="admin-shell">
-
-      <div class="admin-head">
-
-        <div>
-          <span class="market-category">MODEX.UZ</span>
-          <h1>Admin Panel</h1>
-          <p id="adminEmail"></p>
-        </div>
-
-        <div class="admin-top-actions">
-          <a href="index.html" class="small-btn">
-            Sayt
-          </a>
-
-          <a href="settings.html" class="small-btn">
-            Sozlamalar
-          </a>
-
-          <a href="operator.html" class="small-btn">
-            Operator panel
-          </a>
-
-          <button id="refreshAdminBtn" class="small-btn">
-            Yangilash
-          </button>
-
-          <button id="logoutBtn" class="small-btn">
-            Chiqish
-          </button>
-        </div>
+        <button
+          class="small-btn delete-product-btn"
+          data-id="${product.id}"
+        >
+          O‘chirish
+        </button>
 
       </div>
+    `;
 
+    adminProducts.appendChild(
+      item
+    );
+  });
 
-      <!-- STATISTIKA -->
-      <div class="stats-row">
+  adminProducts
+    .querySelectorAll(
+      ".edit-product-btn"
+    )
+    .forEach(button => {
+      button.onclick = () => {
+        editProduct(
+          button.dataset.id
+        );
+      };
+    });
 
-        <div class="stat">
-          <b id="aProducts">0</b>
-          <span>Mahsulotlar</span>
-        </div>
+  adminProducts
+    .querySelectorAll(
+      ".delete-product-btn"
+    )
+    .forEach(button => {
+      button.onclick = () => {
+        deleteProduct(
+          button.dataset.id
+        );
+      };
+    });
 
-        <div class="stat">
-          <b id="aOrders">0</b>
-          <span>Buyurtmalar</span>
-        </div>
+  adminProducts
+    .querySelectorAll(
+      ".copy-target-btn"
+    )
+    .forEach(button => {
+      button.onclick =
+        async () => {
+          const link =
+            productLink(
+              button.dataset.id
+            );
 
-        <div class="stat">
-          <b id="aNew">0</b>
-          <span>Yangi buyurtma</span>
-        </div>
+          try {
+            await navigator.clipboard.writeText(
+              link
+            );
 
-        <div class="stat">
-          <b id="aOperators">0</b>
-          <span>Operatorlar</span>
-        </div>
+            const old =
+              button.textContent;
 
-      </div>
+            button.textContent =
+              "Nusxalandi ✅";
 
+            setTimeout(() => {
+              button.textContent =
+                old;
+            }, 1500);
 
-      <div class="admin-grid">
+          } catch {
+            prompt(
+              "Target link:",
+              link
+            );
+          }
+        };
+    });
+}
 
-        <!-- MAHSULOT QO‘SHISH / TAHRIRLASH -->
-        <section class="panel">
+/* =========================
+   ORDERS
+========================= */
 
-          <h2 id="productFormTitle">
-            Mahsulot qo‘shish
-          </h2>
+async function loadOrders() {
+  try {
+    orders = await api(
+      "orders?select=*&order=id.desc"
+    );
 
-          <form id="productForm" class="admin-form">
+    renderOrders();
 
-            <input
-              id="editProductId"
-              type="hidden"
+  } catch (error) {
+    console.error(error);
+
+    setMessage(
+      ordersMessage,
+      "Buyurtmalarni yuklab bo‘lmadi.",
+      "error"
+    );
+  }
+}
+
+function renderOrders() {
+  const search =
+    adminOrderSearch.value
+      .trim()
+      .toLowerCase();
+
+  const filtered =
+    orders.filter(order => {
+      const text = `
+        ${order.name || ""}
+        ${order.phone || ""}
+        ${order.product || ""}
+        ${order.size || ""}
+        ${order.color || ""}
+      `.toLowerCase();
+
+      return text.includes(search);
+    });
+
+  ordersBody.innerHTML =
+    filtered
+      .map(order => `
+        <tr>
+
+          <td>
+            ${order.id}
+          </td>
+
+          <td>
+            ${esc(order.name || "")}
+          </td>
+
+          <td>
+            <a href="tel:${esc(order.phone || "")}">
+              ${esc(order.phone || "")}
+            </a>
+          </td>
+
+          <td>
+            ${esc(order.product || "")}
+          </td>
+
+          <td>
+            ${Number(order.quantity || 1)}
+          </td>
+
+          <td>
+            ${esc(order.size || "-")}
+          </td>
+
+          <td>
+            ${esc(order.color || "-")}
+          </td>
+
+          <td>
+
+            <select
+              class="order-status"
+              data-id="${order.id}"
             >
-
-            <label>
-              Mahsulot nomi
-              <input
-                id="pName"
-                type="text"
-                required
-                placeholder="Masalan: Qizlar komplekti"
+              <option
+                value="new"
+                ${
+                  order.status === "new"
+                    ? "selected"
+                    : ""
+                }
               >
-            </label>
+                Yangi
+              </option>
 
-            <label>
-              Kategoriya
-              <input
-                id="pCategory"
-                type="text"
-                required
-                placeholder="Masalan: Bolalar kiyimi"
+              <option
+                value="confirmed"
+                ${
+                  order.status === "confirmed"
+                    ? "selected"
+                    : ""
+                }
               >
-            </label>
+                Tasdiqlandi
+              </option>
 
-            <label>
-              Asosiy narx
-              <input
-                id="pPrice"
-                type="number"
-                min="0"
-                required
-                placeholder="199000"
+              <option
+                value="delivery"
+                ${
+                  order.status === "delivery"
+                    ? "selected"
+                    : ""
+                }
               >
-            </label>
+                Yetkazishda
+              </option>
 
-            <label>
-              Eski narx
-              <input
-                id="pOldPrice"
-                type="number"
-                min="0"
-                placeholder="249000"
+              <option
+                value="done"
+                ${
+                  order.status === "done"
+                    ? "selected"
+                    : ""
+                }
               >
-            </label>
+                Yakunlandi
+              </option>
 
-            <label>
-              Chegirma foizi
-              <input
-                id="pDiscount"
-                type="number"
-                min="0"
-                max="100"
-                placeholder="20"
+              <option
+                value="cancelled"
+                ${
+                  order.status === "cancelled"
+                    ? "selected"
+                    : ""
+                }
               >
-            </label>
+                Bekor qilindi
+              </option>
+            </select>
 
-            <label>
-              Tavsif
-              <textarea
-                id="pDesc"
-                rows="5"
-                placeholder="Mahsulot haqida qisqacha..."
-              ></textarea>
-            </label>
+          </td>
 
-            <label>
-              Rasm
-              <input
-                id="pImage"
-                type="file"
-                accept="image/*"
-              >
-            </label>
+        </tr>
+      `)
+      .join("");
 
-            <div class="product-form-buttons">
+  ordersBody
+    .querySelectorAll(
+      ".order-status"
+    )
+    .forEach(select => {
+      select.onchange =
+        async () => {
+          try {
+            await api(
+              `orders?id=eq.${encodeURIComponent(select.dataset.id)}`,
+              {
+                method: "PATCH",
 
-              <button
-                id="productSubmitBtn"
-                class="main-btn"
-                type="submit"
-              >
-                Mahsulot qo‘shish
-              </button>
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                  Prefer:
+                    "return=minimal"
+                },
 
-              <button
-                id="cancelEditBtn"
-                class="product-secondary-btn hidden"
-                type="button"
-              >
-                Bekor qilish
-              </button>
+                body:
+                  JSON.stringify({
+                    status:
+                      select.value
+                  })
+              }
+            );
 
-            </div>
+            const order =
+              orders.find(
+                item =>
+                  Number(item.id) ===
+                  Number(select.dataset.id)
+              );
 
-            <p
-              id="productMessage"
-              class="form-message"
-            ></p>
+            if (order) {
+              order.status =
+                select.value;
+            }
 
-          </form>
+            updateStats();
 
+          } catch (error) {
+            console.error(error);
 
-          <div
-            id="adminProducts"
-            class="product-admin-list"
-          ></div>
+            alert(
+              "Statusni o‘zgartirib bo‘lmadi."
+            );
+          }
+        };
+    });
+}
 
-        </section>
+adminOrderSearch.addEventListener(
+  "input",
+  renderOrders
+);
 
+/* =========================
+   OPERATORS
+========================= */
 
-        <!-- OPERATOR -->
-        <section class="panel">
+async function loadOperators() {
+  try {
+    operators = await api(
+      "profiles?select=id,name,role,active&role=eq.operator&order=name.asc"
+    );
 
-          <h2>Operator yaratish</h2>
+    renderOperators();
 
-          <form
-            id="operatorCreateForm"
-            class="admin-form"
-          >
+  } catch (error) {
+    console.error(error);
 
-            <label>
-              Operator ismi
-              <input
-                id="opName"
-                required
-                placeholder="Operator ismi"
-              >
-            </label>
+    operators = [];
+    renderOperators();
+  }
+}
 
-            <label>
-              Email
-              <input
-                id="newOpEmail"
-                type="email"
-                required
-                placeholder="operator@email.com"
-              >
-            </label>
+function renderOperators() {
+  operatorsList.innerHTML = "";
 
-            <label>
-              Parol
-              <input
-                id="newOpPassword"
-                type="password"
-                required
-                minlength="6"
-                placeholder="Kamida 6 ta belgi"
-              >
-            </label>
+  if (!operators.length) {
+    operatorsList.innerHTML = `
+      <p class="drawer-empty">
+        Operator yo‘q.
+      </p>
+    `;
 
-            <button
-              class="main-btn"
-              type="submit"
-            >
-              Operator yaratish
-            </button>
+    return;
+  }
 
-            <p
-              id="operatorCreateMessage"
-              class="form-message"
-            ></p>
+  operators.forEach(operator => {
+    const box =
+      document.createElement("div");
 
-          </form>
+    box.className =
+      "support-item";
 
-          <div id="operatorsList"></div>
-
-        </section>
-
-      </div>
-
-
-      <!-- BUYURTMALAR -->
-      <section class="panel wide-panel">
-
-        <div class="section-title">
-          <h2>Buyurtmalar</h2>
-
-          <input
-            id="adminOrderSearch"
-            type="search"
-            placeholder="Ism, telefon, mahsulot..."
-          >
-        </div>
-
-        <div class="table-wrap">
-
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Ism</th>
-                <th>Telefon</th>
-                <th>Mahsulot</th>
-                <th>Soni</th>
-                <th>O‘lcham</th>
-                <th>Rang</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody id="ordersBody"></tbody>
-          </table>
-
-        </div>
-
-        <p
-          id="ordersMessage"
-          class="form-message"
-        ></p>
-
-      </section>
-
-
-      <!-- YORDAM MUROJAATLARI -->
-      <section class="panel wide-panel">
-
-        <h2>Yordam murojaatlari</h2>
+    box.innerHTML = `
+      <div>
+        <strong>
+          ${esc(operator.name || "Operator")}
+        </strong>
 
         <div
-          id="adminSupportList"
-          class="support-list"
-        ></div>
+          style="
+            font-size:12px;
+            color:#777;
+            margin-top:4px;
+          "
+        >
+          ${
+            operator.active
+              ? "Faol"
+              : "Bloklangan"
+          }
+        </div>
+      </div>
 
-      </section>
+      <button
+        class="small-btn operator-toggle"
+        data-id="${operator.id}"
+        data-active="${operator.active}"
+      >
+        ${
+          operator.active
+            ? "Bloklash"
+            : "Faollashtirish"
+        }
+      </button>
+    `;
 
-    </div>
+    operatorsList.appendChild(
+      box
+    );
+  });
 
-  </section>
+  operatorsList
+    .querySelectorAll(
+      ".operator-toggle"
+    )
+    .forEach(button => {
+      button.onclick =
+        async () => {
+          const newActive =
+            button.dataset.active !==
+            "true";
 
+          try {
+            await api(
+              `profiles?id=eq.${encodeURIComponent(button.dataset.id)}`,
+              {
+                method: "PATCH",
 
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                  Prefer:
+                    "return=minimal"
+                },
 
-</body>
-</html>
+                body:
+                  JSON.stringify({
+                    active:
+                      newActive
+                  })
+              }
+            );
+
+            await loadOperators();
+
+            updateStats();
+
+          } catch (error) {
+            console.error(error);
+
+            alert(
+              "Operator holatini o‘zgartirib bo‘lmadi."
+            );
+          }
+        };
+    });
+}
+
+/* =========================
+   OPERATOR YARATISH
+========================= */
+
+operatorCreateForm.onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+    const button =
+      operatorCreateForm.querySelector(
+        'button[type="submit"]'
+      );
+
+    button.disabled = true;
+
+    button.textContent =
+      "Yaratilmoqda...";
+
+    setMessage(
+      operatorCreateMessage,
+      ""
+    );
+
+    try {
+      const response =
+        await fetch(
+          `${SUPABASE_URL}/functions/v1/smart-endpoint`,
+          {
+            method: "POST",
+
+            headers: {
+              apikey: SUPABASE_KEY,
+
+              Authorization:
+                `Bearer ${accessToken}`,
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+                name:
+                  opName.value.trim(),
+
+                email:
+                  newOpEmail.value.trim(),
+
+                password:
+                  newOpPassword.value
+              })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          data.message ||
+          "Operator yaratilmadi"
+        );
+      }
+
+      setMessage(
+        operatorCreateMessage,
+        "Operator yaratildi ✅",
+        "success"
+      );
+
+      operatorCreateForm.reset();
+
+      await loadOperators();
+
+      updateStats();
+
+    } catch (error) {
+      console.error(error);
+
+      setMessage(
+        operatorCreateMessage,
+        error.message ||
+        "Operator yaratilmadi.",
+        "error"
+      );
+
+    } finally {
+      button.disabled = false;
+
+      button.textContent =
+        "Operator yaratish";
+    }
+  };
+
+/* =========================
+   SUPPORT
+========================= */
+
+async function loadSupport() {
+  try {
+    supportRequests =
+      await api(
+        "support_requests?select=*&order=id.desc"
+      );
+
+    renderSupport();
+
+  } catch (error) {
+    console.error(error);
+
+    adminSupportList.innerHTML = `
+      <p class="drawer-empty">
+        Murojaatlarni yuklab bo‘lmadi.
+      </p>
+    `;
+  }
+}
+
+function renderSupport() {
+  if (!supportRequests.length) {
+    adminSupportList.innerHTML = `
+      <p class="drawer-empty">
+        Hozircha murojaat yo‘q.
+      </p>
+    `;
+
+    return;
+  }
+
+  adminSupportList.innerHTML =
+    supportRequests
+      .map(item => `
+        <div class="support-item">
+
+          <div>
+            <strong>
+              ${esc(item.name || "")}
+            </strong>
+
+            <p
+              style="
+                margin:6px 0;
+                color:#666;
+              "
+            >
+              ${esc(item.message || "")}
+            </p>
+
+            <a
+              href="tel:${esc(item.phone || "")}"
+            >
+              ${esc(item.phone || "")}
+            </a>
+          </div>
+
+          <span class="badge">
+            ${esc(item.status || "new")}
+          </span>
+
+        </div>
+      `)
+      .join("");
+}
+
+/* =========================
+   START
+========================= */
+
+restoreSession();
