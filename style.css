@@ -1892,4 +1892,44 @@ td{
     flex-direction:column;
   }
 
+}.brand{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  text-decoration:none;
+}
+
+.brand-mini{
+  font-size:8px;
+  font-weight:700;
+  color:#8a8a95;
+  letter-spacing:.4px;
+  white-space:nowrap;
+}
+
+.brand-main{
+  font-size:25px;
+  font-weight:950;
+  letter-spacing:-1.2px;
+  color:#18181f;
+  white-space:nowrap;
+}
+
+.brand-uz{
+  color:var(--brand);
+}
+
+@media(max-width:700px){
+
+  .brand{
+    gap:5px;
+  }
+
+  .brand-mini{
+    font-size:7px;
+  }
+
+  .brand-main{
+    font-size:20px;
+  }
 }
