@@ -3,20 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+
   <title>MODEX.UZ — Admin Panel</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="./style.css?v=20260814">
 </head>
 
 <body>
 
   <!-- LOGIN -->
   <section id="loginView" class="login-wrap">
+
     <div class="login-box">
-      <h2>Admin kirish</h2>
+
+      <span class="market-category">
+        MODEX.UZ
+      </span>
+
+      <h2>
+        Admin kirish
+      </h2>
 
       <form id="loginForm">
+
         <label>
           Email
+
           <input
             id="email"
             type="email"
@@ -25,8 +37,10 @@
           >
         </label>
 
+
         <label>
           Parol
+
           <input
             id="password"
             type="password"
@@ -35,49 +49,93 @@
           >
         </label>
 
-        <button class="main-btn full-btn" type="submit">
+
+        <button
+          class="main-btn full-btn"
+          type="submit"
+        >
           Kirish
         </button>
 
-        <p id="loginMessage" class="form-message"></p>
+
+        <p
+          id="loginMessage"
+          class="form-message"
+        ></p>
+
       </form>
+
     </div>
+
   </section>
 
 
-  <!-- ADMIN -->
+  <!-- ADMIN PANEL -->
   <section id="adminView" class="hidden">
 
     <div class="admin-shell">
 
+      <!-- HEADER -->
       <div class="admin-head">
 
         <div>
-          <span class="market-category">MODEX.UZ</span>
-          <h1>Admin Panel</h1>
+
+          <span class="market-category">
+            MODEX.UZ
+          </span>
+
+          <h1>
+            Admin Panel
+          </h1>
+
           <p id="adminEmail"></p>
+
         </div>
 
+
         <div class="admin-top-actions">
-          <a href="index.html" class="small-btn">
+
+          <a
+            href="index.html"
+            class="small-btn"
+          >
             Sayt
           </a>
 
-          <a href="settings.html" class="small-btn">
+
+          <a
+            href="settings.html"
+            class="small-btn"
+          >
             Sozlamalar
           </a>
 
-          <a href="operator.html" class="small-btn">
+
+          <a
+            href="operator.html"
+            class="small-btn"
+          >
             Operator panel
           </a>
 
-          <button id="refreshAdminBtn" class="small-btn">
+
+          <button
+            id="refreshAdminBtn"
+            class="small-btn"
+            type="button"
+          >
             Yangilash
           </button>
 
-          <button id="logoutBtn" class="small-btn">
+
+          <button
+            id="logoutBtn"
+            class="small-btn"
+            type="button"
+          >
             Chiqish
           </button>
+
         </div>
 
       </div>
@@ -87,46 +145,84 @@
       <div class="stats-row">
 
         <div class="stat">
-          <b id="aProducts">0</b>
-          <span>Mahsulotlar</span>
+
+          <b id="aProducts">
+            0
+          </b>
+
+          <span>
+            Mahsulotlar
+          </span>
+
         </div>
 
-        <div class="stat">
-          <b id="aOrders">0</b>
-          <span>Buyurtmalar</span>
-        </div>
 
         <div class="stat">
-          <b id="aNew">0</b>
-          <span>Yangi buyurtma</span>
+
+          <b id="aOrders">
+            0
+          </b>
+
+          <span>
+            Buyurtmalar
+          </span>
+
         </div>
 
+
         <div class="stat">
-          <b id="aOperators">0</b>
-          <span>Operatorlar</span>
+
+          <b id="aNew">
+            0
+          </b>
+
+          <span>
+            Yangi buyurtma
+          </span>
+
+        </div>
+
+
+        <div class="stat">
+
+          <b id="aOperators">
+            0
+          </b>
+
+          <span>
+            Operatorlar
+          </span>
+
         </div>
 
       </div>
 
 
+      <!-- MAIN GRID -->
       <div class="admin-grid">
 
-        <!-- MAHSULOT QO‘SHISH / TAHRIRLASH -->
+        <!-- PRODUCT -->
         <section class="panel">
 
           <h2 id="productFormTitle">
             Mahsulot qo‘shish
           </h2>
 
-          <form id="productForm" class="admin-form">
+
+          <form
+            id="productForm"
+            class="admin-form"
+          >
 
             <input
               id="editProductId"
               type="hidden"
             >
 
+
             <label>
               Mahsulot nomi
+
               <input
                 id="pName"
                 type="text"
@@ -135,8 +231,10 @@
               >
             </label>
 
+
             <label>
               Kategoriya
+
               <input
                 id="pCategory"
                 type="text"
@@ -145,8 +243,10 @@
               >
             </label>
 
+
             <label>
               Asosiy narx
+
               <input
                 id="pPrice"
                 type="number"
@@ -156,8 +256,10 @@
               >
             </label>
 
+
             <label>
               Eski narx
+
               <input
                 id="pOldPrice"
                 type="number"
@@ -166,8 +268,10 @@
               >
             </label>
 
+
             <label>
               Chegirma foizi
+
               <input
                 id="pDiscount"
                 type="number"
@@ -177,8 +281,26 @@
               >
             </label>
 
+
+            <!-- OMBOR -->
+            <label>
+              Omborda nechta bor
+
+              <input
+                id="pStock"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+                required
+                placeholder="10"
+              >
+            </label>
+
+
             <label>
               Tavsif
+
               <textarea
                 id="pDesc"
                 rows="5"
@@ -186,14 +308,17 @@
               ></textarea>
             </label>
 
+
             <label>
-              Rasm
+              Mahsulot rasmi
+
               <input
                 id="pImage"
                 type="file"
                 accept="image/*"
               >
             </label>
+
 
             <div class="product-form-buttons">
 
@@ -205,6 +330,7 @@
                 Mahsulot qo‘shish
               </button>
 
+
               <button
                 id="cancelEditBtn"
                 class="product-secondary-btn hidden"
@@ -215,6 +341,7 @@
 
             </div>
 
+
             <p
               id="productMessage"
               class="form-message"
@@ -223,6 +350,7 @@
           </form>
 
 
+          <!-- PRODUCT LIST -->
           <div
             id="adminProducts"
             class="product-admin-list"
@@ -234,7 +362,10 @@
         <!-- OPERATOR -->
         <section class="panel">
 
-          <h2>Operator yaratish</h2>
+          <h2>
+            Operator yaratish
+          </h2>
+
 
           <form
             id="operatorCreateForm"
@@ -243,15 +374,19 @@
 
             <label>
               Operator ismi
+
               <input
                 id="opName"
+                type="text"
                 required
                 placeholder="Operator ismi"
               >
             </label>
 
+
             <label>
               Email
+
               <input
                 id="newOpEmail"
                 type="email"
@@ -260,16 +395,19 @@
               >
             </label>
 
+
             <label>
               Parol
+
               <input
                 id="newOpPassword"
                 type="password"
-                required
                 minlength="6"
+                required
                 placeholder="Kamida 6 ta belgi"
               >
             </label>
+
 
             <button
               class="main-btn"
@@ -278,12 +416,14 @@
               Operator yaratish
             </button>
 
+
             <p
               id="operatorCreateMessage"
               class="form-message"
             ></p>
 
           </form>
+
 
           <div id="operatorsList"></div>
 
@@ -292,39 +432,76 @@
       </div>
 
 
-      <!-- BUYURTMALAR -->
+      <!-- ORDERS -->
       <section class="panel wide-panel">
 
         <div class="section-title">
-          <h2>Buyurtmalar</h2>
+
+          <h2>
+            Buyurtmalar
+          </h2>
+
 
           <input
             id="adminOrderSearch"
             type="search"
             placeholder="Ism, telefon, mahsulot..."
           >
+
         </div>
+
 
         <div class="table-wrap">
 
           <table>
+
             <thead>
+
               <tr>
-                <th>ID</th>
-                <th>Ism</th>
-                <th>Telefon</th>
-                <th>Mahsulot</th>
-                <th>Soni</th>
-                <th>O‘lcham</th>
-                <th>Rang</th>
-                <th>Status</th>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Ism
+                </th>
+
+                <th>
+                  Telefon
+                </th>
+
+                <th>
+                  Mahsulot
+                </th>
+
+                <th>
+                  Soni
+                </th>
+
+                <th>
+                  O‘lcham
+                </th>
+
+                <th>
+                  Rang
+                </th>
+
+                <th>
+                  Status
+                </th>
+
               </tr>
+
             </thead>
 
+
             <tbody id="ordersBody"></tbody>
+
           </table>
 
         </div>
+
 
         <p
           id="ordersMessage"
@@ -334,10 +511,13 @@
       </section>
 
 
-      <!-- YORDAM MUROJAATLARI -->
+      <!-- SUPPORT -->
       <section class="panel wide-panel">
 
-        <h2>Yordam murojaatlari</h2>
+        <h2>
+          Yordam murojaatlari
+        </h2>
+
 
         <div
           id="adminSupportList"
@@ -351,8 +531,8 @@
   </section>
 
 
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+  <script src="./config.js?v=20260814"></script>
+  <script src="./admin.js?v=20260814"></script>
 
 </body>
 </html>
