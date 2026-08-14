@@ -1,23 +1,39 @@
 <!doctype html>
 <html lang="uz">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <title>MODEX.UZ — Internet do‘kon</title>
 
-  <link rel="stylesheet" href="./style.css?v=20260813-2">
+  <!-- YANGI CACHE VERSION -->
+  <link
+    rel="stylesheet"
+    href="./style.css?v=20260814-1708"
+  >
 </head>
+
 
 <body>
 
-  <!-- HEADER -->
+  <!-- =========================
+       HEADER
+  ========================= -->
+
   <header class="market-header">
 
     <div class="header-inner">
 
       <!-- LOGO -->
-      <a href="index.html" class="brand">
+      <a
+        href="./index.html"
+        class="brand"
+      >
 
         <small class="brand-mini">
           ziza.kds
@@ -40,18 +56,20 @@
       </button>
 
 
-      <!-- DESKTOP QIDIRUV -->
+      <!-- DESKTOP SEARCH -->
       <div class="header-search">
 
         <input
           id="searchInput"
           type="search"
           placeholder="Mahsulot va kategoriyalarni qidiring"
+          autocomplete="off"
         >
 
         <button
           id="searchBtn"
           type="button"
+          aria-label="Qidirish"
         >
           🔍
         </button>
@@ -59,7 +77,7 @@
       </div>
 
 
-      <!-- HEADER BUTTONS -->
+      <!-- HEADER ACTIONS -->
       <div class="header-buttons">
 
         <button
@@ -107,11 +125,13 @@
         id="mobileSearchInput"
         type="search"
         placeholder="Mahsulot qidirish..."
+        autocomplete="off"
       >
 
       <button
         id="mobileSearchBtn"
         type="button"
+        aria-label="Qidirish"
       >
         🔍
       </button>
@@ -120,6 +140,10 @@
 
   </header>
 
+
+  <!-- =========================
+       MAIN
+  ========================= -->
 
   <main>
 
@@ -139,7 +163,8 @@
           </h1>
 
           <p>
-            Katalogdan tanlang, buyurtma qoldiring — operatorimiz siz bilan bog‘lanadi.
+            Katalogdan tanlang, buyurtma qoldiring —
+            operatorimiz siz bilan bog‘lanadi.
           </p>
 
           <a
@@ -173,7 +198,10 @@
     </section>
 
 
-    <!-- KATEGORIYALAR -->
+    <!-- =========================
+         CATEGORIES
+    ========================= -->
+
     <section class="market-section">
 
       <div class="section-title">
@@ -201,7 +229,10 @@
     </section>
 
 
-    <!-- FILTER -->
+    <!-- =========================
+         FILTER
+    ========================= -->
+
     <section class="filter-section">
 
       <div class="filter-row">
@@ -236,7 +267,10 @@
     </section>
 
 
-    <!-- MAHSULOTLAR -->
+    <!-- =========================
+         PRODUCTS
+    ========================= -->
+
     <section
       id="products"
       class="market-section"
@@ -274,7 +308,10 @@
     </section>
 
 
-    <!-- AFZALLIKLAR -->
+    <!-- =========================
+         ADVANTAGES
+    ========================= -->
+
     <section class="advantages">
 
       <article>
@@ -347,7 +384,10 @@
     </section>
 
 
-    <!-- SUPPORT -->
+    <!-- =========================
+         SUPPORT
+    ========================= -->
+
     <section class="support-section">
 
       <div class="support-info">
@@ -380,12 +420,15 @@
           required
         >
 
+
         <input
           id="supportPhone"
           type="tel"
+          inputmode="tel"
           placeholder="+998 90 123 45 67"
           required
         >
+
 
         <textarea
           id="supportMessage"
@@ -393,12 +436,14 @@
           required
         ></textarea>
 
+
         <button
           type="submit"
           class="main-btn"
         >
           Yuborish
         </button>
+
 
         <p
           id="supportFormMessage"
@@ -412,7 +457,10 @@
   </main>
 
 
-  <!-- FOOTER -->
+  <!-- =========================
+       FOOTER
+  ========================= -->
+
   <footer>
 
     <div>
@@ -427,6 +475,7 @@
 
     </div>
 
+
     <span>
       © 2026 MODEX.UZ
     </span>
@@ -434,7 +483,10 @@
   </footer>
 
 
-  <!-- BUYURTMA MODAL -->
+  <!-- =========================
+       QUICK ORDER
+  ========================= -->
+
   <dialog id="orderDialog">
 
     <form
@@ -450,13 +502,16 @@
         ×
       </button>
 
+
       <span class="modal-label">
         TEZ BUYURTMA
       </span>
 
+
       <h2 id="selectedProductTitle">
         Mahsulot
       </h2>
+
 
       <input
         id="productInput"
@@ -470,6 +525,7 @@
         <input
           id="nameInput"
           type="text"
+          maxlength="80"
           required
         >
       </label>
@@ -519,17 +575,19 @@
           min="1"
           max="20"
           value="1"
+          required
         >
       </label>
 
 
       <button
         id="submitOrder"
-        type="submit"
         class="main-btn full-btn"
+        type="submit"
       >
         Buyurtma berish
       </button>
+
 
       <p
         id="formMessage"
@@ -541,14 +599,16 @@
   </dialog>
 
 
-  <!-- CART OVERLAY -->
+  <!-- =========================
+       CART
+  ========================= -->
+
   <div
     id="cartOverlay"
     class="drawer-overlay hidden"
   ></div>
 
 
-  <!-- CART DRAWER -->
   <aside
     id="cartDrawer"
     class="market-drawer hidden"
@@ -598,14 +658,16 @@
   </aside>
 
 
-  <!-- FAVORITES OVERLAY -->
+  <!-- =========================
+       FAVORITES
+  ========================= -->
+
   <div
     id="favoritesOverlay"
     class="drawer-overlay hidden"
   ></div>
 
 
-  <!-- FAVORITES DRAWER -->
   <aside
     id="favoritesDrawer"
     class="market-drawer hidden"
@@ -642,15 +704,21 @@
   </aside>
 
 
-  <!-- MOBILE NAV -->
+  <!-- =========================
+       MOBILE NAV
+  ========================= -->
+
   <nav class="mobile-bottom-nav">
 
     <a
-      href="index.html"
+      href="./index.html"
       class="mobile-nav-item active"
     >
       <span>⌂</span>
-      <small>Bosh sahifa</small>
+
+      <small>
+        Bosh sahifa
+      </small>
     </a>
 
 
@@ -660,7 +728,10 @@
       type="button"
     >
       <span>▦</span>
-      <small>Katalog</small>
+
+      <small>
+        Katalog
+      </small>
     </button>
 
 
@@ -670,7 +741,10 @@
       type="button"
     >
       <span>♡</span>
-      <small>Sevimlilar</small>
+
+      <small>
+        Sevimlilar
+      </small>
     </button>
 
 
@@ -680,14 +754,22 @@
       type="button"
     >
       <span>🛒</span>
-      <small>Savat</small>
+
+      <small>
+        Savat
+      </small>
     </button>
 
   </nav>
 
 
-  <script src="./config.js?v=20260813-2"></script>
-  <script src="./app.js?v=20260813-2"></script>
+  <!-- =========================
+       SCRIPTS
+  ========================= -->
+
+  <script src="./config.js?v=20260814-1708"></script>
+
+  <script src="./app.js?v=20260814-1708"></script>
 
 </body>
 </html>
