@@ -1,28 +1,28 @@
 <!doctype html>
 <html lang="uz">
+
 <head>
   <meta charset="utf-8">
 
   <meta
     name="viewport"
-    content="width=device-width,initial-scale=1"
+    content="width=device-width, initial-scale=1"
   >
 
-  <title>
-    MODEX.UZ — Admin Panel
-  </title>
+  <title>MODEX.UZ — Admin Panel</title>
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260814-admin2"
+    href="./style.css?v=20260814-1715"
   >
 </head>
 
+
 <body>
 
-<!-- =========================
+<!-- =====================================
      LOGIN
-========================= -->
+===================================== -->
 
 <section
   id="loginView"
@@ -36,8 +36,9 @@
     </span>
 
     <h2>
-      Admin kirish
+      Admin panelga kirish
     </h2>
+
 
     <form id="loginForm">
 
@@ -47,8 +48,9 @@
         <input
           id="email"
           type="email"
+          autocomplete="email"
+          placeholder="Email"
           required
-          placeholder="admin@email.com"
         >
       </label>
 
@@ -59,15 +61,16 @@
         <input
           id="password"
           type="password"
-          required
+          autocomplete="current-password"
           placeholder="Parol"
+          required
         >
       </label>
 
 
       <button
-        class="main-btn full-btn"
         type="submit"
+        class="main-btn full-btn"
       >
         Kirish
       </button>
@@ -85,9 +88,9 @@
 </section>
 
 
-<!-- =========================
-     ADMIN
-========================= -->
+<!-- =====================================
+     ADMIN PANEL
+===================================== -->
 
 <section
   id="adminView"
@@ -97,9 +100,7 @@
   <div class="admin-shell">
 
 
-    <!-- =========================
-         ADMIN HEADER
-    ========================= -->
+    <!-- HEADER -->
 
     <div class="admin-head">
 
@@ -121,7 +122,7 @@
       <div class="admin-top-actions">
 
         <a
-          href="index.html"
+          href="./index.html"
           class="small-btn"
         >
           🏠 Sayt
@@ -129,7 +130,7 @@
 
 
         <a
-          href="settings.html"
+          href="./settings.html"
           class="small-btn"
         >
           ⚙️ Sozlamalar
@@ -137,7 +138,7 @@
 
 
         <a
-          href="operator.html"
+          href="./operator.html"
           class="small-btn"
         >
           👨‍💻 Operator
@@ -166,9 +167,9 @@
     </div>
 
 
-    <!-- =========================
+    <!-- =====================================
          ASOSIY STATISTIKA
-    ========================= -->
+    ===================================== -->
 
     <div class="stats-row">
 
@@ -226,16 +227,16 @@
     </div>
 
 
-    <!-- =========================
+    <!-- =====================================
          BUYURTMA STATISTIKASI
-    ========================= -->
+    ===================================== -->
 
     <div class="admin-order-stats">
 
       <article class="order-stat-card">
 
         <span>
-          📅 Bugungi buyurtmalar
+          📅 Bugungi
         </span>
 
         <strong id="todayOrdersCount">
@@ -312,16 +313,14 @@
     </div>
 
 
-    <!-- =========================
-         ADMIN GRID
-    ========================= -->
+    <!-- =====================================
+         PRODUCT + OPERATOR
+    ===================================== -->
 
     <div class="admin-grid">
 
 
-      <!-- =========================
-           PRODUCT
-      ========================= -->
+      <!-- PRODUCT -->
 
       <section class="panel">
 
@@ -450,7 +449,7 @@
 
 
           <label>
-            Rasm
+            Mahsulot rasmi
 
             <input
               id="pImage"
@@ -464,8 +463,8 @@
 
             <button
               id="productSubmitBtn"
-              class="main-btn"
               type="submit"
+              class="main-btn"
             >
               Mahsulot qo‘shish
             </button>
@@ -473,8 +472,8 @@
 
             <button
               id="cancelEditBtn"
-              class="product-secondary-btn hidden"
               type="button"
+              class="product-secondary-btn hidden"
             >
               Bekor qilish
             </button>
@@ -498,9 +497,7 @@
       </section>
 
 
-      <!-- =========================
-           OPERATOR
-      ========================= -->
+      <!-- OPERATOR -->
 
       <section class="panel">
 
@@ -564,8 +561,8 @@
 
 
           <button
-            class="main-btn"
             type="submit"
+            class="main-btn"
           >
             Operator yaratish
           </button>
@@ -586,9 +583,9 @@
     </div>
 
 
-    <!-- =========================
+    <!-- =====================================
          BUYURTMALAR
-    ========================= -->
+    ===================================== -->
 
     <section class="panel wide-panel orders-panel">
 
@@ -617,7 +614,8 @@
       </div>
 
 
-      <!-- FILTER BUTTONS -->
+      <!-- STATUS FILTER -->
+
       <div
         id="orderStatusFilters"
         class="order-status-filters"
@@ -689,6 +687,7 @@
 
 
       <!-- SEARCH -->
+
       <div class="admin-order-tools">
 
         <input
@@ -709,7 +708,8 @@
       </div>
 
 
-      <!-- ORDER TABLE -->
+      <!-- DESKTOP TABLE -->
+
       <div class="table-wrap">
 
         <table class="orders-table">
@@ -718,41 +718,23 @@
 
             <tr>
 
-              <th>
-                ID
-              </th>
+              <th>ID</th>
 
-              <th>
-                Mijoz
-              </th>
+              <th>Mijoz</th>
 
-              <th>
-                Telefon
-              </th>
+              <th>Telefon</th>
 
-              <th>
-                Mahsulot
-              </th>
+              <th>Mahsulot</th>
 
-              <th>
-                Soni
-              </th>
+              <th>Soni</th>
 
-              <th>
-                O‘lcham
-              </th>
+              <th>O‘lcham</th>
 
-              <th>
-                Rang
-              </th>
+              <th>Rang</th>
 
-              <th>
-                Status
-              </th>
+              <th>Status</th>
 
-              <th>
-                Amal
-              </th>
+              <th>Amal</th>
 
             </tr>
 
@@ -774,9 +756,7 @@
     </section>
 
 
-    <!-- =========================
-         MOBILE ORDER CARDS
-    ========================= -->
+    <!-- MOBILE BUYURTMALAR -->
 
     <section
       id="mobileOrders"
@@ -784,9 +764,9 @@
     ></section>
 
 
-    <!-- =========================
+    <!-- =====================================
          SUPPORT
-    ========================= -->
+    ===================================== -->
 
     <section class="panel wide-panel">
 
@@ -820,8 +800,13 @@
 </section>
 
 
-<script src="./config.js?v=20260814-admin2"></script>
-<script src="./admin.js?v=20260814-admin2"></script>
+<!-- =====================================
+     SCRIPT
+===================================== -->
+
+<script src="./config.js?v=20260814-1715"></script>
+
+<script src="./admin.js?v=20260814-1715"></script>
 
 </body>
 </html>
