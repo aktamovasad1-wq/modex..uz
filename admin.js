@@ -1,32 +1,42 @@
-const { SUPABASE_URL, SUPABASE_KEY } = window.MODEX_CONFIG;
+/* =========================================
+   MODEX.UZ ADMIN
+========================================= */
+
+const CONFIG = window.MODEX_CONFIG || {};
+
+const SUPABASE_URL = CONFIG.SUPABASE_URL;
+const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  alert("config.js noto‘g‘ri yoki Supabase ma’lumotlari yo‘q.");
+  throw new Error("MODEX_CONFIG topilmadi.");
+}
 
 const REST = `${SUPABASE_URL}/rest/v1`;
 const AUTH = `${SUPABASE_URL}/auth/v1`;
 
-let accessToken = "";
-let refreshToken = "";
-let currentUser = null;
+let token = "";
+let user = null;
 
 let products = [];
 let orders = [];
 let operators = [];
 let supportRequests = [];
 
-let currentOrderStatus = "all";
+let orderFilter = "all";
 
 
 /* =========================================
-   ELEMENTLAR
+   ELEMENTS
 ========================================= */
 
 const loginView = document.getElementById("loginView");
 const adminView = document.getElementById("adminView");
 
 const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
-
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
+const loginMessage = document.getElementById("loginMessage");
 
 const adminEmail = document.getElementById("adminEmail");
 
@@ -43,19 +53,15 @@ const editProductId = document.getElementById("editProductId");
 
 const pName = document.getElementById("pName");
 const pCategory = document.getElementById("pCategory");
-
 const pPrice = document.getElementById("pPrice");
 const pOldPrice = document.getElementById("pOldPrice");
-
 const pDiscount = document.getElementById("pDiscount");
 const pStock = document.getElementById("pStock");
-
 const pDesc = document.getElementById("pDesc");
 const pImage = document.getElementById("pImage");
 
 const productSubmitBtn = document.getElementById("productSubmitBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
-
 const productMessage = document.getElementById("productMessage");
 const adminProducts = document.getElementById("adminProducts");
 
@@ -63,69 +69,42 @@ const adminProducts = document.getElementById("adminProducts");
 /* OPERATOR */
 
 const operatorCreateForm = document.getElementById("operatorCreateForm");
-
 const opName = document.getElementById("opName");
 const newOpEmail = document.getElementById("newOpEmail");
 const newOpPassword = document.getElementById("newOpPassword");
-
-const operatorCreateMessage =
-  document.getElementById("operatorCreateMessage");
-
-const operatorsList =
-  document.getElementById("operatorsList");
+const operatorCreateMessage = document.getElementById("operatorCreateMessage");
+const operatorsList = document.getElementById("operatorsList");
 
 
 /* ORDERS */
 
-const adminOrderSearch =
-  document.getElementById("adminOrderSearch");
+const adminOrderSearch = document.getElementById("adminOrderSearch");
+const clearOrderSearch = document.getElementById("clearOrderSearch");
 
-const clearOrderSearch =
-  document.getElementById("clearOrderSearch");
-
-const ordersBody =
-  document.getElementById("ordersBody");
-
-const mobileOrders =
-  document.getElementById("mobileOrders");
-
-const ordersMessage =
-  document.getElementById("ordersMessage");
-
-const visibleOrderCount =
-  document.getElementById("visibleOrderCount");
+const ordersBody = document.getElementById("ordersBody");
+const mobileOrders = document.getElementById("mobileOrders");
+const ordersMessage = document.getElementById("ordersMessage");
+const visibleOrderCount = document.getElementById("visibleOrderCount");
 
 
 /* SUPPORT */
 
-const adminSupportList =
-  document.getElementById("adminSupportList");
+const adminSupportList = document.getElementById("adminSupportList");
 
 
-/* STATISTIKA */
+/* STATS */
 
 const aProducts = document.getElementById("aProducts");
 const aOrders = document.getElementById("aOrders");
 const aNew = document.getElementById("aNew");
 const aOperators = document.getElementById("aOperators");
 
-const todayOrdersCount =
-  document.getElementById("todayOrdersCount");
-
-const newOrdersCount =
-  document.getElementById("newOrdersCount");
-
-const talkedOrdersCount =
-  document.getElementById("talkedOrdersCount");
-
-const confirmedOrdersCount =
-  document.getElementById("confirmedOrdersCount");
-
-const deliveryOrdersCount =
-  document.getElementById("deliveryOrdersCount");
-
-const doneOrdersCount =
-  document.getElementById("doneOrdersCount");
+const todayOrdersCount = document.getElementById("todayOrdersCount");
+const newOrdersCount = document.getElementById("newOrdersCount");
+const talkedOrdersCount = document.getElementById("talkedOrdersCount");
+const confirmedOrdersCount = document.getElementById("confirmedOrdersCount");
+const deliveryOrdersCount = document.getElementById("deliveryOrdersCount");
+const doneOrdersCount = document.getElementById("doneOrdersCount");
 
 
 /* =========================================
@@ -133,120 +112,66 @@ const doneOrdersCount =
 ========================================= */
 
 function esc(value = "") {
-  return String(value).replace(/[&<>"']/g, char => ({
+  return String(value).replace(/[&<>"']/g, ch => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#039;"
-  })[char]);
+  })[ch]);
 }
 
+function setMessage(el, text, type = "") {
+  if (!el) return;
+
+  el.textContent = text;
+  el.className = `form-message ${type}`.trim();
+}
 
 function money(value) {
-  return (
-    new Intl.NumberFormat("uz-UZ")
-      .format(Number(value || 0))
-    + " so‘m"
-  );
+  return `${new Intl.NumberFormat("uz-UZ").format(Number(value || 0))} so‘m`;
 }
 
-
-function setMessage(element, text, type = "") {
-  if (!element) return;
-
-  element.textContent = text;
-  element.className = `form-message ${type}`.trim();
+function phoneClean(value = "") {
+  return String(value).replace(/[^\d+]/g, "");
 }
-
-
-function normalizePhone(phone = "") {
-  return String(phone).replace(/[^\d+]/g, "");
-}
-
 
 function formatDate(value) {
   if (!value) return "-";
 
-  try {
-    return new Date(value).toLocaleString("uz-UZ");
-  } catch {
-    return "-";
-  }
+  return new Date(value).toLocaleString("uz-UZ");
 }
-
 
 function isToday(value) {
   if (!value) return false;
 
-  const date = new Date(value);
+  const d = new Date(value);
   const now = new Date();
 
   return (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate()
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
   );
 }
 
+function showLogin() {
+  loginView.classList.remove("hidden");
+  adminView.classList.add("hidden");
+}
 
-function productLink(id) {
-  const path = location.pathname.replace(/admin\.html.*$/, "");
-
-  return `${location.origin}${path}product.html?id=${id}`;
+function showAdmin() {
+  loginView.classList.add("hidden");
+  adminView.classList.remove("hidden");
 }
 
 
 /* =========================================
-   SESSION
+   LOGIN
 ========================================= */
 
-function saveSession(auth) {
-  accessToken = auth.access_token || "";
-  refreshToken = auth.refresh_token || "";
-
-  localStorage.setItem(
-    "modex_admin_session",
-    JSON.stringify({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    })
-  );
-}
-
-
-function loadSavedSession() {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("modex_admin_session") || "{}"
-    );
-
-    accessToken = saved.access_token || "";
-    refreshToken = saved.refresh_token || "";
-
-  } catch {
-    accessToken = "";
-    refreshToken = "";
-  }
-}
-
-
-function clearSession() {
-  accessToken = "";
-  refreshToken = "";
-  currentUser = null;
-
-  localStorage.removeItem("modex_admin_session");
-  localStorage.removeItem("modex_admin_token");
-}
-
-
-/* =========================================
-   AUTH
-========================================= */
-
-async function signIn(email, password) {
-  const response = await fetch(
+async function login(email, password) {
+  const res = await fetch(
     `${AUTH}/token?grant_type=password`,
     {
       method: "POST",
@@ -263,14 +188,14 @@ async function signIn(email, password) {
     }
   );
 
-  const data = await response.json();
+  const data = await res.json();
 
-  if (!response.ok) {
+  if (!res.ok) {
     throw new Error(
       data.error_description ||
       data.msg ||
       data.message ||
-      "Email yoki parol noto‘g‘ri."
+      "Email yoki parol xato."
     );
   }
 
@@ -278,63 +203,21 @@ async function signIn(email, password) {
 }
 
 
-async function refreshSession() {
-  if (!refreshToken) {
-    throw new Error("Sessiya mavjud emas.");
-  }
-
-  const response = await fetch(
-    `${AUTH}/token?grant_type=refresh_token`,
-    {
-      method: "POST",
-
-      headers: {
-        apikey: SUPABASE_KEY,
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        refresh_token: refreshToken
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error("Sessiya tugagan.");
-  }
-
-  saveSession(data);
-
-  return data;
-}
-
-
-async function getCurrentUser() {
-  const response = await fetch(
+async function getUser() {
+  const res = await fetch(
     `${AUTH}/user`,
     {
       headers: {
         apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${token}`
       }
     }
   );
 
-  if (response.status === 401 && refreshToken) {
-    await refreshSession();
+  const data = await res.json();
 
-    return getCurrentUser();
-  }
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message ||
-      "Sessiya topilmadi."
-    );
+  if (!res.ok) {
+    throw new Error("Sessiya tugagan.");
   }
 
   return data;
@@ -345,50 +228,35 @@ async function getCurrentUser() {
    REST API
 ========================================= */
 
-async function api(path, options = {}, retry = true) {
-  const response = await fetch(
+async function api(path, options = {}) {
+  const res = await fetch(
     `${REST}/${path}`,
     {
       ...options,
 
       headers: {
         apikey: SUPABASE_KEY,
-
-        Authorization:
-          `Bearer ${accessToken || SUPABASE_KEY}`,
-
+        Authorization: `Bearer ${token}`,
         ...(options.headers || {})
       }
     }
   );
 
-  if (
-    response.status === 401 &&
-    retry &&
-    refreshToken
-  ) {
-    await refreshSession();
-
-    return api(path, options, false);
-  }
-
-  if (!response.ok) {
-    const text = await response.text();
+  if (!res.ok) {
+    const text = await res.text();
 
     throw new Error(
-      text || `HTTP ${response.status}`
+      text || `HTTP ${res.status}`
     );
   }
 
-  if (response.status === 204) {
+  if (res.status === 204) {
     return null;
   }
 
-  const text = await response.text();
+  const text = await res.text();
 
-  return text
-    ? JSON.parse(text)
-    : null;
+  return text ? JSON.parse(text) : null;
 }
 
 
@@ -396,29 +264,23 @@ async function api(path, options = {}, retry = true) {
    ADMIN ROLE
 ========================================= */
 
-async function checkAdminRole(userId) {
+async function checkAdmin(uid) {
   const rows = await api(
-    `profiles?select=id,name,role,active&id=eq.${encodeURIComponent(userId)}&limit=1`
+    `profiles?select=id,name,role,active&id=eq.${encodeURIComponent(uid)}&limit=1`
   );
 
   const profile = rows?.[0];
 
   if (!profile) {
-    throw new Error(
-      "Admin profili topilmadi."
-    );
+    throw new Error("profiles jadvalida admin topilmadi.");
   }
 
   if (profile.role !== "admin") {
-    throw new Error(
-      "Bu akkaunt admin emas."
-    );
+    throw new Error("Bu akkaunt admin emas.");
   }
 
   if (profile.active !== true) {
-    throw new Error(
-      "Admin akkaunti faol emas."
-    );
+    throw new Error("Admin akkaunti faol emas.");
   }
 
   return profile;
@@ -426,70 +288,53 @@ async function checkAdminRole(userId) {
 
 
 /* =========================================
-   VIEW
-========================================= */
-
-function showLogin() {
-  loginView.classList.remove("hidden");
-  adminView.classList.add("hidden");
-}
-
-
-function showAdmin() {
-  loginView.classList.add("hidden");
-  adminView.classList.remove("hidden");
-}
-
-
-/* =========================================
-   LOGIN
+   LOGIN FORM
 ========================================= */
 
 loginForm.addEventListener("submit", async event => {
   event.preventDefault();
 
-  const button =
-    loginForm.querySelector('button[type="submit"]');
+  const button = loginForm.querySelector('button[type="submit"]');
 
   button.disabled = true;
-  button.textContent = "Tekshirilmoqda...";
+  button.textContent = "Kirilmoqda...";
 
-  setMessage(
-    loginMessage,
-    "Kirish tekshirilmoqda..."
-  );
+  setMessage(loginMessage, "Tekshirilmoqda...");
 
   try {
-    const auth = await signIn(
+    const auth = await login(
       emailInput.value.trim(),
       passwordInput.value
     );
 
-    saveSession(auth);
+    token = auth.access_token;
+    user = auth.user;
 
-    currentUser = auth.user;
+    await checkAdmin(user.id);
 
-    await checkAdminRole(currentUser.id);
+    sessionStorage.setItem("modex_admin_token", token);
 
-    adminEmail.textContent =
-      currentUser.email || "";
-
-    setMessage(loginMessage, "");
+    adminEmail.textContent = user.email || "";
 
     showAdmin();
 
-    await loadAdminData();
+    setMessage(loginMessage, "");
+
+    await loadAll();
 
   } catch (error) {
-    console.error("LOGIN XATO:", error);
+    console.error("LOGIN:", error);
 
-    clearSession();
+    token = "";
+    user = null;
+
+    sessionStorage.removeItem("modex_admin_token");
+
     showLogin();
 
     setMessage(
       loginMessage,
-      error.message ||
-      "Admin panelga kirib bo‘lmadi.",
+      error.message,
       "error"
     );
 
@@ -501,43 +346,38 @@ loginForm.addEventListener("submit", async event => {
 
 
 /* =========================================
-   SESSION RESTORE
+   RESTORE SESSION
 ========================================= */
 
 async function restoreSession() {
-  loadSavedSession();
+  const saved = sessionStorage.getItem("modex_admin_token");
 
-  /* oldingi versiyadagi token bo‘lsa ham sinaymiz */
-  if (!accessToken) {
-    const oldToken =
-      localStorage.getItem("modex_admin_token");
-
-    if (oldToken) {
-      accessToken = oldToken;
-    }
-  }
-
-  if (!accessToken) {
+  if (!saved) {
     showLogin();
     return;
   }
 
+  token = saved;
+
   try {
-    currentUser = await getCurrentUser();
+    user = await getUser();
 
-    await checkAdminRole(currentUser.id);
+    await checkAdmin(user.id);
 
-    adminEmail.textContent =
-      currentUser.email || "";
+    adminEmail.textContent = user.email || "";
 
     showAdmin();
 
-    await loadAdminData();
+    await loadAll();
 
   } catch (error) {
-    console.error("SESSION XATO:", error);
+    console.error("RESTORE:", error);
 
-    clearSession();
+    token = "";
+    user = null;
+
+    sessionStorage.removeItem("modex_admin_token");
+
     showLogin();
   }
 }
@@ -549,37 +389,33 @@ async function restoreSession() {
 
 logoutBtn.addEventListener("click", async () => {
   try {
-    if (accessToken) {
-      await fetch(
-        `${AUTH}/logout`,
-        {
-          method: "POST",
+    await fetch(
+      `${AUTH}/logout`,
+      {
+        method: "POST",
 
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${accessToken}`
-          }
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${token}`
         }
-      );
-    }
-  } catch (error) {
-    console.error(error);
-  }
+      }
+    );
+  } catch {}
 
-  clearSession();
+  token = "";
+  user = null;
 
-  emailInput.value = "";
-  passwordInput.value = "";
+  sessionStorage.removeItem("modex_admin_token");
 
   showLogin();
 });
 
 
 /* =========================================
-   LOAD ADMIN DATA
+   LOAD ALL
 ========================================= */
 
-async function loadAdminData() {
+async function loadAll() {
   await Promise.allSettled([
     loadProducts(),
     loadOrders(),
@@ -592,501 +428,44 @@ async function loadAdminData() {
 }
 
 
-refreshAdminBtn.addEventListener(
-  "click",
-  async () => {
-    refreshAdminBtn.disabled = true;
-    refreshAdminBtn.textContent =
-      "Yangilanmoqda...";
+refreshAdminBtn.addEventListener("click", async () => {
+  refreshAdminBtn.disabled = true;
+  refreshAdminBtn.textContent = "Yangilanmoqda...";
 
-    try {
-      await loadAdminData();
+  await loadAll();
 
-    } finally {
-      refreshAdminBtn.disabled = false;
-      refreshAdminBtn.textContent =
-        "🔄 Yangilash";
-    }
-  }
-);
+  refreshAdminBtn.disabled = false;
+  refreshAdminBtn.textContent = "🔄 Yangilash";
+});
 
 
 /* =========================================
-   STATS
-========================================= */
-
-function updateStats() {
-  aProducts.textContent =
-    products.length;
-
-  aOrders.textContent =
-    orders.length;
-
-  aNew.textContent =
-    orders.filter(
-      order =>
-        (order.status || "new") === "new"
-    ).length;
-
-  aOperators.textContent =
-    operators.length;
-}
-
-
-function updateOrderStats() {
-  todayOrdersCount.textContent =
-    orders.filter(
-      order => isToday(order.created_at)
-    ).length;
-
-  newOrdersCount.textContent =
-    orders.filter(
-      order =>
-        (order.status || "new") === "new"
-    ).length;
-
-  talkedOrdersCount.textContent =
-    orders.filter(
-      order => order.status === "talked"
-    ).length;
-
-  confirmedOrdersCount.textContent =
-    orders.filter(
-      order => order.status === "confirmed"
-    ).length;
-
-  deliveryOrdersCount.textContent =
-    orders.filter(
-      order => order.status === "delivery"
-    ).length;
-
-  doneOrdersCount.textContent =
-    orders.filter(
-      order => order.status === "done"
-    ).length;
-}
-
-
-/* =========================================
-   IMAGE UPLOAD
-========================================= */
-
-async function uploadImage(file) {
-  if (!file) return null;
-
-  const extension =
-    file.name.split(".").pop().toLowerCase();
-
-  const filename =
-    `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2)}.${extension}`;
-
-  const response = await fetch(
-    `${SUPABASE_URL}/storage/v1/object/products/${filename}`,
-    {
-      method: "POST",
-
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${accessToken}`,
-
-        "Content-Type":
-          file.type ||
-          "application/octet-stream",
-
-        "x-upsert": "false"
-      },
-
-      body: file
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      await response.text()
-    );
-  }
-
-  return (
-    `${SUPABASE_URL}/storage/v1/object/public/products/${filename}`
-  );
-}
-
-
-/* =========================================
-   PRODUCTS LOAD
+   PRODUCTS
 ========================================= */
 
 async function loadProducts() {
-  try {
-    products = await api(
-      "products?select=*&order=id.desc"
-    );
+  products = await api(
+    "products?select=*&order=id.desc"
+  );
 
-    renderAdminProducts();
-
-  } catch (error) {
-    console.error("PRODUCTS:", error);
-
-    setMessage(
-      productMessage,
-      "Mahsulotlarni yuklab bo‘lmadi.",
-      "error"
-    );
-  }
+  renderProducts();
 }
 
 
-/* =========================================
-   PRODUCT SAVE
-========================================= */
-
-productForm.addEventListener(
-  "submit",
-  async event => {
-
-    event.preventDefault();
-
-    const editingId =
-      editProductId.value.trim();
-
-    const price =
-      Number(pPrice.value || 0);
-
-    const oldPrice =
-      pOldPrice.value
-        ? Number(pOldPrice.value)
-        : null;
-
-    let discount =
-      Number(pDiscount.value || 0);
-
-    const stock =
-      Math.max(
-        0,
-        Math.floor(
-          Number(pStock.value || 0)
-        )
-      );
-
-
-    if (
-      oldPrice &&
-      oldPrice > price &&
-      discount === 0
-    ) {
-      discount = Math.round(
-        ((oldPrice - price) / oldPrice) * 100
-      );
-
-      pDiscount.value = discount;
-    }
-
-
-    if (
-      discount < 0 ||
-      discount > 100
-    ) {
-      setMessage(
-        productMessage,
-        "Chegirma 0–100 oralig‘ida bo‘lishi kerak.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    productSubmitBtn.disabled = true;
-
-    productSubmitBtn.textContent =
-      editingId
-        ? "Saqlanmoqda..."
-        : "Qo‘shilmoqda...";
-
-
-    try {
-      let imageUrl = null;
-
-      if (pImage.files?.[0]) {
-        imageUrl =
-          await uploadImage(
-            pImage.files[0]
-          );
-      }
-
-
-      const payload = {
-        name:
-          pName.value.trim(),
-
-        category:
-          pCategory.value.trim(),
-
-        price,
-
-        old_price:
-          oldPrice,
-
-        discount_percent:
-          discount,
-
-        stock,
-
-        description:
-          pDesc.value.trim(),
-
-        active: true
-      };
-
-
-      if (imageUrl) {
-        payload.image_url =
-          imageUrl;
-      }
-
-
-      if (editingId) {
-        await api(
-          `products?id=eq.${encodeURIComponent(editingId)}`,
-          {
-            method: "PATCH",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-
-              Prefer:
-                "return=minimal"
-            },
-
-            body:
-              JSON.stringify(payload)
-          }
-        );
-
-        setMessage(
-          productMessage,
-          "Mahsulot yangilandi ✅",
-          "success"
-        );
-
-      } else {
-        await api(
-          "products",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-
-              Prefer:
-                "return=minimal"
-            },
-
-            body:
-              JSON.stringify(payload)
-          }
-        );
-
-        setMessage(
-          productMessage,
-          "Mahsulot qo‘shildi ✅",
-          "success"
-        );
-      }
-
-
-      resetProductForm();
-
-      await loadProducts();
-
-      updateStats();
-
-    } catch (error) {
-      console.error("PRODUCT SAVE:", error);
-
-      setMessage(
-        productMessage,
-        "Mahsulotni saqlab bo‘lmadi.",
-        "error"
-      );
-
-    } finally {
-      productSubmitBtn.disabled =
-        false;
-
-      if (!editProductId.value) {
-        productSubmitBtn.textContent =
-          "Mahsulot qo‘shish";
-      }
-    }
-  }
-);
-
-
-/* =========================================
-   PRODUCT RESET
-========================================= */
-
-function resetProductForm() {
-  productForm.reset();
-
-  editProductId.value = "";
-  pStock.value = 0;
-
-  productFormTitle.textContent =
-    "Mahsulot qo‘shish";
-
-  productSubmitBtn.textContent =
-    "Mahsulot qo‘shish";
-
-  cancelEditBtn.classList.add(
-    "hidden"
-  );
-}
-
-
-cancelEditBtn.addEventListener(
-  "click",
-  () => {
-    resetProductForm();
-    setMessage(productMessage, "");
-  }
-);
-
-
-/* =========================================
-   EDIT PRODUCT
-========================================= */
-
-function editProduct(id) {
-  const product = products.find(
-    item =>
-      Number(item.id) === Number(id)
-  );
-
-  if (!product) return;
-
-  editProductId.value =
-    product.id;
-
-  pName.value =
-    product.name || "";
-
-  pCategory.value =
-    product.category || "";
-
-  pPrice.value =
-    product.price || "";
-
-  pOldPrice.value =
-    product.old_price || "";
-
-  pDiscount.value =
-    product.discount_percent || "";
-
-  pStock.value =
-    Number(product.stock || 0);
-
-  pDesc.value =
-    product.description || "";
-
-  productFormTitle.textContent =
-    "Mahsulotni tahrirlash";
-
-  productSubmitBtn.textContent =
-    "Saqlash";
-
-  cancelEditBtn.classList.remove(
-    "hidden"
-  );
-
-  productForm.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-}
-
-
-/* =========================================
-   DELETE PRODUCT
-========================================= */
-
-async function deleteProduct(id) {
-  const product = products.find(
-    item =>
-      Number(item.id) === Number(id)
-  );
-
-  if (!product) return;
-
-  if (
-    !confirm(
-      `"${product.name}" mahsulotini o‘chirasizmi?`
-    )
-  ) {
-    return;
-  }
-
-  try {
-    await api(
-      `products?id=eq.${encodeURIComponent(id)}`,
-      {
-        method: "DELETE",
-
-        headers: {
-          Prefer:
-            "return=minimal"
-        }
-      }
-    );
-
-    await loadProducts();
-    updateStats();
-
-  } catch (error) {
-    console.error(error);
-
-    alert(
-      "Mahsulotni o‘chirib bo‘lmadi."
-    );
-  }
-}
-
-
-/* =========================================
-   RENDER PRODUCTS
-========================================= */
-
-function renderAdminProducts() {
-  adminProducts.innerHTML = "";
-
+function renderProducts() {
   if (!products.length) {
     adminProducts.innerHTML = `
       <p class="drawer-empty">
-        Hozircha mahsulot yo‘q.
+        Mahsulot yo‘q.
       </p>
     `;
 
     return;
   }
 
+  adminProducts.innerHTML = products.map(product => `
 
-  products.forEach(product => {
-    const stock =
-      Number(product.stock || 0);
-
-    const item =
-      document.createElement("div");
-
-    item.className =
-      "product-admin-item";
-
-
-    item.innerHTML = `
+    <div class="product-admin-item">
 
       <img
         src="${esc(product.image_url || "")}"
@@ -1096,7 +475,7 @@ function renderAdminProducts() {
       <div class="product-admin-info">
 
         <strong>
-          ${esc(product.name || "")}
+          ${esc(product.name)}
         </strong>
 
         <span>
@@ -1107,676 +486,527 @@ function renderAdminProducts() {
           ${money(product.price)}
         </strong>
 
-        ${
-          product.old_price &&
-          Number(product.old_price) >
-          Number(product.price)
-            ? `
-              <span style="text-decoration:line-through">
-                ${money(product.old_price)}
-              </span>
-            `
-            : ""
-        }
-
-        ${
-          Number(product.discount_percent || 0) > 0
-            ? `
-              <span style="
-                color:#6f35e8;
-                font-weight:900;
-              ">
-                -${Number(product.discount_percent)}%
-              </span>
-            `
-            : ""
-        }
-
-        ${
-          stock > 0
-            ? `
-              <span style="
-                color:#16835a;
-                font-weight:900;
-              ">
-                Omborda: ${stock} dona
-              </span>
-            `
-            : `
-              <span style="
-                color:#d6455d;
-                font-weight:900;
-              ">
-                Tugagan
-              </span>
-            `
-        }
+        <span>
+          Omborda: ${Number(product.stock || 0)} dona
+        </span>
 
       </div>
-
 
       <div class="product-admin-actions">
 
         <button
-          class="small-btn edit-product-btn"
-          data-id="${product.id}"
           type="button"
+          class="small-btn editProduct"
+          data-id="${product.id}"
         >
           ✏️ Tahrirlash
         </button>
 
         <button
-          class="small-btn copy-target-btn"
-          data-id="${product.id}"
           type="button"
-        >
-          🔗 Link
-        </button>
-
-        <button
-          class="small-btn delete-product-btn"
+          class="small-btn deleteProduct"
           data-id="${product.id}"
-          type="button"
         >
           🗑 O‘chirish
         </button>
 
       </div>
-    `;
+
+    </div>
+
+  `).join("");
 
 
-    adminProducts.appendChild(
-      item
-    );
+  document.querySelectorAll(".editProduct").forEach(btn => {
+    btn.onclick = () => startEditProduct(btn.dataset.id);
   });
 
 
-  document
-    .querySelectorAll(".edit-product-btn")
-    .forEach(button => {
-      button.onclick = () =>
-        editProduct(
-          button.dataset.id
-        );
-    });
-
-
-  document
-    .querySelectorAll(".delete-product-btn")
-    .forEach(button => {
-      button.onclick = () =>
-        deleteProduct(
-          button.dataset.id
-        );
-    });
-
-
-  document
-    .querySelectorAll(".copy-target-btn")
-    .forEach(button => {
-      button.onclick = async () => {
-        const link =
-          productLink(
-            button.dataset.id
-          );
-
-        try {
-          await navigator.clipboard
-            .writeText(link);
-
-          const old =
-            button.textContent;
-
-          button.textContent =
-            "Nusxalandi ✅";
-
-          setTimeout(() => {
-            button.textContent =
-              old;
-          }, 1400);
-
-        } catch {
-          prompt(
-            "Mahsulot linki:",
-            link
-          );
-        }
-      };
-    });
+  document.querySelectorAll(".deleteProduct").forEach(btn => {
+    btn.onclick = () => deleteProduct(btn.dataset.id);
+  });
 }
 
 
 /* =========================================
-   ORDER STATUS INFO
+   IMAGE UPLOAD
 ========================================= */
 
-function statusInfo(status) {
-  switch (status) {
-    case "talked":
-      return {
-        text: "Gaplashildi",
-        icon: "🟠",
-        className:
-          "status-talked"
-      };
+async function uploadImage(file) {
+  if (!file) return null;
 
-    case "confirmed":
-      return {
-        text: "Tasdiqlandi",
-        icon: "🔵",
-        className:
-          "status-confirmed"
-      };
+  const ext = file.name.split(".").pop();
 
-    case "delivery":
-      return {
-        text: "Yetkazishda",
-        icon: "🟣",
-        className:
-          "status-delivery"
-      };
+  const name =
+    `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-    case "done":
-      return {
-        text: "Yakunlandi",
-        icon: "🟢",
-        className:
-          "status-done"
-      };
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/products/${name}`,
+    {
+      method: "POST",
 
-    case "cancelled":
-      return {
-        text: "Bekor qilindi",
-        icon: "⚪",
-        className:
-          "status-cancelled"
-      };
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": file.type
+      },
 
-    default:
-      return {
-        text: "Yangi",
-        icon: "🔴",
-        className:
-          "status-new"
-      };
+      body: file
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(await res.text());
   }
-}
 
-
-function statusUsesStock(status) {
-  return [
-    "confirmed",
-    "delivery",
-    "done"
-  ].includes(status);
+  return `${SUPABASE_URL}/storage/v1/object/public/products/${name}`;
 }
 
 
 /* =========================================
-   ORDERS LOAD
+   SAVE PRODUCT
+========================================= */
+
+productForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  productSubmitBtn.disabled = true;
+
+  try {
+    const id = editProductId.value;
+
+    let imageUrl = null;
+
+    if (pImage.files?.[0]) {
+      imageUrl = await uploadImage(pImage.files[0]);
+    }
+
+    const payload = {
+      name: pName.value.trim(),
+      category: pCategory.value.trim(),
+      price: Number(pPrice.value || 0),
+      old_price: pOldPrice.value ? Number(pOldPrice.value) : null,
+      discount_percent: Number(pDiscount.value || 0),
+      stock: Math.max(0, Number(pStock.value || 0)),
+      description: pDesc.value.trim(),
+      active: true
+    };
+
+    if (imageUrl) {
+      payload.image_url = imageUrl;
+    }
+
+    if (id) {
+      await api(
+        `products?id=eq.${encodeURIComponent(id)}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+
+          body: JSON.stringify(payload)
+        }
+      );
+
+      setMessage(
+        productMessage,
+        "Mahsulot yangilandi ✅",
+        "success"
+      );
+
+    } else {
+      await api(
+        "products",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+
+          body: JSON.stringify(payload)
+        }
+      );
+
+      setMessage(
+        productMessage,
+        "Mahsulot qo‘shildi ✅",
+        "success"
+      );
+    }
+
+    resetProductForm();
+
+    await loadProducts();
+
+    updateStats();
+
+  } catch (error) {
+    console.error(error);
+
+    setMessage(
+      productMessage,
+      error.message,
+      "error"
+    );
+
+  } finally {
+    productSubmitBtn.disabled = false;
+  }
+});
+
+
+function startEditProduct(id) {
+  const p = products.find(x => Number(x.id) === Number(id));
+
+  if (!p) return;
+
+  editProductId.value = p.id;
+
+  pName.value = p.name || "";
+  pCategory.value = p.category || "";
+  pPrice.value = p.price || "";
+  pOldPrice.value = p.old_price || "";
+  pDiscount.value = p.discount_percent || "";
+  pStock.value = p.stock || 0;
+  pDesc.value = p.description || "";
+
+  productFormTitle.textContent = "Mahsulotni tahrirlash";
+  productSubmitBtn.textContent = "Saqlash";
+
+  cancelEditBtn.classList.remove("hidden");
+
+  productForm.scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+
+function resetProductForm() {
+  productForm.reset();
+
+  editProductId.value = "";
+
+  pStock.value = 0;
+
+  productFormTitle.textContent = "Mahsulot qo‘shish";
+  productSubmitBtn.textContent = "Mahsulot qo‘shish";
+
+  cancelEditBtn.classList.add("hidden");
+}
+
+
+cancelEditBtn.addEventListener("click", resetProductForm);
+
+
+async function deleteProduct(id) {
+  if (!confirm("Mahsulotni o‘chirasizmi?")) return;
+
+  await api(
+    `products?id=eq.${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+
+      headers: {
+        Prefer: "return=minimal"
+      }
+    }
+  );
+
+  await loadProducts();
+
+  updateStats();
+}
+
+
+/* =========================================
+   ORDERS
 ========================================= */
 
 async function loadOrders() {
-  try {
-    orders = await api(
-      "orders?select=*&order=id.desc"
-    );
+  orders = await api(
+    "orders?select=*&order=id.desc"
+  );
 
-    renderOrders();
-
-  } catch (error) {
-    console.error("ORDERS:", error);
-
-    setMessage(
-      ordersMessage,
-      "Buyurtmalarni yuklab bo‘lmadi.",
-      "error"
-    );
-  }
+  renderOrders();
 }
 
 
-/* =========================================
-   FILTER ORDERS
-========================================= */
+function statusInfo(status = "new") {
+  const map = {
+    new: ["🔴", "Yangi", "status-new"],
+    talked: ["🟠", "Gaplashildi", "status-talked"],
+    confirmed: ["🔵", "Tasdiqlandi", "status-confirmed"],
+    delivery: ["🟣", "Yetkazishda", "status-delivery"],
+    done: ["🟢", "Yakunlandi", "status-done"],
+    cancelled: ["⚪", "Bekor qilindi", "status-cancelled"]
+  };
+
+  const item = map[status] || map.new;
+
+  return {
+    icon: item[0],
+    text: item[1],
+    className: item[2]
+  };
+}
+
 
 function filteredOrders() {
-  const search =
-    adminOrderSearch.value
-      .trim()
-      .toLowerCase();
+  const search = adminOrderSearch.value.trim().toLowerCase();
 
   return orders.filter(order => {
-    const status =
-      order.status || "new";
+    const status = order.status || "new";
 
     const statusOk =
-      currentOrderStatus === "all" ||
-      status === currentOrderStatus;
+      orderFilter === "all" ||
+      status === orderFilter;
 
     const text = `
       ${order.id || ""}
       ${order.name || ""}
-      ${order.surname || ""}
       ${order.phone || ""}
       ${order.product || ""}
       ${order.size || ""}
       ${order.color || ""}
-      ${order.region || ""}
-      ${order.address || ""}
     `.toLowerCase();
 
-    return (
-      statusOk &&
-      text.includes(search)
-    );
+    return statusOk && text.includes(search);
   });
 }
 
 
-/* =========================================
-   RENDER ORDERS
-========================================= */
-
 function renderOrders() {
-  const list =
-    filteredOrders();
+  const list = filteredOrders();
 
-  visibleOrderCount.textContent =
-    `${list.length} ta`;
+  visibleOrderCount.textContent = `${list.length} ta`;
 
   renderDesktopOrders(list);
   renderMobileOrders(list);
 }
 
 
-/* =========================================
-   DESKTOP ORDERS
-========================================= */
+function statusSelect(order) {
+  const s = order.status || "new";
+
+  return `
+    <select
+      class="order-status-select ${statusInfo(s).className}"
+      data-id="${order.id}"
+    >
+      <option value="new" ${s === "new" ? "selected" : ""}>🔴 Yangi</option>
+      <option value="talked" ${s === "talked" ? "selected" : ""}>🟠 Gaplashildi</option>
+      <option value="confirmed" ${s === "confirmed" ? "selected" : ""}>🔵 Tasdiqlandi</option>
+      <option value="delivery" ${s === "delivery" ? "selected" : ""}>🟣 Yetkazishda</option>
+      <option value="done" ${s === "done" ? "selected" : ""}>🟢 Yakunlandi</option>
+      <option value="cancelled" ${s === "cancelled" ? "selected" : ""}>⚪ Bekor qilindi</option>
+    </select>
+  `;
+}
+
 
 function renderDesktopOrders(list) {
   if (!list.length) {
     ordersBody.innerHTML = `
       <tr>
-        <td colspan="9">
-          Buyurtma topilmadi.
-        </td>
+        <td colspan="9">Buyurtma yo‘q.</td>
       </tr>
     `;
 
     return;
   }
 
+  ordersBody.innerHTML = list.map(order => {
 
-  ordersBody.innerHTML =
-    list.map(order => {
-      const status =
-        statusInfo(
-          order.status || "new"
-        );
+    const info = statusInfo(order.status || "new");
 
-      return `
-        <tr class="order-row ${status.className}">
+    return `
 
-          <td>
-            #${order.id}
-          </td>
+      <tr class="order-row ${info.className}">
 
-          <td>
-            <strong>
-              ${esc(order.name || "")}
-            </strong>
+        <td>#${order.id}</td>
 
-            <small style="
-              display:block;
-              margin-top:3px;
-              color:#888;
-            ">
-              ${esc(formatDate(order.created_at))}
-            </small>
-          </td>
+        <td>
+          <strong>${esc(order.name || "")}</strong>
+          <small style="display:block">
+            ${esc(formatDate(order.created_at))}
+          </small>
+        </td>
 
-          <td>
-            <a
-              href="tel:${esc(normalizePhone(order.phone))}"
-              class="order-phone-link"
-            >
-              📞 ${esc(order.phone || "")}
-            </a>
-          </td>
+        <td>
+          <a href="tel:${esc(phoneClean(order.phone))}">
+            📞 ${esc(order.phone || "")}
+          </a>
+        </td>
 
-          <td>
-            ${esc(order.product || "")}
-          </td>
+        <td>${esc(order.product || "")}</td>
 
-          <td>
-            ${Number(order.quantity || 1)}
-          </td>
+        <td>${Number(order.quantity || 1)}</td>
 
-          <td>
-            ${esc(order.size || "-")}
-          </td>
+        <td>${esc(order.size || "-")}</td>
 
-          <td>
-            ${esc(order.color || "-")}
-          </td>
+        <td>${esc(order.color || "-")}</td>
 
-          <td>
-            ${statusSelectHtml(order)}
-          </td>
+        <td>${statusSelect(order)}</td>
 
-          <td>
+        <td>
+          <a
+            class="small-btn"
+            href="tel:${esc(phoneClean(order.phone))}"
+          >
+            📞
+          </a>
+        </td>
 
-            <div class="order-actions">
+      </tr>
 
-              <a
-                href="tel:${esc(normalizePhone(order.phone))}"
-                class="small-btn call-order-btn"
-              >
-                📞
-              </a>
+    `;
+  }).join("");
 
-              ${
-                (order.status || "new") === "new"
-                  ? `
-                    <button
-                      class="small-btn quick-talked-btn"
-                      data-id="${order.id}"
-                      type="button"
-                    >
-                      Gaplashildi
-                    </button>
-                  `
-                  : ""
-              }
-
-            </div>
-
-          </td>
-
-        </tr>
-      `;
-    }).join("");
-
-  connectOrderButtons();
+  connectOrderStatus();
 }
 
-
-/* =========================================
-   STATUS SELECT
-========================================= */
-
-function statusSelectHtml(order) {
-  const status =
-    statusInfo(order.status || "new");
-
-  return `
-    <select
-      class="order-status-select ${status.className}"
-      data-id="${order.id}"
-    >
-
-      <option value="new"
-        ${(order.status || "new") === "new" ? "selected" : ""}
-      >
-        🔴 Yangi
-      </option>
-
-      <option value="talked"
-        ${order.status === "talked" ? "selected" : ""}
-      >
-        🟠 Gaplashildi
-      </option>
-
-      <option value="confirmed"
-        ${order.status === "confirmed" ? "selected" : ""}
-      >
-        🔵 Tasdiqlandi
-      </option>
-
-      <option value="delivery"
-        ${order.status === "delivery" ? "selected" : ""}
-      >
-        🟣 Yetkazishda
-      </option>
-
-      <option value="done"
-        ${order.status === "done" ? "selected" : ""}
-      >
-        🟢 Yakunlandi
-      </option>
-
-      <option value="cancelled"
-        ${order.status === "cancelled" ? "selected" : ""}
-      >
-        ⚪ Bekor qilindi
-      </option>
-
-    </select>
-  `;
-}
-
-
-/* =========================================
-   MOBILE ORDERS
-========================================= */
 
 function renderMobileOrders(list) {
   if (!list.length) {
-    mobileOrders.innerHTML = `
-      <div class="drawer-empty">
-        Buyurtma topilmadi.
-      </div>
-    `;
-
+    mobileOrders.innerHTML = "";
     return;
   }
 
+  mobileOrders.innerHTML = list.map(order => {
 
-  mobileOrders.innerHTML =
-    list.map(order => {
-      const status =
-        statusInfo(
-          order.status || "new"
-        );
+    const info = statusInfo(order.status || "new");
 
-      return `
-        <article
-          class="mobile-order-card ${status.className}"
-        >
+    return `
 
-          <div class="mobile-order-top">
+      <article class="mobile-order-card ${info.className}">
 
-            <div>
-              <span class="mobile-order-id">
-                #${order.id}
-              </span>
+        <div class="mobile-order-top">
 
-              <strong>
-                ${esc(order.name || "")}
-              </strong>
-            </div>
-
-            <span
-              class="mobile-status-badge ${status.className}"
-            >
-              ${status.icon}
-              ${status.text}
-            </span>
-
-          </div>
-
-
-          <div class="mobile-order-product">
-
-            <span>
-              Mahsulot
+          <div>
+            <span class="mobile-order-id">
+              #${order.id}
             </span>
 
             <strong>
-              ${esc(order.product || "")}
+              ${esc(order.name || "")}
             </strong>
-
           </div>
 
+          <span class="mobile-status-badge ${info.className}">
+            ${info.icon} ${info.text}
+          </span>
 
-          <div class="mobile-order-grid">
+        </div>
 
-            <div>
-              <span>Soni</span>
-              <strong>
-                ${Number(order.quantity || 1)}
-              </strong>
-            </div>
+        <div class="mobile-order-product">
+          <span>Mahsulot</span>
+          <strong>${esc(order.product || "")}</strong>
+        </div>
 
-            <div>
-              <span>O‘lcham</span>
-              <strong>
-                ${esc(order.size || "-")}
-              </strong>
-            </div>
+        <div class="mobile-order-grid">
 
-            <div>
-              <span>Rang</span>
-              <strong>
-                ${esc(order.color || "-")}
-              </strong>
-            </div>
-
+          <div>
+            <span>Soni</span>
+            <strong>${Number(order.quantity || 1)}</strong>
           </div>
 
+          <div>
+            <span>O‘lcham</span>
+            <strong>${esc(order.size || "-")}</strong>
+          </div>
 
-          <a
-            href="tel:${esc(normalizePhone(order.phone))}"
-            class="mobile-order-phone"
-          >
-            📞 ${esc(order.phone || "")}
-          </a>
+          <div>
+            <span>Rang</span>
+            <strong>${esc(order.color || "-")}</strong>
+          </div>
+
+        </div>
+
+        <a
+          href="tel:${esc(phoneClean(order.phone))}"
+          class="mobile-order-phone"
+        >
+          📞 ${esc(order.phone || "")}
+        </a>
+
+        ${statusSelect(order)}
+
+      </article>
+
+    `;
+  }).join("");
+
+  connectOrderStatus();
+}
 
 
-          ${statusSelectHtml(order)}
-
-
-          <small class="mobile-order-date">
-            ${esc(formatDate(order.created_at))}
-          </small>
-
-        </article>
-      `;
-    }).join("");
-
-  connectOrderButtons();
+function connectOrderStatus() {
+  document.querySelectorAll(".order-status-select").forEach(select => {
+    select.onchange = async () => {
+      await changeOrderStatus(
+        select.dataset.id,
+        select.value
+      );
+    };
+  });
 }
 
 
 /* =========================================
-   CONNECT ORDER BUTTONS
+   STOCK STATUS
 ========================================= */
 
-function connectOrderButtons() {
-  document
-    .querySelectorAll(".order-status-select")
-    .forEach(select => {
-      select.onchange =
-        async () => {
-          await changeOrderStatus(
-            select.dataset.id,
-            select.value
-          );
-        };
-    });
-
-
-  document
-    .querySelectorAll(".quick-talked-btn")
-    .forEach(button => {
-      button.onclick =
-        async () => {
-          await changeOrderStatus(
-            button.dataset.id,
-            "talked"
-          );
-        };
-    });
+function usesStock(status) {
+  return ["confirmed", "delivery", "done"].includes(status);
 }
 
 
-/* =========================================
-   STOCK + STATUS
-========================================= */
-
-async function changeOrderStatus(
-  id,
-  newStatus
-) {
+async function changeOrderStatus(id, newStatus) {
   try {
     const rows = await api(
       `orders?select=*&id=eq.${encodeURIComponent(id)}&limit=1`
     );
 
-    const order =
-      rows?.[0];
+    const order = rows?.[0];
 
     if (!order) {
-      throw new Error(
-        "Buyurtma topilmadi."
-      );
+      throw new Error("Buyurtma topilmadi.");
     }
 
+    const qty = Math.max(1, Number(order.quantity || 1));
+    const productId = order.product_id;
 
-    const quantity =
-      Math.max(
-        1,
-        Number(order.quantity || 1)
+    let adjusted = order.stock_adjusted === true;
+
+    const needStock = usesStock(newStatus);
+
+
+    if (needStock && !adjusted && productId) {
+
+      const pRows = await api(
+        `products?select=id,stock&id=eq.${encodeURIComponent(productId)}&limit=1`
       );
 
-    const productId =
-      order.product_id;
-
-    let stockAdjusted =
-      order.stock_adjusted === true;
-
-    const shouldUseStock =
-      statusUsesStock(newStatus);
-
-
-    /* STOCKNI KAMAYTIRISH */
-
-    if (
-      shouldUseStock &&
-      !stockAdjusted &&
-      productId
-    ) {
-      const productRows =
-        await api(
-          `products?select=id,name,stock&id=eq.${encodeURIComponent(productId)}&limit=1`
-        );
-
-      const product =
-        productRows?.[0];
+      const product = pRows?.[0];
 
       if (!product) {
-        throw new Error(
-          "Mahsulot topilmadi."
-        );
+        throw new Error("Mahsulot topilmadi.");
       }
 
-      const currentStock =
-        Number(product.stock || 0);
+      const stock = Number(product.stock || 0);
 
-
-      if (
-        currentStock <
-        quantity
-      ) {
+      if (stock < qty) {
         alert(
-          `Omborda yetarli mahsulot yo‘q.\nOmborda: ${currentStock} dona\nBuyurtma: ${quantity} dona`
+          `Omborda yetarli mahsulot yo‘q.\nOmborda: ${stock}\nBuyurtma: ${qty}`
         );
 
-        renderOrders();
         return;
       }
-
 
       await api(
         `products?id=eq.${encodeURIComponent(productId)}`,
@@ -1784,44 +1014,29 @@ async function changeOrderStatus(
           method: "PATCH",
 
           headers: {
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=minimal"
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
           },
 
           body: JSON.stringify({
-            stock:
-              currentStock -
-              quantity
+            stock: stock - qty
           })
         }
       );
 
-
-      stockAdjusted = true;
+      adjusted = true;
     }
 
 
-    /* STOCKNI QAYTARISH */
+    if (!needStock && adjusted && productId) {
 
-    if (
-      !shouldUseStock &&
-      stockAdjusted &&
-      productId
-    ) {
-      const productRows =
-        await api(
-          `products?select=id,stock&id=eq.${encodeURIComponent(productId)}&limit=1`
-        );
+      const pRows = await api(
+        `products?select=id,stock&id=eq.${encodeURIComponent(productId)}&limit=1`
+      );
 
-      const product =
-        productRows?.[0];
+      const product = pRows?.[0];
 
       if (product) {
-        const currentStock =
-          Number(product.stock || 0);
 
         await api(
           `products?id=eq.${encodeURIComponent(productId)}`,
@@ -1829,40 +1044,30 @@ async function changeOrderStatus(
             method: "PATCH",
 
             headers: {
-              "Content-Type":
-                "application/json",
-
-              Prefer:
-                "return=minimal"
+              "Content-Type": "application/json",
+              Prefer: "return=minimal"
             },
 
             body: JSON.stringify({
-              stock:
-                currentStock +
-                quantity
+              stock: Number(product.stock || 0) + qty
             })
           }
         );
       }
 
-      stockAdjusted = false;
+      adjusted = false;
     }
 
 
     const payload = {
       status: newStatus,
-
-      stock_adjusted:
-        stockAdjusted,
-
-      updated_at:
-        new Date().toISOString()
+      stock_adjusted: adjusted,
+      updated_at: new Date().toISOString()
     };
 
 
     if (newStatus === "talked") {
-      payload.talked_at =
-        new Date().toISOString();
+      payload.talked_at = new Date().toISOString();
     }
 
 
@@ -1872,15 +1077,11 @@ async function changeOrderStatus(
         method: "PATCH",
 
         headers: {
-          "Content-Type":
-            "application/json",
-
-          Prefer:
-            "return=minimal"
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
         },
 
-        body:
-          JSON.stringify(payload)
+        body: JSON.stringify(payload)
       }
     );
 
@@ -1894,47 +1095,30 @@ async function changeOrderStatus(
     updateOrderStats();
 
   } catch (error) {
-    console.error(
-      "STATUS XATO:",
-      error
-    );
+    console.error(error);
 
-    alert(
-      error.message ||
-      "Statusni o‘zgartirib bo‘lmadi."
-    );
-
-    renderOrders();
+    alert(error.message);
   }
 }
 
 
 /* =========================================
-   ORDER FILTER
+   ORDER FILTERS
 ========================================= */
 
-document
-  .querySelectorAll(".order-filter-btn")
-  .forEach(button => {
+document.querySelectorAll(".order-filter-btn").forEach(btn => {
+  btn.onclick = () => {
 
-    button.addEventListener(
-      "click",
-      () => {
-        currentOrderStatus =
-          button.dataset.status;
+    orderFilter = btn.dataset.status;
 
-        document
-          .querySelectorAll(".order-filter-btn")
-          .forEach(item =>
-            item.classList.remove("active")
-          );
+    document.querySelectorAll(".order-filter-btn")
+      .forEach(x => x.classList.remove("active"));
 
-        button.classList.add("active");
+    btn.classList.add("active");
 
-        renderOrders();
-      }
-    );
-  });
+    renderOrders();
+  };
+});
 
 
 adminOrderSearch.addEventListener(
@@ -1943,40 +1127,24 @@ adminOrderSearch.addEventListener(
 );
 
 
-clearOrderSearch.addEventListener(
-  "click",
-  () => {
-    adminOrderSearch.value = "";
-    renderOrders();
-    adminOrderSearch.focus();
-  }
-);
+clearOrderSearch.addEventListener("click", () => {
+  adminOrderSearch.value = "";
+  renderOrders();
+});
 
 
 /* =========================================
-   OPERATORS LOAD
+   OPERATORS
 ========================================= */
 
 async function loadOperators() {
-  try {
-    operators = await api(
-      "profiles?select=id,name,role,active&role=eq.operator&order=name.asc"
-    );
+  operators = await api(
+    "profiles?select=id,name,role,active&role=eq.operator&order=name.asc"
+  );
 
-    renderOperators();
-
-  } catch (error) {
-    console.error("OPERATORS:", error);
-
-    operators = [];
-    renderOperators();
-  }
+  renderOperators();
 }
 
-
-/* =========================================
-   RENDER OPERATORS
-========================================= */
 
 function renderOperators() {
   if (!operators.length) {
@@ -1989,97 +1157,60 @@ function renderOperators() {
     return;
   }
 
+  operatorsList.innerHTML = operators.map(op => `
 
-  operatorsList.innerHTML =
-    operators.map(operator => `
-      <div class="support-item">
+    <div class="support-item">
+
+      <div>
+        <strong>${esc(op.name || "Operator")}</strong>
 
         <div>
-
-          <strong>
-            ${esc(operator.name || "Operator")}
-          </strong>
-
-          <div style="
-            margin-top:4px;
-            font-size:12px;
-            color:${
-              operator.active
-                ? "#16835a"
-                : "#d6455d"
-            };
-          ">
-            ${
-              operator.active
-                ? "● Faol"
-                : "● Bloklangan"
-            }
-          </div>
-
+          ${op.active ? "🟢 Faol" : "🔴 Bloklangan"}
         </div>
-
-
-        <button
-          class="small-btn operator-toggle"
-          data-id="${operator.id}"
-          data-active="${operator.active}"
-          type="button"
-        >
-          ${
-            operator.active
-              ? "Bloklash"
-              : "Faollashtirish"
-          }
-        </button>
-
       </div>
-    `).join("");
+
+      <button
+        class="small-btn opToggle"
+        data-id="${op.id}"
+        data-active="${op.active}"
+        type="button"
+      >
+        ${op.active ? "Bloklash" : "Faollashtirish"}
+      </button>
+
+    </div>
+
+  `).join("");
 
 
-  document
-    .querySelectorAll(".operator-toggle")
-    .forEach(button => {
+  document.querySelectorAll(".opToggle").forEach(btn => {
 
-      button.onclick =
-        async () => {
+    btn.onclick = async () => {
 
-          const newActive =
-            button.dataset.active !== "true";
+      const active =
+        btn.dataset.active !== "true";
 
-          try {
-            await api(
-              `profiles?id=eq.${encodeURIComponent(button.dataset.id)}`,
-              {
-                method: "PATCH",
+      await api(
+        `profiles?id=eq.${encodeURIComponent(btn.dataset.id)}`,
+        {
+          method: "PATCH",
 
-                headers: {
-                  "Content-Type":
-                    "application/json",
+          headers: {
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
 
-                  Prefer:
-                    "return=minimal"
-                },
+          body: JSON.stringify({
+            active
+          })
+        }
+      );
 
-                body: JSON.stringify({
-                  active:
-                    newActive
-                })
-              }
-            );
+      await loadOperators();
 
-            await loadOperators();
-
-            updateStats();
-
-          } catch (error) {
-            console.error(error);
-
-            alert(
-              "Operator holatini o‘zgartirib bo‘lmadi."
-            );
-          }
-        };
-    });
+      updateStats();
+    };
+  });
 }
 
 
@@ -2087,108 +1218,67 @@ function renderOperators() {
    CREATE OPERATOR
 ========================================= */
 
-operatorCreateForm.addEventListener(
-  "submit",
-  async event => {
+operatorCreateForm.addEventListener("submit", async event => {
+  event.preventDefault();
 
-    event.preventDefault();
+  const button =
+    operatorCreateForm.querySelector('button[type="submit"]');
 
-    const button =
-      operatorCreateForm.querySelector(
-        'button[type="submit"]'
+  button.disabled = true;
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/smart-endpoint`,
+      {
+        method: "POST",
+
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          name: opName.value.trim(),
+          email: newOpEmail.value.trim(),
+          password: newOpPassword.value
+        })
+      }
+    );
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Operator yaratilmadi."
       );
+    }
 
-    button.disabled = true;
-    button.textContent =
-      "Yaratilmoqda...";
+    operatorCreateForm.reset();
 
     setMessage(
       operatorCreateMessage,
-      ""
+      "Operator yaratildi ✅",
+      "success"
     );
 
+    await loadOperators();
 
-    try {
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/smart-endpoint`,
-        {
-          method: "POST",
+    updateStats();
 
-          headers: {
-            apikey:
-              SUPABASE_KEY,
+  } catch (error) {
+    setMessage(
+      operatorCreateMessage,
+      error.message,
+      "error"
+    );
 
-            Authorization:
-              `Bearer ${accessToken}`,
-
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              name:
-                opName.value.trim(),
-
-              email:
-                newOpEmail.value.trim(),
-
-              password:
-                newOpPassword.value
-            })
-        }
-      );
-
-
-      let data = {};
-
-      try {
-        data =
-          await response.json();
-      } catch {}
-
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-          data.message ||
-          "Operator yaratilmadi."
-        );
-      }
-
-
-      setMessage(
-        operatorCreateMessage,
-        "Operator yaratildi ✅",
-        "success"
-      );
-
-      operatorCreateForm.reset();
-
-      await loadOperators();
-
-      updateStats();
-
-    } catch (error) {
-      console.error(
-        "CREATE OPERATOR:",
-        error
-      );
-
-      setMessage(
-        operatorCreateMessage,
-        error.message ||
-        "Operator yaratilmadi.",
-        "error"
-      );
-
-    } finally {
-      button.disabled = false;
-      button.textContent =
-        "Operator yaratish";
-    }
+  } finally {
+    button.disabled = false;
   }
-);
+});
 
 
 /* =========================================
@@ -2196,22 +1286,11 @@ operatorCreateForm.addEventListener(
 ========================================= */
 
 async function loadSupport() {
-  try {
-    supportRequests = await api(
-      "support_requests?select=*&order=id.desc"
-    );
+  supportRequests = await api(
+    "support_requests?select=*&order=id.desc"
+  );
 
-    renderSupport();
-
-  } catch (error) {
-    console.error("SUPPORT:", error);
-
-    adminSupportList.innerHTML = `
-      <p class="drawer-empty">
-        Murojaatlarni yuklab bo‘lmadi.
-      </p>
-    `;
-  }
+  renderSupport();
 }
 
 
@@ -2219,45 +1298,73 @@ function renderSupport() {
   if (!supportRequests.length) {
     adminSupportList.innerHTML = `
       <p class="drawer-empty">
-        Hozircha murojaat yo‘q.
+        Murojaat yo‘q.
       </p>
     `;
 
     return;
   }
 
+  adminSupportList.innerHTML = supportRequests.map(item => `
 
-  adminSupportList.innerHTML =
-    supportRequests.map(item => `
-      <div class="support-item">
+    <div class="support-item">
 
-        <div>
+      <div>
 
-          <strong>
-            ${esc(item.name || "")}
-          </strong>
+        <strong>
+          ${esc(item.name || "")}
+        </strong>
 
-          <p style="
-            margin:6px 0;
-            color:#666;
-          ">
-            ${esc(item.message || "")}
-          </p>
+        <p>
+          ${esc(item.message || "")}
+        </p>
 
-          <a
-            href="tel:${esc(normalizePhone(item.phone))}"
-          >
-            📞 ${esc(item.phone || "")}
-          </a>
-
-        </div>
-
-        <span class="badge">
-          ${esc(item.status || "new")}
-        </span>
+        <a href="tel:${esc(phoneClean(item.phone))}">
+          📞 ${esc(item.phone || "")}
+        </a>
 
       </div>
-    `).join("");
+
+    </div>
+
+  `).join("");
+}
+
+
+/* =========================================
+   STATS
+========================================= */
+
+function updateStats() {
+  aProducts.textContent = products.length;
+  aOrders.textContent = orders.length;
+
+  aNew.textContent = orders.filter(
+    x => (x.status || "new") === "new"
+  ).length;
+
+  aOperators.textContent = operators.length;
+}
+
+
+function updateOrderStats() {
+  todayOrdersCount.textContent =
+    orders.filter(x => isToday(x.created_at)).length;
+
+  newOrdersCount.textContent =
+    orders.filter(x => (x.status || "new") === "new").length;
+
+  talkedOrdersCount.textContent =
+    orders.filter(x => x.status === "talked").length;
+
+  confirmedOrdersCount.textContent =
+    orders.filter(x => x.status === "confirmed").length;
+
+  deliveryOrdersCount.textContent =
+    orders.filter(x => x.status === "delivery").length;
+
+  doneOrdersCount.textContent =
+    orders.filter(x => x.status === "done").length;
 }
 
 
