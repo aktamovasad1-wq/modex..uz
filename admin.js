@@ -38,6 +38,7 @@ const pCategory = document.getElementById("pCategory");
 const pPrice = document.getElementById("pPrice");
 const pOldPrice = document.getElementById("pOldPrice");
 const pDiscount = document.getElementById("pDiscount");
+const pStock = document.getElementById("pStock");
 const pDesc = document.getElementById("pDesc");
 const pImage = document.getElementById("pImage");
 
@@ -65,7 +66,7 @@ const aNew = document.getElementById("aNew");
 const aOperators = document.getElementById("aOperators");
 
 /* =========================
-   YORDAMCHI
+   HELPERS
 ========================= */
 
 function esc(value = "") {
@@ -80,52 +81,37 @@ function esc(value = "") {
 
 function money(value) {
   return (
-    new Intl.NumberFormat("uz-UZ").format(
-      Number(value || 0)
-    ) + " so‘m"
+    new Intl.NumberFormat("uz-UZ").format(Number(value || 0))
+    + " so‘m"
   );
 }
 
 function setMessage(element, text, type = "") {
   element.textContent = text;
-
-  element.className =
-    `form-message ${type}`.trim();
+  element.className = `form-message ${type}`.trim();
 }
 
 function productLink(id) {
-  const path = location.pathname.replace(
-    /admin\.html.*$/,
-    ""
-  );
-
+  const path = location.pathname.replace(/admin\.html.*$/, "");
   return `${location.origin}${path}product.html?id=${id}`;
 }
 
 /* =========================
-   REST API
+   API
 ========================= */
 
 async function api(path, options = {}) {
-  const response = await fetch(
-    `${REST}/${path}`,
-    {
-      ...options,
-      headers: {
-        apikey: SUPABASE_KEY,
-
-        Authorization:
-          `Bearer ${accessToken || SUPABASE_KEY}`,
-
-        ...(options.headers || {})
-      }
+  const response = await fetch(`${REST}/${path}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${accessToken || SUPABASE_KEY}`,
+      ...(options.headers || {})
     }
-  );
+  });
 
   if (!response.ok) {
-    throw new Error(
-      await response.text()
-    );
+    throw new Error(await response.text());
   }
 
   if (response.status === 204) {
@@ -133,10 +119,7 @@ async function api(path, options = {}) {
   }
 
   const text = await response.text();
-
-  return text
-    ? JSON.parse(text)
-    : null;
+  return text ? JSON.parse(text) : null;
 }
 
 /* =========================
@@ -148,12 +131,10 @@ async function signIn(email, password) {
     `${AUTH}/token?grant_type=password`,
     {
       method: "POST",
-
       headers: {
         apikey: SUPABASE_KEY,
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
         email,
         password
@@ -161,8 +142,7 @@ async function signIn(email, password) {
     }
   );
 
-  const data =
-    await response.json();
+  const data = await response.json();
 
   if (!response.ok) {
     throw new Error(
@@ -181,19 +161,15 @@ async function getCurrentUser() {
     {
       headers: {
         apikey: SUPABASE_KEY,
-        Authorization:
-          `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`
       }
     }
   );
 
-  const data =
-    await response.json();
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      "Sessiya topilmadi"
-    );
+    throw new Error("Sessiya topilmadi");
   }
 
   return data;
@@ -214,17 +190,11 @@ async function checkAdminRole(userId) {
 }
 
 function saveSession(token) {
-  localStorage.setItem(
-    "modex_admin_token",
-    token
-  );
+  localStorage.setItem("modex_admin_token", token);
 }
 
 function clearSession() {
-  localStorage.removeItem(
-    "modex_admin_token"
-  );
-
+  localStorage.removeItem("modex_admin_token");
   accessToken = "";
   currentUser = null;
 }
@@ -243,79 +213,56 @@ function showAdmin() {
    LOGIN
 ========================= */
 
-loginForm.onsubmit =
-  async event => {
+loginForm.onsubmit = async event => {
+  event.preventDefault();
 
-    event.preventDefault();
+  setMessage(loginMessage, "Tekshirilmoqda...");
+
+  try {
+    const auth = await signIn(
+      emailInput.value.trim(),
+      passwordInput.value
+    );
+
+    accessToken = auth.access_token;
+    currentUser = auth.user;
+
+    const isAdmin = await checkAdminRole(currentUser.id);
+
+    if (!isAdmin) {
+      throw new Error("Bu akkauntda admin huquqi yo‘q.");
+    }
+
+    saveSession(accessToken);
+
+    adminEmail.textContent = currentUser.email || "";
+
+    setMessage(loginMessage, "");
+
+    showAdmin();
+
+    await loadAdminData();
+
+  } catch (error) {
+    console.error(error);
+
+    clearSession();
 
     setMessage(
       loginMessage,
-      "Tekshirilmoqda..."
+      error.message || "Kirishda xatolik",
+      "error"
     );
-
-    try {
-      const auth =
-        await signIn(
-          emailInput.value.trim(),
-          passwordInput.value
-        );
-
-      accessToken =
-        auth.access_token;
-
-      currentUser =
-        auth.user;
-
-      const isAdmin =
-        await checkAdminRole(
-          currentUser.id
-        );
-
-      if (!isAdmin) {
-        throw new Error(
-          "Bu akkauntda admin huquqi yo‘q."
-        );
-      }
-
-      saveSession(
-        accessToken
-      );
-
-      adminEmail.textContent =
-        currentUser.email || "";
-
-      setMessage(
-        loginMessage,
-        ""
-      );
-
-      showAdmin();
-
-      await loadAdminData();
-
-    } catch (error) {
-      console.error(error);
-
-      clearSession();
-
-      setMessage(
-        loginMessage,
-        error.message ||
-        "Kirishda xatolik",
-        "error"
-      );
-    }
-  };
+  }
+};
 
 /* =========================
-   SESSION START
+   RESTORE SESSION
 ========================= */
 
 async function restoreSession() {
   accessToken =
-    localStorage.getItem(
-      "modex_admin_token"
-    ) || "";
+    localStorage.getItem("modex_admin_token") || "";
 
   if (!accessToken) {
     showLogin();
@@ -323,22 +270,15 @@ async function restoreSession() {
   }
 
   try {
-    currentUser =
-      await getCurrentUser();
+    currentUser = await getCurrentUser();
 
-    const isAdmin =
-      await checkAdminRole(
-        currentUser.id
-      );
+    const isAdmin = await checkAdminRole(currentUser.id);
 
     if (!isAdmin) {
-      throw new Error(
-        "Admin huquqi yo‘q"
-      );
+      throw new Error("Admin huquqi yo‘q");
     }
 
-    adminEmail.textContent =
-      currentUser.email || "";
+    adminEmail.textContent = currentUser.email || "";
 
     showAdmin();
 
@@ -379,47 +319,35 @@ async function loadAdminData() {
   updateStats();
 }
 
-refreshAdminBtn.onclick =
-  async () => {
-    refreshAdminBtn.disabled = true;
+refreshAdminBtn.onclick = async () => {
+  refreshAdminBtn.disabled = true;
+  refreshAdminBtn.textContent = "Yangilanmoqda...";
 
-    refreshAdminBtn.textContent =
-      "Yangilanmoqda...";
-
-    try {
-      await loadAdminData();
-
-    } finally {
-      refreshAdminBtn.disabled = false;
-
-      refreshAdminBtn.textContent =
-        "Yangilash";
-    }
-  };
+  try {
+    await loadAdminData();
+  } finally {
+    refreshAdminBtn.disabled = false;
+    refreshAdminBtn.textContent = "Yangilash";
+  }
+};
 
 /* =========================
-   STATISTIKA
+   STATS
 ========================= */
 
 function updateStats() {
-  aProducts.textContent =
-    products.length;
+  aProducts.textContent = products.length;
+  aOrders.textContent = orders.length;
 
-  aOrders.textContent =
-    orders.length;
+  aNew.textContent = orders.filter(
+    order => order.status === "new"
+  ).length;
 
-  aNew.textContent =
-    orders.filter(
-      order =>
-        order.status === "new"
-    ).length;
-
-  aOperators.textContent =
-    operators.length;
+  aOperators.textContent = operators.length;
 }
 
 /* =========================
-   RASM YUKLASH
+   IMAGE UPLOAD
 ========================= */
 
 async function uploadImage(file) {
@@ -427,11 +355,10 @@ async function uploadImage(file) {
     return null;
   }
 
-  const extension =
-    file.name
-      .split(".")
-      .pop()
-      .toLowerCase();
+  const extension = file.name
+    .split(".")
+    .pop()
+    .toLowerCase();
 
   const filename =
     `${Date.now()}-${Math.random()
@@ -444,33 +371,26 @@ async function uploadImage(file) {
     `${SUPABASE_URL}/storage/v1/object/${bucket}/${filename}`,
     {
       method: "POST",
-
       headers: {
         apikey: SUPABASE_KEY,
-        Authorization:
-          `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type":
           file.type || "application/octet-stream",
         "x-upsert": "false"
       },
-
       body: file
     }
   );
 
   if (!response.ok) {
-    throw new Error(
-      await response.text()
-    );
+    throw new Error(await response.text());
   }
 
-  return (
-    `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filename}`
-  );
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${filename}`;
 }
 
 /* =========================
-   PRODUCTS LOAD
+   PRODUCTS
 ========================= */
 
 async function loadProducts() {
@@ -496,179 +416,144 @@ async function loadProducts() {
    PRODUCT FORM
 ========================= */
 
-productForm.onsubmit =
-  async event => {
+productForm.onsubmit = async event => {
+  event.preventDefault();
 
-    event.preventDefault();
+  const editingId = editProductId.value.trim();
 
-    const editingId =
-      editProductId.value.trim();
+  const name = pName.value.trim();
+  const category = pCategory.value.trim();
+  const price = Number(pPrice.value || 0);
 
-    const name =
-      pName.value.trim();
+  const oldPrice = pOldPrice.value
+    ? Number(pOldPrice.value)
+    : null;
 
-    const category =
-      pCategory.value.trim();
+  let discount = Number(pDiscount.value || 0);
 
-    const price =
-      Number(pPrice.value || 0);
+  const stock = Math.max(
+    0,
+    Math.floor(Number(pStock.value || 0))
+  );
 
-    const oldPrice =
-      pOldPrice.value
-        ? Number(pOldPrice.value)
-        : null;
+  if (
+    oldPrice &&
+    oldPrice > price &&
+    !discount
+  ) {
+    discount = Math.round(
+      ((oldPrice - price) / oldPrice) * 100
+    );
 
-    let discount =
-      Number(
-        pDiscount.value || 0
+    pDiscount.value = discount;
+  }
+
+  if (discount < 0 || discount > 100) {
+    setMessage(
+      productMessage,
+      "Chegirma 0 dan 100 gacha bo‘lishi kerak.",
+      "error"
+    );
+
+    return;
+  }
+
+  productSubmitBtn.disabled = true;
+
+  productSubmitBtn.textContent =
+    editingId
+      ? "Saqlanmoqda..."
+      : "Qo‘shilmoqda...";
+
+  setMessage(productMessage, "");
+
+  try {
+    let imageUrl = null;
+
+    if (pImage.files?.[0]) {
+      imageUrl = await uploadImage(
+        pImage.files[0]
       );
-
-    if (
-      oldPrice &&
-      oldPrice > price &&
-      !discount
-    ) {
-      discount =
-        Math.round(
-          ((oldPrice - price) /
-            oldPrice) *
-          100
-        );
-
-      pDiscount.value =
-        discount;
     }
 
-    if (
-      discount < 0 ||
-      discount > 100
-    ) {
+    const payload = {
+      name,
+      category,
+      price,
+      old_price: oldPrice,
+      discount_percent: discount,
+      stock,
+      description: pDesc.value.trim(),
+      active: true
+    };
+
+    if (imageUrl) {
+      payload.image_url = imageUrl;
+    }
+
+    if (editingId) {
+      await api(
+        `products?id=eq.${encodeURIComponent(editingId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
       setMessage(
         productMessage,
-        "Chegirma 0 dan 100 gacha bo‘lishi kerak.",
-        "error"
+        "Mahsulot yangilandi ✅",
+        "success"
       );
 
-      return;
+    } else {
+      await api(
+        "products",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      setMessage(
+        productMessage,
+        "Mahsulot qo‘shildi ✅",
+        "success"
+      );
     }
 
-    productSubmitBtn.disabled =
-      true;
+    resetProductForm();
 
-    productSubmitBtn.textContent =
-      editingId
-        ? "Saqlanmoqda..."
-        : "Qo‘shilmoqda...";
+    await loadProducts();
+
+    updateStats();
+
+  } catch (error) {
+    console.error(error);
 
     setMessage(
       productMessage,
-      ""
+      "Mahsulotni saqlab bo‘lmadi.",
+      "error"
     );
 
-    try {
-      let imageUrl = null;
+  } finally {
+    productSubmitBtn.disabled = false;
 
-      if (pImage.files?.[0]) {
-        imageUrl =
-          await uploadImage(
-            pImage.files[0]
-          );
-      }
-
-      const payload = {
-        name,
-        category,
-        price,
-        old_price: oldPrice,
-        discount_percent: discount,
-        description:
-          pDesc.value.trim(),
-        active: true
-      };
-
-      if (imageUrl) {
-        payload.image_url =
-          imageUrl;
-      }
-
-      if (editingId) {
-        await api(
-          `products?id=eq.${encodeURIComponent(editingId)}`,
-          {
-            method: "PATCH",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-              Prefer:
-                "return=minimal"
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-          }
-        );
-
-        setMessage(
-          productMessage,
-          "Mahsulot yangilandi ✅",
-          "success"
-        );
-
-      } else {
-        await api(
-          "products",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-              Prefer:
-                "return=minimal"
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-          }
-        );
-
-        setMessage(
-          productMessage,
-          "Mahsulot qo‘shildi ✅",
-          "success"
-        );
-      }
-
-      resetProductForm();
-
-      await loadProducts();
-
-      updateStats();
-
-    } catch (error) {
-      console.error(error);
-
-      setMessage(
-        productMessage,
-        "Mahsulotni saqlab bo‘lmadi.",
-        "error"
-      );
-
-    } finally {
-      productSubmitBtn.disabled =
-        false;
-
-      productSubmitBtn.textContent =
-        editProductId.value
-          ? "Saqlash"
-          : "Mahsulot qo‘shish";
-    }
-  };
+    productSubmitBtn.textContent =
+      editProductId.value
+        ? "Saqlash"
+        : "Mahsulot qo‘shish";
+  }
+};
 
 /* =========================
    PRODUCT RESET
@@ -678,6 +563,7 @@ function resetProductForm() {
   productForm.reset();
 
   editProductId.value = "";
+  pStock.value = 0;
 
   productFormTitle.textContent =
     "Mahsulot qo‘shish";
@@ -685,18 +571,12 @@ function resetProductForm() {
   productSubmitBtn.textContent =
     "Mahsulot qo‘shish";
 
-  cancelEditBtn.classList.add(
-    "hidden"
-  );
+  cancelEditBtn.classList.add("hidden");
 }
 
 cancelEditBtn.onclick = () => {
   resetProductForm();
-
-  setMessage(
-    productMessage,
-    ""
-  );
+  setMessage(productMessage, "");
 };
 
 /* =========================
@@ -704,37 +584,23 @@ cancelEditBtn.onclick = () => {
 ========================= */
 
 function editProduct(id) {
-  const product =
-    products.find(
-      item =>
-        Number(item.id) ===
-        Number(id)
-    );
+  const product = products.find(
+    item => Number(item.id) === Number(id)
+  );
 
   if (!product) {
     return;
   }
 
-  editProductId.value =
-    product.id;
+  editProductId.value = product.id;
 
-  pName.value =
-    product.name || "";
-
-  pCategory.value =
-    product.category || "";
-
-  pPrice.value =
-    product.price || "";
-
-  pOldPrice.value =
-    product.old_price || "";
-
-  pDiscount.value =
-    product.discount_percent || "";
-
-  pDesc.value =
-    product.description || "";
+  pName.value = product.name || "";
+  pCategory.value = product.category || "";
+  pPrice.value = product.price || "";
+  pOldPrice.value = product.old_price || "";
+  pDiscount.value = product.discount_percent || "";
+  pStock.value = Number(product.stock || 0);
+  pDesc.value = product.description || "";
 
   productFormTitle.textContent =
     "Mahsulotni tahrirlash";
@@ -742,9 +608,7 @@ function editProduct(id) {
   productSubmitBtn.textContent =
     "Saqlash";
 
-  cancelEditBtn.classList.remove(
-    "hidden"
-  );
+  cancelEditBtn.classList.remove("hidden");
 
   productForm.scrollIntoView({
     behavior: "smooth",
@@ -753,23 +617,19 @@ function editProduct(id) {
 }
 
 /* =========================
-   PRODUCT DELETE
+   DELETE PRODUCT
 ========================= */
 
 async function deleteProduct(id) {
-  const product =
-    products.find(
-      item =>
-        Number(item.id) ===
-        Number(id)
-    );
+  const product = products.find(
+    item => Number(item.id) === Number(id)
+  );
 
   if (!product) return;
 
-  const ok =
-    confirm(
-      `"${product.name}" mahsulotini o‘chirasizmi?`
-    );
+  const ok = confirm(
+    `"${product.name}" mahsulotini o‘chirasizmi?`
+  );
 
   if (!ok) {
     return;
@@ -780,10 +640,8 @@ async function deleteProduct(id) {
       `products?id=eq.${encodeURIComponent(id)}`,
       {
         method: "DELETE",
-
         headers: {
-          Prefer:
-            "return=minimal"
+          Prefer: "return=minimal"
         }
       }
     );
@@ -819,11 +677,9 @@ function renderAdminProducts() {
   }
 
   products.forEach(product => {
-    const item =
-      document.createElement("div");
+    const item = document.createElement("div");
 
-    item.className =
-      "product-admin-item";
+    item.className = "product-admin-item";
 
     let priceHtml = `
       <strong>
@@ -837,32 +693,48 @@ function renderAdminProducts() {
       Number(product.price)
     ) {
       priceHtml += `
-        <span
-          style="
-            text-decoration:line-through;
-            color:#888;
-          "
-        >
+        <span style="
+          text-decoration:line-through;
+          color:#888;
+        ">
           ${money(product.old_price)}
         </span>
       `;
     }
 
     if (
-      Number(product.discount_percent) >
-      0
+      Number(product.discount_percent) > 0
     ) {
       priceHtml += `
-        <span
-          style="
-            color:#6d3df0;
-            font-weight:900;
-          "
-        >
+        <span style="
+          color:#6d3df0;
+          font-weight:900;
+        ">
           -${Number(product.discount_percent)}%
         </span>
       `;
     }
+
+    const stock = Number(product.stock || 0);
+
+    const stockHtml =
+      stock > 0
+        ? `
+          <span style="
+            color:#16835a;
+            font-weight:800;
+          ">
+            Omborda: ${stock} dona
+          </span>
+        `
+        : `
+          <span style="
+            color:#d6455d;
+            font-weight:900;
+          ">
+            Tugagan
+          </span>
+        `;
 
     item.innerHTML = `
       <img
@@ -881,6 +753,8 @@ function renderAdminProducts() {
         </span>
 
         ${priceHtml}
+
+        ${stockHtml}
 
         <span>
           ${
@@ -918,70 +792,52 @@ function renderAdminProducts() {
       </div>
     `;
 
-    adminProducts.appendChild(
-      item
-    );
+    adminProducts.appendChild(item);
   });
 
   adminProducts
-    .querySelectorAll(
-      ".edit-product-btn"
-    )
+    .querySelectorAll(".edit-product-btn")
     .forEach(button => {
       button.onclick = () => {
-        editProduct(
-          button.dataset.id
-        );
+        editProduct(button.dataset.id);
       };
     });
 
   adminProducts
-    .querySelectorAll(
-      ".delete-product-btn"
-    )
+    .querySelectorAll(".delete-product-btn")
     .forEach(button => {
       button.onclick = () => {
-        deleteProduct(
-          button.dataset.id
-        );
+        deleteProduct(button.dataset.id);
       };
     });
 
   adminProducts
-    .querySelectorAll(
-      ".copy-target-btn"
-    )
+    .querySelectorAll(".copy-target-btn")
     .forEach(button => {
-      button.onclick =
-        async () => {
-          const link =
-            productLink(
-              button.dataset.id
-            );
+      button.onclick = async () => {
+        const link = productLink(
+          button.dataset.id
+        );
 
-          try {
-            await navigator.clipboard.writeText(
-              link
-            );
+        try {
+          await navigator.clipboard.writeText(link);
 
-            const old =
-              button.textContent;
+          const old = button.textContent;
 
-            button.textContent =
-              "Nusxalandi ✅";
+          button.textContent =
+            "Nusxalandi ✅";
 
-            setTimeout(() => {
-              button.textContent =
-                old;
-            }, 1500);
+          setTimeout(() => {
+            button.textContent = old;
+          }, 1500);
 
-          } catch {
-            prompt(
-              "Target link:",
-              link
-            );
-          }
-        };
+        } catch {
+          prompt(
+            "Target link:",
+            link
+          );
+        }
+      };
     });
 }
 
@@ -1014,172 +870,138 @@ function renderOrders() {
       .trim()
       .toLowerCase();
 
-  const filtered =
-    orders.filter(order => {
-      const text = `
-        ${order.name || ""}
-        ${order.phone || ""}
-        ${order.product || ""}
-        ${order.size || ""}
-        ${order.color || ""}
-      `.toLowerCase();
+  const filtered = orders.filter(order => {
+    const text = `
+      ${order.name || ""}
+      ${order.phone || ""}
+      ${order.product || ""}
+      ${order.size || ""}
+      ${order.color || ""}
+    `.toLowerCase();
 
-      return text.includes(search);
-    });
+    return text.includes(search);
+  });
 
   ordersBody.innerHTML =
-    filtered
-      .map(order => `
-        <tr>
+    filtered.map(order => `
+      <tr>
 
-          <td>
-            ${order.id}
-          </td>
+        <td>${order.id}</td>
 
-          <td>
-            ${esc(order.name || "")}
-          </td>
+        <td>
+          ${esc(order.name || "")}
+        </td>
 
-          <td>
-            <a href="tel:${esc(order.phone || "")}">
-              ${esc(order.phone || "")}
-            </a>
-          </td>
+        <td>
+          <a href="tel:${esc(order.phone || "")}">
+            ${esc(order.phone || "")}
+          </a>
+        </td>
 
-          <td>
-            ${esc(order.product || "")}
-          </td>
+        <td>
+          ${esc(order.product || "")}
+        </td>
 
-          <td>
-            ${Number(order.quantity || 1)}
-          </td>
+        <td>
+          ${Number(order.quantity || 1)}
+        </td>
 
-          <td>
-            ${esc(order.size || "-")}
-          </td>
+        <td>
+          ${esc(order.size || "-")}
+        </td>
 
-          <td>
-            ${esc(order.color || "-")}
-          </td>
+        <td>
+          ${esc(order.color || "-")}
+        </td>
 
-          <td>
+        <td>
 
-            <select
-              class="order-status"
-              data-id="${order.id}"
+          <select
+            class="order-status"
+            data-id="${order.id}"
+          >
+
+            <option
+              value="new"
+              ${order.status === "new" ? "selected" : ""}
             >
-              <option
-                value="new"
-                ${
-                  order.status === "new"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Yangi
-              </option>
+              Yangi
+            </option>
 
-              <option
-                value="confirmed"
-                ${
-                  order.status === "confirmed"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Tasdiqlandi
-              </option>
+            <option
+              value="confirmed"
+              ${order.status === "confirmed" ? "selected" : ""}
+            >
+              Tasdiqlandi
+            </option>
 
-              <option
-                value="delivery"
-                ${
-                  order.status === "delivery"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Yetkazishda
-              </option>
+            <option
+              value="delivery"
+              ${order.status === "delivery" ? "selected" : ""}
+            >
+              Yetkazishda
+            </option>
 
-              <option
-                value="done"
-                ${
-                  order.status === "done"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Yakunlandi
-              </option>
+            <option
+              value="done"
+              ${order.status === "done" ? "selected" : ""}
+            >
+              Yakunlandi
+            </option>
 
-              <option
-                value="cancelled"
-                ${
-                  order.status === "cancelled"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Bekor qilindi
-              </option>
-            </select>
+            <option
+              value="cancelled"
+              ${order.status === "cancelled" ? "selected" : ""}
+            >
+              Bekor qilindi
+            </option>
 
-          </td>
+          </select>
 
-        </tr>
-      `)
-      .join("");
+        </td>
+
+      </tr>
+    `).join("");
 
   ordersBody
-    .querySelectorAll(
-      ".order-status"
-    )
+    .querySelectorAll(".order-status")
     .forEach(select => {
-      select.onchange =
-        async () => {
-          try {
-            await api(
-              `orders?id=eq.${encodeURIComponent(select.dataset.id)}`,
-              {
-                method: "PATCH",
-
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                  Prefer:
-                    "return=minimal"
-                },
-
-                body:
-                  JSON.stringify({
-                    status:
-                      select.value
-                  })
-              }
-            );
-
-            const order =
-              orders.find(
-                item =>
-                  Number(item.id) ===
-                  Number(select.dataset.id)
-              );
-
-            if (order) {
-              order.status =
-                select.value;
+      select.onchange = async () => {
+        try {
+          await api(
+            `orders?id=eq.${encodeURIComponent(select.dataset.id)}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Prefer: "return=minimal"
+              },
+              body: JSON.stringify({
+                status: select.value
+              })
             }
+          );
 
-            updateStats();
+          const order = orders.find(
+            item =>
+              Number(item.id) ===
+              Number(select.dataset.id)
+          );
 
-          } catch (error) {
-            console.error(error);
-
-            alert(
-              "Statusni o‘zgartirib bo‘lmadi."
-            );
+          if (order) {
+            order.status = select.value;
           }
-        };
+
+          updateStats();
+
+        } catch (error) {
+          console.error(error);
+
+          alert(
+            "Statusni o‘zgartirib bo‘lmadi."
+          );
+        }
+      };
     });
 }
 
@@ -1222,31 +1044,29 @@ function renderOperators() {
   }
 
   operators.forEach(operator => {
-    const box =
-      document.createElement("div");
+    const box = document.createElement("div");
 
-    box.className =
-      "support-item";
+    box.className = "support-item";
 
     box.innerHTML = `
       <div>
+
         <strong>
           ${esc(operator.name || "Operator")}
         </strong>
 
-        <div
-          style="
-            font-size:12px;
-            color:#777;
-            margin-top:4px;
-          "
-        >
+        <div style="
+          font-size:12px;
+          color:#777;
+          margin-top:4px;
+        ">
           ${
             operator.active
               ? "Faol"
               : "Bloklangan"
           }
         </div>
+
       </div>
 
       <button
@@ -1262,153 +1082,122 @@ function renderOperators() {
       </button>
     `;
 
-    operatorsList.appendChild(
-      box
-    );
+    operatorsList.appendChild(box);
   });
 
   operatorsList
-    .querySelectorAll(
-      ".operator-toggle"
-    )
+    .querySelectorAll(".operator-toggle")
     .forEach(button => {
-      button.onclick =
-        async () => {
-          const newActive =
-            button.dataset.active !==
-            "true";
+      button.onclick = async () => {
+        const newActive =
+          button.dataset.active !== "true";
 
-          try {
-            await api(
-              `profiles?id=eq.${encodeURIComponent(button.dataset.id)}`,
-              {
-                method: "PATCH",
+        try {
+          await api(
+            `profiles?id=eq.${encodeURIComponent(button.dataset.id)}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Prefer: "return=minimal"
+              },
+              body: JSON.stringify({
+                active: newActive
+              })
+            }
+          );
 
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                  Prefer:
-                    "return=minimal"
-                },
+          await loadOperators();
 
-                body:
-                  JSON.stringify({
-                    active:
-                      newActive
-                  })
-              }
-            );
+          updateStats();
 
-            await loadOperators();
+        } catch (error) {
+          console.error(error);
 
-            updateStats();
-
-          } catch (error) {
-            console.error(error);
-
-            alert(
-              "Operator holatini o‘zgartirib bo‘lmadi."
-            );
-          }
-        };
+          alert(
+            "Operator holatini o‘zgartirib bo‘lmadi."
+          );
+        }
+      };
     });
 }
 
 /* =========================
-   OPERATOR YARATISH
+   CREATE OPERATOR
 ========================= */
 
-operatorCreateForm.onsubmit =
-  async event => {
+operatorCreateForm.onsubmit = async event => {
+  event.preventDefault();
 
-    event.preventDefault();
+  const button =
+    operatorCreateForm.querySelector(
+      'button[type="submit"]'
+    );
 
-    const button =
-      operatorCreateForm.querySelector(
-        'button[type="submit"]'
+  button.disabled = true;
+  button.textContent = "Yaratilmoqda...";
+
+  setMessage(
+    operatorCreateMessage,
+    ""
+  );
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/smart-endpoint`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: opName.value.trim(),
+          email: newOpEmail.value.trim(),
+          password: newOpPassword.value
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Operator yaratilmadi"
       );
-
-    button.disabled = true;
-
-    button.textContent =
-      "Yaratilmoqda...";
+    }
 
     setMessage(
       operatorCreateMessage,
-      ""
+      "Operator yaratildi ✅",
+      "success"
     );
 
-    try {
-      const response =
-        await fetch(
-          `${SUPABASE_URL}/functions/v1/smart-endpoint`,
-          {
-            method: "POST",
+    operatorCreateForm.reset();
 
-            headers: {
-              apikey: SUPABASE_KEY,
+    await loadOperators();
 
-              Authorization:
-                `Bearer ${accessToken}`,
+    updateStats();
 
-              "Content-Type":
-                "application/json"
-            },
+  } catch (error) {
+    console.error(error);
 
-            body:
-              JSON.stringify({
-                name:
-                  opName.value.trim(),
+    setMessage(
+      operatorCreateMessage,
+      error.message ||
+      "Operator yaratilmadi.",
+      "error"
+    );
 
-                email:
-                  newOpEmail.value.trim(),
-
-                password:
-                  newOpPassword.value
-              })
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-          data.message ||
-          "Operator yaratilmadi"
-        );
-      }
-
-      setMessage(
-        operatorCreateMessage,
-        "Operator yaratildi ✅",
-        "success"
-      );
-
-      operatorCreateForm.reset();
-
-      await loadOperators();
-
-      updateStats();
-
-    } catch (error) {
-      console.error(error);
-
-      setMessage(
-        operatorCreateMessage,
-        error.message ||
-        "Operator yaratilmadi.",
-        "error"
-      );
-
-    } finally {
-      button.disabled = false;
-
-      button.textContent =
-        "Operator yaratish";
-    }
-  };
+  } finally {
+    button.disabled = false;
+    button.textContent =
+      "Operator yaratish";
+  }
+};
 
 /* =========================
    SUPPORT
@@ -1416,10 +1205,9 @@ operatorCreateForm.onsubmit =
 
 async function loadSupport() {
   try {
-    supportRequests =
-      await api(
-        "support_requests?select=*&order=id.desc"
-      );
+    supportRequests = await api(
+      "support_requests?select=*&order=id.desc"
+    );
 
     renderSupport();
 
@@ -1446,38 +1234,34 @@ function renderSupport() {
   }
 
   adminSupportList.innerHTML =
-    supportRequests
-      .map(item => `
-        <div class="support-item">
+    supportRequests.map(item => `
+      <div class="support-item">
 
-          <div>
-            <strong>
-              ${esc(item.name || "")}
-            </strong>
+        <div>
 
-            <p
-              style="
-                margin:6px 0;
-                color:#666;
-              "
-            >
-              ${esc(item.message || "")}
-            </p>
+          <strong>
+            ${esc(item.name || "")}
+          </strong>
 
-            <a
-              href="tel:${esc(item.phone || "")}"
-            >
-              ${esc(item.phone || "")}
-            </a>
-          </div>
+          <p style="
+            margin:6px 0;
+            color:#666;
+          ">
+            ${esc(item.message || "")}
+          </p>
 
-          <span class="badge">
-            ${esc(item.status || "new")}
-          </span>
+          <a href="tel:${esc(item.phone || "")}">
+            ${esc(item.phone || "")}
+          </a>
 
         </div>
-      `)
-      .join("");
+
+        <span class="badge">
+          ${esc(item.status || "new")}
+        </span>
+
+      </div>
+    `).join("");
 }
 
 /* =========================
