@@ -1,2192 +1,1085 @@
-const { SUPABASE_URL, SUPABASE_KEY } = window.MODEX_CONFIG;
+(() => {
+  const config = window.MODEX_CONFIG || {};
 
-const REST = `${SUPABASE_URL}/rest/v1`;
+  const SUPABASE_URL = config.SUPABASE_URL;
+  const SUPABASE_KEY = config.SUPABASE_KEY;
 
-let products = [];
-let filteredProducts = [];
+  const productsGrid = document.getElementById("productsGrid");
+  const categoryList = document.getElementById("categoryList");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const sortSelect = document.getElementById("sortSelect");
+  const productCount = document.getElementById("productCount");
+  const emptyState = document.getElementById("emptyState");
 
-let selectedOrderProduct = null;
+  const searchInput = document.getElementById("searchInput");
+  const mobileSearchInput = document.getElementById("mobileSearchInput");
 
-let cart = JSON.parse(
-  localStorage.getItem("modex_cart") || "[]"
-);
+  const orderDialog = document.getElementById("orderDialog");
+  const orderForm = document.getElementById("orderForm");
+  const closeDialog = document.getElementById("closeDialog");
 
-let favorites = JSON.parse(
-  localStorage.getItem("modex_favorites") || "[]"
-);
+  const selectedProductTitle =
+    document.getElementById("selectedProductTitle");
 
+  const productInput = document.getElementById("productInput");
+  const nameInput = document.getElementById("nameInput");
+  const phoneInput = document.getElementById("phoneInput");
+  const sizeInput = document.getElementById("sizeInput");
+  const colorInput = document.getElementById("colorInput");
+  const quantityInput = document.getElementById("quantityInput");
 
-/* =========================================
-   ELEMENTLAR
-========================================= */
+  const formMessage = document.getElementById("formMessage");
+  const submitOrder = document.getElementById("submitOrder");
 
-const productsGrid =
-  document.getElementById("productsGrid");
+  const supportForm = document.getElementById("supportForm");
+  const supportName = document.getElementById("supportName");
+  const supportPhone = document.getElementById("supportPhone");
+  const supportMessage = document.getElementById("supportMessage");
+  const supportFormMessage =
+    document.getElementById("supportFormMessage");
 
-const productCount =
-  document.getElementById("productCount");
+  const favoriteCount = document.getElementById("favoriteCount");
+  const cartCount = document.getElementById("cartCount");
 
-const emptyState =
-  document.getElementById("emptyState");
+  const favoritesBtn = document.getElementById("favoritesBtn");
+  const cartBtn = document.getElementById("cartBtn");
 
-const searchInput =
-  document.getElementById("searchInput");
+  const mobileFavoritesBtn =
+    document.getElementById("mobileFavoritesBtn");
 
-const mobileSearchInput =
-  document.getElementById("mobileSearchInput");
+  const mobileCartBtn =
+    document.getElementById("mobileCartBtn");
 
-const categoryList =
-  document.getElementById("categoryList");
+  const favoritesDrawer =
+    document.getElementById("favoritesDrawer");
 
-const categoryFilter =
-  document.getElementById("categoryFilter");
+  const cartDrawer =
+    document.getElementById("cartDrawer");
 
-const sortSelect =
-  document.getElementById("sortSelect");
+  const favoritesOverlay =
+    document.getElementById("favoritesOverlay");
 
-const orderDialog =
-  document.getElementById("orderDialog");
+  const cartOverlay =
+    document.getElementById("cartOverlay");
 
-const orderForm =
-  document.getElementById("orderForm");
+  const closeFavorites =
+    document.getElementById("closeFavorites");
 
-const cartDrawer =
-  document.getElementById("cartDrawer");
+  const closeCart =
+    document.getElementById("closeCart");
 
-const cartOverlay =
-  document.getElementById("cartOverlay");
+  const favoriteItems =
+    document.getElementById("favoriteItems");
 
-const favoritesDrawer =
-  document.getElementById("favoritesDrawer");
+  const cartItems =
+    document.getElementById("cartItems");
 
-const favoritesOverlay =
-  document.getElementById("favoritesOverlay");
-
-
-/* =========================================
-   HELPERS
-========================================= */
-
-function money(value) {
-  return (
-    new Intl.NumberFormat("uz-UZ")
-      .format(Number(value || 0))
-    + " so‘m"
-  );
-}
-
-
-function esc(value = "") {
-  return String(value).replace(
-    /[&<>"']/g,
-    char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    })[char]
-  );
-}
+  const cartTotal =
+    document.getElementById("cartTotal");
 
 
-async function api(path, options = {}) {
+  let allProducts = [];
+  let currentProducts = [];
 
-  const response = await fetch(
-    `${REST}/${path}`,
-    {
-      ...options,
+  let favorites =
+    JSON.parse(localStorage.getItem("modex_favorites") || "[]");
 
-      headers: {
-        apikey: SUPABASE_KEY,
-
-        Authorization:
-          `Bearer ${SUPABASE_KEY}`,
-
-        ...(options.headers || {})
-      }
-    }
-  );
+  let cart =
+    JSON.parse(localStorage.getItem("modex_cart") || "[]");
 
 
-  if (!response.ok) {
-    throw new Error(
-      await response.text()
-    );
+  function money(value) {
+    const number = Number(value || 0);
+
+    return number.toLocaleString("uz-UZ") + " so‘m";
   }
 
 
-  if (response.status === 204) {
-    return null;
+  function setFormMessage(text, type = "") {
+    formMessage.textContent = text;
+    formMessage.className = "form-message";
+
+    if (type) {
+      formMessage.classList.add(type);
+    }
   }
 
 
-  const text =
-    await response.text();
+  function setSupportMessage(text, type = "") {
+    supportFormMessage.textContent = text;
+    supportFormMessage.className = "form-message";
+
+    if (type) {
+      supportFormMessage.classList.add(type);
+    }
+  }
 
 
-  return text
-    ? JSON.parse(text)
-    : null;
-}
-
-
-function productLink(product) {
-
-  const base =
-    location.origin +
-    location.pathname.replace(
-      /index\.html.*$/,
-      ""
-    );
-
-
-  return (
-    `${base}product.html?id=${product.id}`
-  );
-}
-
-
-/* =========================================
-   SETTINGS
-========================================= */
-
-async function loadSiteSettings() {
-
-  try {
-
-    const rows =
-      await api(
-        "site_settings?select=*&order=id.asc&limit=1"
-      );
-
-
-    const settings =
-      rows?.[0];
-
-
-    if (!settings) {
-      return false;
+  async function supabaseRequest(path, options = {}) {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      throw new Error("Supabase config topilmadi.");
     }
 
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/${path}`,
+      {
+        ...options,
 
-    /* SAYT NOMI */
-
-    document
-      .querySelectorAll(".brand")
-      .forEach(el => {
-
-        const name =
-          settings.site_name ||
-          "MODEX.UZ";
-
-
-        /*
-        ziza.kds logosi borligi uchun
-        brand ichini to‘liq almashtirmaymiz.
-        */
-
-        const brandMain =
-          el.querySelector(".brand-main");
-
-
-        if (brandMain) {
-
-          if (
-            name
-              .toUpperCase()
-              .endsWith(".UZ")
-          ) {
-
-            brandMain.innerHTML =
-              `${esc(name.slice(0, -3))}<span class="brand-uz">.UZ</span>`;
-
-          } else {
-
-            brandMain.textContent =
-              name;
-          }
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          ...(options.headers || {})
         }
-      });
-
-
-    /* HERO */
-
-    const heroTitle =
-      document.querySelector(
-        ".hero-text h1"
-      );
-
-    const heroText =
-      document.querySelector(
-        ".hero-text p"
-      );
-
-
-    if (
-      heroTitle &&
-      settings.hero_title
-    ) {
-
-      heroTitle.textContent =
-        settings.hero_title;
-    }
-
-
-    if (
-      heroText &&
-      settings.hero_text
-    ) {
-
-      heroText.textContent =
-        settings.hero_text;
-    }
-
-
-    /* ASOSIY RANG */
-
-    if (
-      settings.primary_color
-    ) {
-
-      document.documentElement
-        .style
-        .setProperty(
-          "--brand",
-          settings.primary_color
-        );
-    }
-
-
-    /* TEXNIK ISHLAR */
-
-    if (
-      settings.maintenance_mode
-    ) {
-
-      document.body.innerHTML = `
-        <div style="
-          min-height:100vh;
-          display:grid;
-          place-items:center;
-          padding:30px;
-          text-align:center;
-          background:#f6f7fb;
-          font-family:Arial,sans-serif;
-        ">
-
-          <div>
-
-            <h1>
-              ${esc(settings.site_name || "MODEX.UZ")}
-            </h1>
-
-            <p>
-              Saytda texnik ishlar olib borilmoqda.
-            </p>
-
-            <p>
-              Tez orada qaytamiz.
-            </p>
-
-          </div>
-
-        </div>
-      `;
-
-
-      return true;
-    }
-
-
-    return false;
-
-  } catch (error) {
-
-    console.error(
-      "Settings xatosi:",
-      error
+      }
     );
 
-    return false;
+    if (!response.ok) {
+      let message = "Server xatosi.";
+
+      try {
+        const data = await response.json();
+
+        if (data?.message) {
+          message = data.message;
+        }
+
+        if (data?.details) {
+          message += ` ${data.details}`;
+        }
+      } catch (_) {}
+
+      throw new Error(message);
+    }
+
+    if (response.status === 204) {
+      return null;
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+      return null;
+    }
+
+    return JSON.parse(text);
   }
-}
 
 
-/* =========================================
-   PRODUCTS
-========================================= */
-
-async function loadProducts() {
-
-  try {
-
-    products =
-      await api(
+  async function loadProducts() {
+    try {
+      const products = await supabaseRequest(
         "products?select=*&active=eq.true&order=id.desc"
       );
 
+      allProducts = Array.isArray(products) ? products : [];
 
-    buildCategories();
+      buildCategories();
+      applyFilters();
 
-    applyFilters();
+    } catch (error) {
+      console.error(error);
 
-  } catch (error) {
-
-    console.error(error);
-
-
-    emptyState
-      ?.classList
-      .remove("hidden");
-
-
-    if (emptyState) {
-
-      emptyState.textContent =
-        "Mahsulotlarni yuklab bo‘lmadi.";
+      productsGrid.innerHTML = `
+        <p style="color:#d6455d;font-weight:700;">
+          Mahsulotlarni yuklab bo‘lmadi.
+        </p>
+      `;
     }
   }
-}
 
 
-/* =========================================
-   CATEGORIES
-========================================= */
+  function buildCategories() {
+    const categories = [
+      ...new Set(
+        allProducts
+          .map(product => product.category)
+          .filter(Boolean)
+      )
+    ];
 
-function buildCategories() {
+    categoryList.innerHTML = "";
 
-  const categories = [
-    ...new Set(
-      products
-        .map(
-          product =>
-            product.category
-        )
-        .filter(Boolean)
-    )
-  ];
+    categoryFilter.innerHTML = `
+      <option value="">
+        Barcha kategoriyalar
+      </option>
+    `;
 
+    categories.forEach(category => {
+      const card = document.createElement("button");
 
-  categoryList.innerHTML =
-    "";
+      card.type = "button";
+      card.className = "category-card";
 
-
-  categoryFilter.innerHTML = `
-    <option value="">
-      Barcha kategoriyalar
-    </option>
-  `;
-
-
-  categories.forEach(
-    category => {
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-
-      button.className =
-        "category-card";
-
-
-      button.type =
-        "button";
-
-
-      button.innerHTML = `
-
-        <span class="category-icon">
-          🛍️
-        </span>
-
-        <strong>
-          ${esc(category)}
-        </strong>
+      card.innerHTML = `
+        <span class="category-icon">▦</span>
+        <strong>${escapeHtml(category)}</strong>
       `;
 
+      card.addEventListener("click", () => {
+        categoryFilter.value = category;
+        applyFilters();
 
-      button.onclick =
-        () => {
+        document
+          .getElementById("products")
+          ?.scrollIntoView({
+            behavior: "smooth"
+          });
+      });
 
-          categoryFilter.value =
-            category;
+      categoryList.appendChild(card);
 
+      const option = document.createElement("option");
 
-          applyFilters();
+      option.value = category;
+      option.textContent = category;
 
-
-          document
-            .getElementById(
-              "products"
-            )
-            ?.scrollIntoView({
-              behavior:
-                "smooth"
-            });
-        };
-
-
-      categoryList.appendChild(
-        button
-      );
+      categoryFilter.appendChild(option);
+    });
+  }
 
 
-      const option =
-        document.createElement(
-          "option"
-        );
+  function applyFilters() {
+    const desktopSearch =
+      searchInput?.value?.trim().toLowerCase() || "";
 
+    const mobileSearch =
+      mobileSearchInput?.value?.trim().toLowerCase() || "";
 
-      option.value =
-        category;
+    const query = mobileSearch || desktopSearch;
 
+    const category = categoryFilter?.value || "";
+    const sort = sortSelect?.value || "new";
 
-      option.textContent =
-        category;
+    let products = [...allProducts];
 
-
-      categoryFilter.appendChild(
-        option
-      );
-    }
-  );
-}
-
-
-/* =========================================
-   SEARCH + FILTER
-========================================= */
-
-function currentSearch() {
-
-  return (
-    searchInput?.value ||
-    mobileSearchInput?.value ||
-    ""
-  )
-    .toLowerCase()
-    .trim();
-}
-
-
-function applyFilters() {
-
-  const search =
-    currentSearch();
-
-
-  const category =
-    categoryFilter.value;
-
-
-  filteredProducts =
-    products.filter(
-      product => {
-
+    if (query) {
+      products = products.filter(product => {
         const text = `
           ${product.name || ""}
           ${product.category || ""}
           ${product.description || ""}
         `.toLowerCase();
 
-
-        const searchOk =
-          text.includes(search);
-
-
-        const categoryOk =
-          !category ||
-          product.category ===
-            category;
-
-
-        return (
-          searchOk &&
-          categoryOk
-        );
-      }
-    );
-
-
-  const sort =
-    sortSelect.value;
-
-
-  if (
-    sort === "cheap"
-  ) {
-
-    filteredProducts.sort(
-      (a, b) =>
-        Number(a.price) -
-        Number(b.price)
-    );
-
-  } else if (
-    sort === "expensive"
-  ) {
-
-    filteredProducts.sort(
-      (a, b) =>
-        Number(b.price) -
-        Number(a.price)
-    );
-
-  } else {
-
-    filteredProducts.sort(
-      (a, b) =>
-        Number(b.id) -
-        Number(a.id)
-    );
-  }
-
-
-  renderProducts();
-}
-
-
-searchInput
-  ?.addEventListener(
-    "input",
-    () => {
-
-      if (
-        mobileSearchInput
-      ) {
-
-        mobileSearchInput.value =
-          searchInput.value;
-      }
-
-
-      applyFilters();
+        return text.includes(query);
+      });
     }
-  );
 
-
-mobileSearchInput
-  ?.addEventListener(
-    "input",
-    () => {
-
-      if (
-        searchInput
-      ) {
-
-        searchInput.value =
-          mobileSearchInput.value;
-      }
-
-
-      applyFilters();
-    }
-  );
-
-
-document
-  .getElementById(
-    "searchBtn"
-  )
-  ?.addEventListener(
-    "click",
-    applyFilters
-  );
-
-
-document
-  .getElementById(
-    "mobileSearchBtn"
-  )
-  ?.addEventListener(
-    "click",
-    applyFilters
-  );
-
-
-categoryFilter
-  ?.addEventListener(
-    "change",
-    applyFilters
-  );
-
-
-sortSelect
-  ?.addEventListener(
-    "change",
-    applyFilters
-  );
-
-
-document
-  .getElementById(
-    "allCategoriesBtn"
-  )
-  ?.addEventListener(
-    "click",
-    () => {
-
-      categoryFilter.value =
-        "";
-
-      applyFilters();
-    }
-  );
-
-
-/* =========================================
-   KATALOG
-========================================= */
-
-function scrollToCategories() {
-
-  document
-    .querySelector(
-      ".market-section"
-    )
-    ?.scrollIntoView({
-      behavior:
-        "smooth"
-    });
-}
-
-
-document
-  .getElementById(
-    "catalogBtn"
-  )
-  ?.addEventListener(
-    "click",
-    scrollToCategories
-  );
-
-
-document
-  .getElementById(
-    "mobileCatalogBtn"
-  )
-  ?.addEventListener(
-    "click",
-    scrollToCategories
-  );
-
-
-/* =========================================
-   DISCOUNT
-========================================= */
-
-function getDiscount(product) {
-
-  const price =
-    Number(
-      product.price || 0
-    );
-
-
-  const oldPrice =
-    Number(
-      product.old_price || 0
-    );
-
-
-  let discount =
-    Number(
-      product.discount_percent ||
-      0
-    );
-
-
-  if (
-    !discount &&
-    oldPrice > price &&
-    oldPrice > 0
-  ) {
-
-    discount =
-      Math.round(
-        (
-          (oldPrice - price) /
-          oldPrice
-        ) *
-        100
+    if (category) {
+      products = products.filter(
+        product => product.category === category
       );
+    }
+
+    if (sort === "cheap") {
+      products.sort(
+        (a, b) =>
+          Number(a.price || 0) - Number(b.price || 0)
+      );
+    }
+
+    if (sort === "expensive") {
+      products.sort(
+        (a, b) =>
+          Number(b.price || 0) - Number(a.price || 0)
+      );
+    }
+
+    if (sort === "new") {
+      products.sort(
+        (a, b) =>
+          Number(b.id || 0) - Number(a.id || 0)
+      );
+    }
+
+    currentProducts = products;
+
+    renderProducts();
   }
 
 
-  return {
-    oldPrice,
-    discount
-  };
-}
+  function renderProducts() {
+    productsGrid.innerHTML = "";
 
+    productCount.textContent =
+      `${currentProducts.length} ta mahsulot`;
 
-/* =========================================
-   STOCK
-========================================= */
+    if (currentProducts.length === 0) {
+      emptyState.classList.remove("hidden");
+      return;
+    }
 
-function stockInfo(product) {
+    emptyState.classList.add("hidden");
 
-  const stock =
-    Number(
-      product.stock || 0
-    );
+    currentProducts.forEach(product => {
+      const card = document.createElement("article");
 
+      card.className = "market-product-card";
 
-  if (
-    stock <= 0
-  ) {
+      const stock = Number(product.stock || 0);
+      const isFavorite = favorites.includes(product.id);
 
-    return {
-      stock: 0,
-      text:
-        "Tugagan",
-      className:
-        "stock-out"
-    };
-  }
+      const oldPrice =
+        Number(product.old_price || 0);
 
-
-  if (
-    stock <= 3
-  ) {
-
-    return {
-      stock,
-      text:
-        `Faqat ${stock} dona qoldi`,
-      className:
-        "stock-low"
-    };
-  }
-
-
-  return {
-    stock,
-    text:
-      `Omborda ${stock} dona`,
-    className:
-      "stock-available"
-  };
-}
-
-
-/* =========================================
-   PRODUCT CARDS
-========================================= */
-
-function renderProducts() {
-
-  productsGrid.innerHTML =
-    "";
-
-
-  productCount.textContent =
-    `${filteredProducts.length} ta mahsulot`;
-
-
-  emptyState.classList.toggle(
-    "hidden",
-    filteredProducts.length > 0
-  );
-
-
-  filteredProducts.forEach(
-    product => {
-
-      const isFavorite =
-        favorites.some(
-          item =>
-            Number(item.id) ===
-            Number(product.id)
-        );
-
-
-      const {
-        oldPrice,
-        discount
-      } =
-        getDiscount(
-          product
-        );
-
-
-      const hasDiscount =
-        oldPrice >
-          Number(product.price) &&
-        discount > 0;
-
-
-      const stock =
-        stockInfo(
-          product
-        );
-
-
-      const soldOut =
-        stock.stock <= 0;
-
-
-      const card =
-        document.createElement(
-          "article"
-        );
-
-
-      card.className =
-        "market-product-card";
-
+      const discount =
+        Number(product.discount_percent || 0);
 
       card.innerHTML = `
-
         <div class="product-image-box">
 
-          <a
-            href="product.html?id=${product.id}"
+          <img
+            src="${escapeAttribute(product.image_url || product.image || "")}"
+            alt="${escapeAttribute(product.name || "Mahsulot")}"
+            loading="lazy"
+            onerror="this.style.display='none'"
           >
 
-            <img
-              src="${esc(product.image_url || "")}"
-              alt="${esc(product.name || "")}"
-              loading="lazy"
-            >
+          <button
+            class="favorite-button"
+            type="button"
+            data-favorite-id="${product.id}"
+          >
+            ${isFavorite ? "♥" : "♡"}
+          </button>
 
+        </div>
+
+        <div class="market-product-info">
+
+          <span class="market-category">
+            ${escapeHtml(product.category || "Mahsulot")}
+          </span>
+
+          <a
+            href="./product.html?id=${product.id}"
+            class="market-product-title"
+          >
+            ${escapeHtml(product.name || "Mahsulot")}
           </a>
 
+          ${
+            product.description
+              ? `
+                <p class="market-description">
+                  ${escapeHtml(product.description)}
+                </p>
+              `
+              : ""
+          }
 
           ${
-            hasDiscount
+            discount > 0
               ? `
-                <span
-                  class="discount-badge"
-                  style="
-                    position:absolute;
-                    left:9px;
-                    top:9px;
-                  "
-                >
+                <span class="discount-badge">
                   -${discount}%
                 </span>
               `
               : ""
           }
 
+          ${
+            oldPrice > 0
+              ? `
+                <span class="old-price">
+                  ${money(oldPrice)}
+                </span>
+              `
+              : ""
+          }
 
-          <button
-            class="favorite-button ${
-              isFavorite
-                ? "favorite-active"
-                : ""
-            }"
-            type="button"
-          >
-            ${
-              isFavorite
-                ? "♥"
-                : "♡"
-            }
-          </button>
+          <strong class="market-price">
+            ${money(product.price)}
+          </strong>
 
-        </div>
-
-
-        <div class="market-product-info">
-
-          <span class="market-category">
-            ${esc(product.category || "Mahsulot")}
-          </span>
-
-
-          <a
-            href="product.html?id=${product.id}"
-            class="market-product-title"
-          >
-            ${esc(product.name || "")}
-          </a>
-
-
-          <p class="market-description">
-            ${esc(product.description || "")}
-          </p>
-
-
-          <div>
-
-            <div class="market-price">
-              ${money(product.price)}
-            </div>
-
-
-            ${
-              hasDiscount
-                ? `
-                  <div class="old-price">
-                    ${money(oldPrice)}
-                  </div>
-                `
-                : ""
-            }
-
-          </div>
-
-
-          <div
-            class="product-stock ${stock.className}"
+          <small
             style="
-              font-size:11px;
-              font-weight:850;
-              ${
-                soldOut
-                  ? "color:#d6455d;"
-                  : stock.stock <= 3
-                    ? "color:#d97913;"
-                    : "color:#16835a;"
-              }
+              color:${stock > 0 ? "#16835a" : "#d6455d"};
+              font-weight:800;
             "
           >
-            ${esc(stock.text)}
-          </div>
-
+            ${
+              stock > 0
+                ? `Omborda ${stock} dona`
+                : "Omborda yo‘q"
+            }
+          </small>
 
           <div class="market-card-buttons">
 
             <button
-              class="main-btn quick-order"
+              class="main-btn"
               type="button"
-              ${
-                soldOut
-                  ? "disabled"
-                  : ""
-              }
+              data-order-id="${product.id}"
+              ${stock <= 0 ? "disabled" : ""}
             >
-              ${
-                soldOut
-                  ? "Tugagan"
-                  : "Buyurtma"
-              }
+              Buyurtma
             </button>
 
-
             <button
-              class="cart-circle add-cart"
+              class="cart-circle"
               type="button"
-              ${
-                soldOut
-                  ? "disabled"
-                  : ""
-              }
+              data-cart-id="${product.id}"
+              ${stock <= 0 ? "disabled" : ""}
             >
               🛒
             </button>
 
           </div>
 
-
-          <button
-            class="copy-product-link"
-            type="button"
-          >
-            🔗 Linkni nusxalash
-          </button>
-
         </div>
       `;
 
+      productsGrid.appendChild(card);
+    });
 
-      if (
-        !soldOut
-      ) {
-
-        card
-          .querySelector(
-            ".quick-order"
-          )
-          .onclick =
-          () =>
-            openOrder(
-              product
-            );
-
-
-        card
-          .querySelector(
-            ".add-cart"
-          )
-          .onclick =
-          () =>
-            addToCart(
-              product
-            );
-      }
-
-
-      card
-        .querySelector(
-          ".favorite-button"
-        )
-        .onclick =
-        event => {
-
-          event.preventDefault();
-
-          toggleFavorite(
-            product
-          );
-
-          renderProducts();
-        };
-
-
-      card
-        .querySelector(
-          ".copy-product-link"
-        )
-        .onclick =
-        async event => {
-
-          const button =
-            event.currentTarget;
-
-
-          const link =
-            productLink(
-              product
-            );
-
-
-          try {
-
-            await navigator
-              .clipboard
-              .writeText(
-                link
-              );
-
-
-            const old =
-              button.textContent;
-
-
-            button.textContent =
-              "Nusxalandi ✅";
-
-
-            setTimeout(
-              () => {
-
-                button.textContent =
-                  old;
-
-              },
-              1500
-            );
-
-          } catch {
-
-            prompt(
-              "Mahsulot linki:",
-              link
-            );
-          }
-        };
-
-
-      productsGrid.appendChild(
-        card
-      );
-    }
-  );
-}
-
-
-/* =========================================
-   OPEN ORDER
-========================================= */
-
-function openOrder(product) {
-
-  const stock =
-    Number(
-      product.stock || 0
-    );
-
-
-  if (
-    stock <= 0
-  ) {
-
-    alert(
-      "Bu mahsulot hozir omborda yo‘q."
-    );
-
-    return;
+    bindProductButtons();
   }
 
 
-  selectedOrderProduct =
-    product;
+  function bindProductButtons() {
+    document
+      .querySelectorAll("[data-order-id]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          const id = Number(button.dataset.orderId);
+          openOrder(id);
+        });
+      });
 
 
-  document
-    .getElementById(
-      "selectedProductTitle"
-    )
-    .textContent =
-    product.name;
+    document
+      .querySelectorAll("[data-favorite-id]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          const id = Number(button.dataset.favoriteId);
+          toggleFavorite(id);
+          applyFilters();
+        });
+      });
 
 
-  document
-    .getElementById(
-      "productInput"
-    )
-    .value =
-    product.name;
-
-
-  document
-    .getElementById(
-      "quantityInput"
-    )
-    .value =
-    1;
-
-
-  document
-    .getElementById(
-      "quantityInput"
-    )
-    .max =
-    stock;
-
-
-  document
-    .getElementById(
-      "formMessage"
-    )
-    .textContent =
-    "";
-
-
-  orderDialog.showModal();
-}
-
-
-document
-  .getElementById(
-    "closeDialog"
-  )
-  .onclick =
-  () => {
-
-    orderDialog.close();
-
-    selectedOrderProduct =
-      null;
-  };
-
-
-orderDialog.addEventListener(
-  "click",
-  event => {
-
-    if (
-      event.target ===
-      orderDialog
-    ) {
-
-      orderDialog.close();
-
-      selectedOrderProduct =
-        null;
-    }
+    document
+      .querySelectorAll("[data-cart-id]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          const id = Number(button.dataset.cartId);
+          addToCart(id);
+        });
+      });
   }
-);
 
 
-/* =========================================
-   ORDER SUBMIT
-========================================= */
+  function openOrder(id) {
+    const product = allProducts.find(
+      item => Number(item.id) === Number(id)
+    );
 
-orderForm.onsubmit =
-  async event => {
-
-    event.preventDefault();
-
-
-    const button =
-      document.getElementById(
-        "submitOrder"
-      );
-
-
-    const message =
-      document.getElementById(
-        "formMessage"
-      );
-
-
-    if (
-      !selectedOrderProduct
-    ) {
-
-      message.textContent =
-        "Mahsulot aniqlanmadi.";
-
-      message.className =
-        "form-message error";
-
+    if (!product) {
       return;
     }
 
+    if (Number(product.stock || 0) <= 0) {
+      alert("Bu mahsulot hozir omborda yo‘q.");
+      return;
+    }
 
-    const name =
-      document
-        .getElementById(
-          "nameInput"
-        )
-        .value
-        .trim();
+    productInput.value = product.id;
+    selectedProductTitle.textContent =
+      product.name || "Mahsulot";
+
+    quantityInput.value = 1;
+
+    sizeInput.value = "";
+    colorInput.value = "";
+
+    setFormMessage("");
+
+    if (typeof orderDialog.showModal === "function") {
+      orderDialog.showModal();
+    } else {
+      orderDialog.setAttribute("open", "");
+    }
+  }
 
 
-    const phone =
-      document
-        .getElementById(
-          "phoneInput"
-        )
-        .value
-        .trim();
+  async function createOrder(event) {
+    event.preventDefault();
 
+    const productId = Number(productInput.value);
+
+    const product = allProducts.find(
+      item => Number(item.id) === productId
+    );
+
+    if (!product) {
+      setFormMessage(
+        "Mahsulot topilmadi.",
+        "error"
+      );
+      return;
+    }
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
 
     const quantity =
       Math.max(
         1,
-        Number(
-          document
-            .getElementById(
-              "quantityInput"
-            )
-            .value || 1
-        )
+        Number(quantityInput.value || 1)
       );
 
+    const size = sizeInput.value.trim();
+    const color = colorInput.value.trim();
 
-    const size =
-      document
-        .getElementById(
-          "sizeInput"
-        )
-        .value
-        .trim();
-
-
-    const color =
-      document
-        .getElementById(
-          "colorInput"
-        )
-        .value
-        .trim();
-
-
-    const digits =
-      phone.replace(
-        /\D/g,
-        ""
+    if (!name || !phone) {
+      setFormMessage(
+        "Ism va telefon raqamini kiriting.",
+        "error"
       );
-
-
-    if (
-      name.length < 2 ||
-      digits.length < 9
-    ) {
-
-      message.textContent =
-        "Ism va telefon raqamini to‘g‘ri kiriting.";
-
-      message.className =
-        "form-message error";
-
       return;
     }
 
-
-    const stock =
-      Number(
-        selectedOrderProduct.stock ||
-        0
+    if (quantity > Number(product.stock || 0)) {
+      setFormMessage(
+        "Omborda yetarli mahsulot yo‘q.",
+        "error"
       );
-
-
-    if (
-      quantity > stock
-    ) {
-
-      message.textContent =
-        `Omborda faqat ${stock} dona mavjud.`;
-
-      message.className =
-        "form-message error";
-
       return;
     }
 
+    submitOrder.disabled = true;
+    submitOrder.textContent = "Yuborilmoqda...";
 
-    button.disabled =
-      true;
-
-
-    button.textContent =
-      "Yuborilmoqda...";
-
+    setFormMessage("");
 
     try {
-
-      const urlParams =
-        new URLSearchParams(
-          location.search
-        );
-
-
-      await api(
+      const created = await supabaseRequest(
         "orders",
         {
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
-
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=minimal"
+            "Prefer": "return=representation"
           },
 
-          body:
-            JSON.stringify({
-
-              name,
-
-              phone,
-
-              product:
-                selectedOrderProduct.name,
-
-              product_id:
-                selectedOrderProduct.id,
-
-              quantity,
-
-              size,
-
-              color,
-
-              status:
-                "new",
-
-              stock_adjusted:
-                false,
-
-              utm_source:
-                urlParams.get(
-                  "utm_source"
-                ) ||
-                "sayt",
-
-              utm_campaign:
-                urlParams.get(
-                  "utm_campaign"
-                ) ||
-                ""
-            })
+          body: JSON.stringify({
+            name: name,
+            phone: phone,
+            product: product.name,
+            product_id: product.id,
+            quantity: quantity,
+            size: size || null,
+            color: color || null,
+            status: "new",
+            stock_adjusted: false
+          })
         }
       );
 
+      const order =
+        Array.isArray(created)
+          ? created[0]
+          : created;
 
-      message.textContent =
-        "Buyurtmangiz qabul qilindi ✅";
+      if (!order?.id) {
+        throw new Error(
+          "Buyurtma yaratildi, lekin ID olinmadi."
+        );
+      }
 
+      setFormMessage(
+        `✅ Buyurtmangiz qabul qilindi! Buyurtma raqamingiz: #${order.id}`,
+        "success"
+      );
 
-      message.className =
-        "form-message success";
+      const trackUrl =
+        `./track.html?id=${encodeURIComponent(order.id)}&phone=${encodeURIComponent(phone)}`;
 
+      const existingTrack =
+        document.getElementById("quickTrackLink");
+
+      if (existingTrack) {
+        existingTrack.remove();
+      }
+
+      const trackLink =
+        document.createElement("a");
+
+      trackLink.id = "quickTrackLink";
+      trackLink.href = trackUrl;
+
+      trackLink.textContent =
+        `📦 Buyurtma #${order.id} holatini kuzatish`;
+
+      trackLink.style.display = "block";
+      trackLink.style.marginTop = "10px";
+      trackLink.style.padding = "12px";
+      trackLink.style.textAlign = "center";
+      trackLink.style.borderRadius = "12px";
+      trackLink.style.background = "#f2edff";
+      trackLink.style.color = "#6f35e8";
+      trackLink.style.fontWeight = "900";
+
+      formMessage.insertAdjacentElement(
+        "afterend",
+        trackLink
+      );
 
       orderForm.reset();
 
-
-      selectedOrderProduct =
-        null;
-
-
-      setTimeout(
-        () => {
-
-          orderDialog.close();
-
-        },
-        1500
-      );
+      productInput.value = product.id;
+      quantityInput.value = 1;
 
     } catch (error) {
-
       console.error(error);
 
-
-      message.textContent =
-        "Buyurtmani yuborib bo‘lmadi.";
-
-
-      message.className =
-        "form-message error";
-
-    } finally {
-
-      button.disabled =
-        false;
-
-
-      button.textContent =
-        "Buyurtma berish";
-    }
-  };
-
-
-/* =========================================
-   CART
-========================================= */
-
-function addToCart(product) {
-
-  if (
-    Number(
-      product.stock || 0
-    ) <= 0
-  ) {
-
-    alert(
-      "Bu mahsulot tugagan."
-    );
-
-    return;
-  }
-
-
-  const existing =
-    cart.find(
-      item =>
-        Number(item.id) ===
-        Number(product.id)
-    );
-
-
-  if (
-    existing
-  ) {
-
-    if (
-      existing.quantity <
-      Number(product.stock)
-    ) {
-
-      existing.quantity +=
-        1;
-    }
-
-  } else {
-
-    cart.push({
-
-      id:
-        product.id,
-
-      name:
-        product.name,
-
-      price:
-        Number(
-          product.price
-        ),
-
-      image_url:
-        product.image_url,
-
-      stock:
-        Number(
-          product.stock || 0
-        ),
-
-      quantity:
-        1
-    });
-  }
-
-
-  saveCart();
-
-  renderCart();
-
-  openCart();
-}
-
-
-function saveCart() {
-
-  localStorage.setItem(
-    "modex_cart",
-    JSON.stringify(cart)
-  );
-
-
-  updateCounters();
-}
-
-
-function renderCart() {
-
-  const container =
-    document.getElementById(
-      "cartItems"
-    );
-
-
-  if (!cart.length) {
-
-    container.innerHTML = `
-      <div class="drawer-empty">
-        Savatingiz hozircha bo‘sh.
-      </div>
-    `;
-
-  } else {
-
-    container.innerHTML =
-      cart.map(
-        (item, index) => `
-
-          <div class="drawer-product">
-
-            <img
-              src="${esc(item.image_url || "")}"
-              alt=""
-            >
-
-
-            <div class="drawer-product-info">
-
-              <strong>
-                ${esc(item.name)}
-              </strong>
-
-              <span>
-                ${money(item.price)}
-              </span>
-
-
-              <div class="quantity-buttons">
-
-                <button
-                  class="minus-cart"
-                  data-index="${index}"
-                  type="button"
-                >
-                  −
-                </button>
-
-
-                <b>
-                  ${item.quantity}
-                </b>
-
-
-                <button
-                  class="plus-cart"
-                  data-index="${index}"
-                  type="button"
-                >
-                  +
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <button
-              class="remove-cart"
-              data-index="${index}"
-              type="button"
-            >
-              ×
-            </button>
-
-          </div>
-        `
-      ).join("");
-  }
-
-
-  container
-    .querySelectorAll(
-      ".plus-cart"
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            const index =
-              Number(
-                button.dataset.index
-              );
-
-
-            const item =
-              cart[index];
-
-
-            if (
-              item.stock &&
-              item.quantity >=
-                item.stock
-            ) {
-
-              alert(
-                `Omborda faqat ${item.stock} dona mavjud.`
-              );
-
-              return;
-            }
-
-
-            item.quantity++;
-
-
-            saveCart();
-
-            renderCart();
-          };
-      }
-    );
-
-
-  container
-    .querySelectorAll(
-      ".minus-cart"
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            const index =
-              Number(
-                button.dataset.index
-              );
-
-
-            cart[index].quantity--;
-
-
-            if (
-              cart[index].quantity <=
-              0
-            ) {
-
-              cart.splice(
-                index,
-                1
-              );
-            }
-
-
-            saveCart();
-
-            renderCart();
-          };
-      }
-    );
-
-
-  container
-    .querySelectorAll(
-      ".remove-cart"
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            cart.splice(
-              Number(
-                button.dataset.index
-              ),
-              1
-            );
-
-
-            saveCart();
-
-            renderCart();
-          };
-      }
-    );
-
-
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        item.price *
-        item.quantity,
-      0
-    );
-
-
-  document
-    .getElementById(
-      "cartTotal"
-    )
-    .textContent =
-    money(total);
-}
-
-
-function openCart() {
-
-  cartDrawer
-    .classList
-    .remove("hidden");
-
-
-  cartOverlay
-    .classList
-    .remove("hidden");
-
-
-  renderCart();
-}
-
-
-function closeCart() {
-
-  cartDrawer
-    .classList
-    .add("hidden");
-
-
-  cartOverlay
-    .classList
-    .add("hidden");
-}
-
-
-document
-  .getElementById(
-    "cartBtn"
-  )
-  .onclick =
-  openCart;
-
-
-document
-  .getElementById(
-    "mobileCartBtn"
-  )
-  .onclick =
-  openCart;
-
-
-document
-  .getElementById(
-    "closeCart"
-  )
-  .onclick =
-  closeCart;
-
-
-cartOverlay.onclick =
-  closeCart;
-
-
-/* =========================================
-   FAVORITES
-========================================= */
-
-function toggleFavorite(
-  product
-) {
-
-  const index =
-    favorites.findIndex(
-      item =>
-        Number(item.id) ===
-        Number(product.id)
-    );
-
-
-  if (
-    index >= 0
-  ) {
-
-    favorites.splice(
-      index,
-      1
-    );
-
-  } else {
-
-    favorites.push({
-
-      id:
-        product.id,
-
-      name:
-        product.name,
-
-      price:
-        Number(
-          product.price
-        ),
-
-      image_url:
-        product.image_url
-    });
-  }
-
-
-  localStorage.setItem(
-    "modex_favorites",
-    JSON.stringify(
-      favorites
-    )
-  );
-
-
-  updateCounters();
-
-  renderFavorites();
-}
-
-
-function renderFavorites() {
-
-  const container =
-    document.getElementById(
-      "favoriteItems"
-    );
-
-
-  if (
-    !favorites.length
-  ) {
-
-    container.innerHTML = `
-      <div class="drawer-empty">
-        Sevimlilar hozircha bo‘sh.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    favorites.map(
-      (item, index) => `
-
-        <div class="drawer-product">
-
-          <img
-            src="${esc(item.image_url || "")}"
-            alt=""
-          >
-
-
-          <div class="drawer-product-info">
-
-            <strong>
-              ${esc(item.name)}
-            </strong>
-
-            <span>
-              ${money(item.price)}
-            </span>
-
-
-            <a
-              class="drawer-open-product"
-              href="product.html?id=${item.id}"
-            >
-              Ko‘rish
-            </a>
-
-          </div>
-
-
-          <button
-            class="remove-favorite"
-            data-index="${index}"
-            type="button"
-          >
-            ×
-          </button>
-
-        </div>
-      `
-    ).join("");
-
-
-  container
-    .querySelectorAll(
-      ".remove-favorite"
-    )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            favorites.splice(
-              Number(
-                button.dataset.index
-              ),
-              1
-            );
-
-
-            localStorage.setItem(
-              "modex_favorites",
-              JSON.stringify(
-                favorites
-              )
-            );
-
-
-            updateCounters();
-
-            renderFavorites();
-
-            renderProducts();
-          };
-      }
-    );
-}
-
-
-function openFavorites() {
-
-  favoritesDrawer
-    .classList
-    .remove("hidden");
-
-
-  favoritesOverlay
-    .classList
-    .remove("hidden");
-
-
-  renderFavorites();
-}
-
-
-function closeFavorites() {
-
-  favoritesDrawer
-    .classList
-    .add("hidden");
-
-
-  favoritesOverlay
-    .classList
-    .add("hidden");
-}
-
-
-document
-  .getElementById(
-    "favoritesBtn"
-  )
-  .onclick =
-  openFavorites;
-
-
-document
-  .getElementById(
-    "mobileFavoritesBtn"
-  )
-  .onclick =
-  openFavorites;
-
-
-document
-  .getElementById(
-    "closeFavorites"
-  )
-  .onclick =
-  closeFavorites;
-
-
-favoritesOverlay.onclick =
-  closeFavorites;
-
-
-/* =========================================
-   COUNTERS
-========================================= */
-
-function updateCounters() {
-
-  document
-    .getElementById(
-      "cartCount"
-    )
-    .textContent =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        Number(
-          item.quantity || 0
-        ),
-      0
-    );
-
-
-  document
-    .getElementById(
-      "favoriteCount"
-    )
-    .textContent =
-    favorites.length;
-}
-
-
-/* =========================================
-   SUPPORT
-========================================= */
-
-document
-  .getElementById(
-    "supportForm"
-  )
-  .onsubmit =
-  async event => {
-
-    event.preventDefault();
-
-
-    const message =
-      document.getElementById(
-        "supportFormMessage"
+      setFormMessage(
+        error.message ||
+        "Buyurtmani yuborishda xato.",
+        "error"
       );
 
+    } finally {
+      submitOrder.disabled = false;
+      submitOrder.textContent =
+        "Buyurtma berish";
+    }
+  }
+
+
+  function toggleFavorite(id) {
+    const exists = favorites.includes(id);
+
+    if (exists) {
+      favorites = favorites.filter(
+        item => item !== id
+      );
+    } else {
+      favorites.push(id);
+    }
+
+    localStorage.setItem(
+      "modex_favorites",
+      JSON.stringify(favorites)
+    );
+
+    updateCounts();
+    renderFavoriteDrawer();
+  }
+
+
+  function addToCart(id) {
+    const product = allProducts.find(
+      item => Number(item.id) === Number(id)
+    );
+
+    if (!product) {
+      return;
+    }
+
+    const existing =
+      cart.find(
+        item => Number(item.id) === Number(id)
+      );
+
+    if (existing) {
+      existing.quantity =
+        Number(existing.quantity || 1) + 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image:
+          product.image_url ||
+          product.image ||
+          "",
+        quantity: 1
+      });
+    }
+
+    saveCart();
+  }
+
+
+  function saveCart() {
+    localStorage.setItem(
+      "modex_cart",
+      JSON.stringify(cart)
+    );
+
+    updateCounts();
+    renderCartDrawer();
+  }
+
+
+  function updateCounts() {
+    favoriteCount.textContent =
+      favorites.length;
+
+    const cartQuantity =
+      cart.reduce(
+        (sum, item) =>
+          sum + Number(item.quantity || 1),
+        0
+      );
+
+    cartCount.textContent =
+      cartQuantity;
+  }
+
+
+  function renderFavoriteDrawer() {
+    if (!favoriteItems) {
+      return;
+    }
+
+    const products =
+      allProducts.filter(
+        item => favorites.includes(item.id)
+      );
+
+    if (products.length === 0) {
+      favoriteItems.innerHTML =
+        "<p>Sevimlilar bo‘sh.</p>";
+      return;
+    }
+
+    favoriteItems.innerHTML =
+      products.map(product => `
+        <div style="
+          padding:10px 0;
+          border-bottom:1px solid #eee;
+        ">
+          <strong>
+            ${escapeHtml(product.name || "Mahsulot")}
+          </strong>
+
+          <div>
+            ${money(product.price)}
+          </div>
+        </div>
+      `).join("");
+  }
+
+
+  function renderCartDrawer() {
+    if (!cartItems) {
+      return;
+    }
+
+    if (cart.length === 0) {
+      cartItems.innerHTML =
+        "<p>Savat bo‘sh.</p>";
+
+      cartTotal.textContent =
+        "0 so‘m";
+
+      return;
+    }
+
+    cartItems.innerHTML =
+      cart.map(item => `
+        <div style="
+          padding:10px 0;
+          border-bottom:1px solid #eee;
+        ">
+          <strong>
+            ${escapeHtml(item.name || "Mahsulot")}
+          </strong>
+
+          <div>
+            ${item.quantity} × ${money(item.price)}
+          </div>
+
+          <button
+            type="button"
+            data-remove-cart="${item.id}"
+            style="margin-top:6px;"
+          >
+            Olib tashlash
+          </button>
+        </div>
+      `).join("");
+
+    const total =
+      cart.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.price || 0) *
+          Number(item.quantity || 1),
+        0
+      );
+
+    cartTotal.textContent =
+      money(total);
+
+    document
+      .querySelectorAll("[data-remove-cart]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          const id =
+            Number(button.dataset.removeCart);
+
+          cart =
+            cart.filter(
+              item =>
+                Number(item.id) !== id
+            );
+
+          saveCart();
+        });
+      });
+  }
+
+
+  function openDrawer(drawer, overlay) {
+    drawer?.classList.remove("hidden");
+    overlay?.classList.remove("hidden");
+  }
+
+
+  function closeDrawer(drawer, overlay) {
+    drawer?.classList.add("hidden");
+    overlay?.classList.add("hidden");
+  }
+
+
+  async function createSupportRequest(event) {
+    event.preventDefault();
+
+    const name =
+      supportName.value.trim();
+
+    const phone =
+      supportPhone.value.trim();
+
+    const message =
+      supportMessage.value.trim();
+
+    if (!name || !phone || !message) {
+      setSupportMessage(
+        "Barcha maydonlarni to‘ldiring.",
+        "error"
+      );
+      return;
+    }
+
+    setSupportMessage("Yuborilmoqda...");
 
     try {
-
-      await api(
+      await supabaseRequest(
         "support_requests",
         {
-          method:
-            "POST",
+          method: "POST",
 
-          headers: {
-
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=minimal"
-          },
-
-          body:
-            JSON.stringify({
-
-              name:
-                document
-                  .getElementById(
-                    "supportName"
-                  )
-                  .value
-                  .trim(),
-
-              phone:
-                document
-                  .getElementById(
-                    "supportPhone"
-                  )
-                  .value
-                  .trim(),
-
-              message:
-                document
-                  .getElementById(
-                    "supportMessage"
-                  )
-                  .value
-                  .trim(),
-
-              status:
-                "new"
-            })
+          body: JSON.stringify({
+            name,
+            phone,
+            message
+          })
         }
       );
 
+      supportForm.reset();
 
-      message.textContent =
-        "Murojaatingiz yuborildi ✅";
-
-
-      message.className =
-        "form-message success";
-
-
-      event.target.reset();
+      setSupportMessage(
+        "✅ Murojaatingiz yuborildi.",
+        "success"
+      );
 
     } catch (error) {
-
       console.error(error);
 
-
-      message.textContent =
-        "Murojaatni yuborib bo‘lmadi.";
-
-
-      message.className =
-        "form-message error";
+      setSupportMessage(
+        error.message ||
+        "Murojaatni yuborib bo‘lmadi.",
+        "error"
+      );
     }
-  };
-
-
-/* =========================================
-   START
-========================================= */
-
-async function startApp() {
-
-  const maintenance =
-    await loadSiteSettings();
-
-
-  if (
-    maintenance
-  ) {
-
-    return;
   }
 
 
-  updateCounters();
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-  renderCart();
 
-  renderFavorites();
-
-  await loadProducts();
-}
+  function escapeAttribute(value) {
+    return escapeHtml(value);
+  }
 
 
-startApp();
+  searchInput?.addEventListener(
+    "input",
+    applyFilters
+  );
+
+  mobileSearchInput?.addEventListener(
+    "input",
+    applyFilters
+  );
+
+  categoryFilter?.addEventListener(
+    "change",
+    applyFilters
+  );
+
+  sortSelect?.addEventListener(
+    "change",
+    applyFilters
+  );
+
+  document
+    .getElementById("searchBtn")
+    ?.addEventListener(
+      "click",
+      applyFilters
+    );
+
+  document
+    .getElementById("mobileSearchBtn")
+    ?.addEventListener(
+      "click",
+      applyFilters
+    );
+
+  document
+    .getElementById("allCategoriesBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        categoryFilter.value = "";
+        applyFilters();
+      }
+    );
+
+
+  closeDialog?.addEventListener(
+    "click",
+    () => orderDialog.close()
+  );
+
+
+  orderForm?.addEventListener(
+    "submit",
+    createOrder
+  );
+
+
+  supportForm?.addEventListener(
+    "submit",
+    createSupportRequest
+  );
+
+
+  favoritesBtn?.addEventListener(
+    "click",
+    () => {
+      renderFavoriteDrawer();
+
+      openDrawer(
+        favoritesDrawer,
+        favoritesOverlay
+      );
+    }
+  );
+
+
+  mobileFavoritesBtn?.addEventListener(
+    "click",
+    () => {
+      renderFavoriteDrawer();
+
+      openDrawer(
+        favoritesDrawer,
+        favoritesOverlay
+      );
+    }
+  );
+
+
+  cartBtn?.addEventListener(
+    "click",
+    () => {
+      renderCartDrawer();
+
+      openDrawer(
+        cartDrawer,
+        cartOverlay
+      );
+    }
+  );
+
+
+  mobileCartBtn?.addEventListener(
+    "click",
+    () => {
+      renderCartDrawer();
+
+      openDrawer(
+        cartDrawer,
+        cartOverlay
+      );
+    }
+  );
+
+
+  closeFavorites?.addEventListener(
+    "click",
+    () => {
+      closeDrawer(
+        favoritesDrawer,
+        favoritesOverlay
+      );
+    }
+  );
+
+
+  favoritesOverlay?.addEventListener(
+    "click",
+    () => {
+      closeDrawer(
+        favoritesDrawer,
+        favoritesOverlay
+      );
+    }
+  );
+
+
+  closeCart?.addEventListener(
+    "click",
+    () => {
+      closeDrawer(
+        cartDrawer,
+        cartOverlay
+      );
+    }
+  );
+
+
+  cartOverlay?.addEventListener(
+    "click",
+    () => {
+      closeDrawer(
+        cartDrawer,
+        cartOverlay
+      );
+    }
+  );
+
+
+  updateCounts();
+  renderFavoriteDrawer();
+  renderCartDrawer();
+
+  loadProducts();
+
+})();
