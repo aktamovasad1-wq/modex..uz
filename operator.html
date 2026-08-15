@@ -13,513 +13,520 @@
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0605"
+    href="./style.css?v=20260815-0615"
   >
 </head>
 
 <body>
 
+  <!-- LOGIN -->
 
-<section
-  id="operatorLoginView"
-  class="login-wrap"
->
+  <section
+    id="operatorLoginView"
+    class="login-wrap"
+  >
 
-  <div class="login-box">
+    <div class="login-box">
 
-    <span class="market-category">
-      MODEX.UZ
-    </span>
+      <span class="market-category">
+        MODEX.UZ
+      </span>
 
-    <h2>
-      Operator panel
-    </h2>
+      <h2>
+        Operator panel
+      </h2>
 
-    <form id="operatorLoginForm">
+      <form id="operatorLoginForm">
 
-      <label>
-        Email
-        <input
-          id="operatorEmail"
-          type="email"
-          required
-        >
-      </label>
+        <label>
+          Email
 
-      <label>
-        Parol
-        <input
-          id="operatorPassword"
-          type="password"
-          required
-        >
-      </label>
+          <input
+            id="operatorEmail"
+            type="email"
+            required
+          >
+        </label>
 
-      <button
-        class="main-btn full-btn"
-        type="submit"
-      >
-        Kirish
-      </button>
+        <label>
+          Parol
 
-      <p
-        id="operatorLoginMessage"
-        class="form-message"
-      ></p>
-
-    </form>
-
-  </div>
-
-</section>
-
-
-<section
-  id="operatorView"
-  class="hidden"
->
-
-  <div class="operator-shell">
-
-    <header class="operator-header">
-
-      <div>
-
-        <span class="market-category">
-          MODEX.UZ
-        </span>
-
-        <h1>
-          Operator Panel
-        </h1>
-
-        <p id="operatorUserName">
-          Operator
-        </p>
-
-      </div>
-
-      <div class="operator-header-buttons">
+          <input
+            id="operatorPassword"
+            type="password"
+            required
+          >
+        </label>
 
         <button
-          id="operatorRefreshBtn"
-          class="small-btn"
+          type="submit"
+          class="main-btn full-btn"
         >
-          🔄
+          Kirish
         </button>
 
-        <button
-          id="operatorLogoutBtn"
-          class="small-btn"
-        >
-          Chiqish
-        </button>
+        <p
+          id="operatorLoginMessage"
+          class="form-message"
+        ></p>
 
-      </div>
+      </form>
 
-    </header>
+    </div>
 
-
-    <section class="operator-stats">
-
-      <article class="operator-stat operator-stat-new">
-        <span>🔴 Yangi</span>
-        <strong id="operatorNewCount">0</strong>
-      </article>
-
-      <article class="operator-stat operator-stat-talked">
-        <span>🟠 Gaplashildi</span>
-        <strong id="operatorTalkedCount">0</strong>
-      </article>
-
-      <article class="operator-stat operator-stat-confirmed">
-        <span>🔵 Tasdiqlandi</span>
-        <strong id="operatorConfirmedCount">0</strong>
-      </article>
-
-      <article class="operator-stat operator-stat-done">
-        <span>🟢 Yakunlandi</span>
-        <strong id="operatorDoneCount">0</strong>
-      </article>
-
-    </section>
+  </section>
 
 
-    <section class="operator-toolbar">
+  <!-- OPERATOR PANEL -->
 
-      <div class="operator-search">
+  <section
+    id="operatorView"
+    class="hidden"
+  >
 
-        <input
-          id="operatorOrderSearch"
-          type="search"
-          placeholder="Ism, telefon yoki mahsulot..."
-        >
+    <div class="operator-shell">
 
-        <button
-          id="operatorClearSearch"
-          type="button"
-        >
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="operator-filter-scroll">
-
-        <button
-          class="operator-filter-btn active"
-          data-status="all"
-        >
-          Barchasi
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="new"
-        >
-          🔴 Yangi
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="talked"
-        >
-          🟠 Gaplashildi
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="confirmed"
-        >
-          🔵 Tasdiqlandi
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="delivery"
-        >
-          🟣 Yetkazishda
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="done"
-        >
-          🟢 Yakunlandi
-        </button>
-
-        <button
-          class="operator-filter-btn"
-          data-status="cancelled"
-        >
-          Bekor
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <section class="operator-orders-section">
-
-      <div class="operator-section-title">
+      <header class="operator-header">
 
         <div>
 
           <span class="market-category">
-            ZAYAVKALAR
+            MODEX.UZ
           </span>
 
-          <h2>
-            Buyurtmalar
-          </h2>
+          <h1>
+            Operator Panel
+          </h1>
+
+          <p id="operatorUserName">
+            Operator
+          </p>
 
         </div>
 
-        <span
-          id="operatorVisibleCount"
-          class="badge"
+        <div class="operator-header-buttons">
+
+          <button
+            id="operatorRefreshBtn"
+            class="small-btn"
+            type="button"
+          >
+            🔄
+          </button>
+
+          <button
+            id="operatorLogoutBtn"
+            class="small-btn"
+            type="button"
+          >
+            Chiqish
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- STATS -->
+
+      <section class="operator-stats">
+
+        <article class="operator-stat operator-stat-new">
+          <span>🔴 Yangi</span>
+          <strong id="operatorNewCount">0</strong>
+        </article>
+
+        <article class="operator-stat operator-stat-talked">
+          <span>🟠 Gaplashildi</span>
+          <strong id="operatorTalkedCount">0</strong>
+        </article>
+
+        <article class="operator-stat operator-stat-confirmed">
+          <span>🔵 Tasdiqlandi</span>
+          <strong id="operatorConfirmedCount">0</strong>
+        </article>
+
+        <article class="operator-stat operator-stat-done">
+          <span>🟢 Yakunlandi</span>
+          <strong id="operatorDoneCount">0</strong>
+        </article>
+
+      </section>
+
+
+      <!-- SEARCH / FILTER -->
+
+      <section class="operator-toolbar">
+
+        <div class="operator-search">
+
+          <input
+            id="operatorOrderSearch"
+            type="search"
+            placeholder="Ism, telefon yoki mahsulot..."
+          >
+
+          <button
+            id="operatorClearSearch"
+            type="button"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <div class="operator-filter-scroll">
+
+          <button
+            class="operator-filter-btn active"
+            data-status="all"
+            type="button"
+          >
+            Barchasi
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="new"
+            type="button"
+          >
+            🔴 Yangi
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="talked"
+            type="button"
+          >
+            🟠 Gaplashildi
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="confirmed"
+            type="button"
+          >
+            🔵 Tasdiqlandi
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="delivery"
+            type="button"
+          >
+            🟣 Yetkazishda
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="done"
+            type="button"
+          >
+            🟢 Yakunlandi
+          </button>
+
+          <button
+            class="operator-filter-btn"
+            data-status="cancelled"
+            type="button"
+          >
+            Bekor
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+
+      <section class="operator-orders-section">
+
+        <div class="operator-section-title">
+
+          <div>
+
+            <span class="market-category">
+              ZAYAVKALAR
+            </span>
+
+            <h2>
+              Buyurtmalar
+            </h2>
+
+          </div>
+
+          <span
+            id="operatorVisibleCount"
+            class="badge"
+          >
+            0 ta
+          </span>
+
+        </div>
+
+        <div
+          id="operatorOrders"
+          class="operator-orders"
+        ></div>
+
+        <p
+          id="operatorOrdersMessage"
+          class="form-message"
+        ></p>
+
+      </section>
+
+    </div>
+
+  </section>
+
+
+  <!-- ORDER MODAL -->
+
+  <dialog
+    id="operatorOrderDialog"
+    class="order-edit-modal"
+  >
+
+    <div class="order-edit-box">
+
+      <button
+        id="operatorCloseOrder"
+        class="order-edit-close"
+        type="button"
+      >
+        ×
+      </button>
+
+      <span class="order-edit-label">
+        ZAYAVKA
+      </span>
+
+      <h2 id="operatorOrderTitle">
+        Buyurtma
+      </h2>
+
+      <form
+        id="operatorOrderForm"
+        class="order-edit-form"
+      >
+
+        <input
+          id="operatorEditOrderId"
+          type="hidden"
         >
-          0 ta
-        </span>
 
-      </div>
+        <div class="order-edit-grid">
 
-      <div
-        id="operatorOrders"
-        class="operator-orders"
-      ></div>
+          <label>
+            Ism
+            <input
+              id="operatorEditName"
+              type="text"
+            >
+          </label>
 
-      <p
-        id="operatorOrdersMessage"
-        class="form-message"
-      ></p>
+          <label>
+            Familiya
+            <input
+              id="operatorEditSurname"
+              type="text"
+            >
+          </label>
 
-    </section>
+        </div>
 
-  </div>
+        <label>
+          Telefon
+          <input
+            id="operatorEditPhone"
+            type="tel"
+          >
+        </label>
 
-</section>
+        <label>
+          Mahsulot
+          <input
+            id="operatorEditProduct"
+            type="text"
+            readonly
+          >
+        </label>
+
+        <div class="operator-order-mini-grid">
+
+          <label>
+            Soni
+            <input
+              id="operatorEditQuantity"
+              type="number"
+              min="1"
+            >
+          </label>
+
+          <label>
+            Razmer
+            <input
+              id="operatorEditSize"
+              type="text"
+            >
+          </label>
+
+          <label>
+            Rang
+            <input
+              id="operatorEditColor"
+              type="text"
+            >
+          </label>
+
+        </div>
+
+        <label>
+          Viloyat / shahar
+          <input
+            id="operatorEditRegion"
+            type="text"
+          >
+        </label>
+
+        <label>
+          Yetkazib berish manzili
+          <textarea
+            id="operatorEditAddress"
+          ></textarea>
+        </label>
+
+        <label>
+          Operator izohi
+          <textarea
+            id="operatorEditNote"
+          ></textarea>
+        </label>
+
+        <label>
+          Status
+
+          <select id="operatorEditStatus">
+
+            <option value="new">
+              🔴 Yangi
+            </option>
+
+            <option value="talked">
+              🟠 Gaplashildi
+            </option>
+
+            <option value="confirmed">
+              🔵 Tasdiqlandi
+            </option>
+
+            <option value="delivery">
+              🟣 Yetkazishda
+            </option>
+
+            <option value="done">
+              🟢 Yakunlandi
+            </option>
+
+            <option value="cancelled">
+              ⚪ Bekor qilindi
+            </option>
+
+          </select>
+
+        </label>
+
+        <a
+          id="operatorCallCustomer"
+          href="#"
+          class="operator-big-call"
+        >
+          📞 Mijozga qo‘ng‘iroq qilish
+        </a>
+
+        <div class="order-edit-actions">
+
+          <button
+            type="submit"
+            class="order-edit-save"
+          >
+            💾 Saqlash
+          </button>
+
+          <button
+            id="operatorQrBtn"
+            type="button"
+            class="order-edit-qr"
+          >
+            QR etiketka
+          </button>
+
+        </div>
+
+        <p
+          id="operatorOrderMessage"
+          class="form-message"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </dialog>
 
 
-<dialog
-  id="operatorOrderDialog"
-  class="order-edit-modal"
->
+  <!-- MOBILE NAV -->
 
-  <div class="order-edit-box">
+  <nav
+    id="operatorMobileNav"
+    class="operator-mobile-nav hidden"
+  >
 
     <button
-      id="operatorCloseOrder"
-      class="order-edit-close"
+      class="operator-mobile-nav-btn active"
+      data-mobile-filter="all"
       type="button"
     >
-      ×
+      <span>▦</span>
+      <small>Barchasi</small>
     </button>
 
-    <span class="order-edit-label">
-      ZAYAVKA
-    </span>
-
-    <h2 id="operatorOrderTitle">
-      Buyurtma
-    </h2>
-
-
-    <form
-      id="operatorOrderForm"
-      class="order-edit-form"
+    <button
+      class="operator-mobile-nav-btn"
+      data-mobile-filter="new"
+      type="button"
     >
-
-      <input
-        id="operatorEditOrderId"
-        type="hidden"
-      >
-
-
-      <div class="order-edit-grid">
-
-        <label>
-          Ism
-
-          <input
-            id="operatorEditName"
-            type="text"
-          >
-        </label>
-
-        <label>
-          Familiya
-
-          <input
-            id="operatorEditSurname"
-            type="text"
-          >
-        </label>
-
-      </div>
-
-
-      <label>
-        Telefon
-
-        <input
-          id="operatorEditPhone"
-          type="tel"
-        >
-      </label>
-
-
-      <label>
-        Mahsulot
-
-        <input
-          id="operatorEditProduct"
-          type="text"
-          readonly
-        >
-      </label>
-
-
-      <div class="operator-order-mini-grid">
-
-        <label>
-          Soni
-
-          <input
-            id="operatorEditQuantity"
-            type="number"
-            min="1"
-          >
-        </label>
-
-        <label>
-          Razmer
-
-          <input
-            id="operatorEditSize"
-            type="text"
-          >
-        </label>
-
-        <label>
-          Rang
-
-          <input
-            id="operatorEditColor"
-            type="text"
-          >
-        </label>
-
-      </div>
-
-
-      <label>
-        Viloyat / shahar
-
-        <input
-          id="operatorEditRegion"
-          type="text"
-        >
-      </label>
-
-
-      <label>
-        Yetkazib berish manzili
-
-        <textarea
-          id="operatorEditAddress"
-        ></textarea>
-      </label>
-
-
-      <label>
-        Operator izohi
-
-        <textarea
-          id="operatorEditNote"
-        ></textarea>
-      </label>
-
-
-      <label>
-        Status
-
-        <select id="operatorEditStatus">
-
-          <option value="new">
-            🔴 Yangi
-          </option>
-
-          <option value="talked">
-            🟠 Gaplashildi
-          </option>
-
-          <option value="confirmed">
-            🔵 Tasdiqlandi
-          </option>
-
-          <option value="delivery">
-            🟣 Yetkazishda
-          </option>
-
-          <option value="done">
-            🟢 Yakunlandi
-          </option>
-
-          <option value="cancelled">
-            ⚪ Bekor qilindi
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <a
-        id="operatorCallCustomer"
-        class="operator-big-call"
-        href="#"
-      >
-        📞 Mijozga qo‘ng‘iroq qilish
-      </a>
-
-
-      <div class="order-edit-actions">
-
-        <button
-          class="order-edit-save"
-          type="submit"
-        >
-          💾 Saqlash
-        </button>
-
-        <button
-          id="operatorQrBtn"
-          class="order-edit-qr"
-          type="button"
-        >
-          QR etiketka
-        </button>
-
-      </div>
-
-
-      <p
-        id="operatorOrderMessage"
-        class="form-message"
-      ></p>
-
-    </form>
-
-  </div>
-
-</dialog>
-
-
-<nav
-  id="operatorMobileNav"
-  class="operator-mobile-nav hidden"
->
-
-  <button
-    class="operator-mobile-nav-btn active"
-    data-mobile-filter="all"
-  >
-    <span>▦</span>
-    <small>Barchasi</small>
-  </button>
-
-  <button
-    class="operator-mobile-nav-btn"
-    data-mobile-filter="new"
-  >
-    <span>🔴</span>
-    <small>Yangi</small>
-  </button>
-
-  <button
-    class="operator-mobile-nav-btn"
-    data-mobile-filter="talked"
-  >
-    <span>🟠</span>
-    <small>Gaplashildi</small>
-  </button>
-
-  <button
-    class="operator-mobile-nav-btn"
-    data-mobile-filter="confirmed"
-  >
-    <span>🔵</span>
-    <small>Tasdiq</small>
-  </button>
-
-</nav>
-
-
-<script src="./config.js?v=20260815-0605"></script>
-<script src="./operator.js?v=20260815-0605"></script>
+      <span>🔴</span>
+      <small>Yangi</small>
+    </button>
+
+    <button
+      class="operator-mobile-nav-btn"
+      data-mobile-filter="talked"
+      type="button"
+    >
+      <span>🟠</span>
+      <small>Gaplashildi</small>
+    </button>
+
+    <button
+      class="operator-mobile-nav-btn"
+      data-mobile-filter="confirmed"
+      type="button"
+    >
+      <span>🔵</span>
+      <small>Tasdiq</small>
+    </button>
+
+  </nav>
+
+
+  <!-- SCRIPT -->
+
+  <script src="./config.js?v=20260815-0615"></script>
+  <script src="./operator.js?v=20260815-0615"></script>
 
 </body>
 </html>
