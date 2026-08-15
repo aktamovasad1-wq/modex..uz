@@ -6,536 +6,821 @@
 
   <meta
     name="viewport"
-    content="width=device-width,initial-scale=1"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#713cf0"
   >
 
   <title>MODEX.UZ — Admin Panel</title>
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0605"
+    href="./style.css?v=20260815-1300"
   >
 </head>
+
 
 <body>
 
 
-<section
-  id="loginView"
-  class="login-wrap"
->
+  <!-- =====================================================
+       LOGIN
+  ====================================================== -->
 
-  <div class="login-box">
+  <section
+    id="loginView"
+    class="login-wrap"
+  >
 
-    <span class="market-category">
-      MODEX.UZ
-    </span>
+    <div class="login-box">
 
-    <h2>
-      Admin panel
-    </h2>
+      <span class="market-category">
+        MODEX.UZ
+      </span>
 
-    <form id="loginForm">
+      <h2>
+        Admin Panel
+      </h2>
 
-      <label>
-        Email
-
-        <input
-          id="email"
-          type="email"
-          required
-        >
-      </label>
-
-      <label>
-        Parol
-
-        <input
-          id="password"
-          type="password"
-          required
-        >
-      </label>
-
-      <button
-        class="main-btn full-btn"
-        type="submit"
-      >
-        Kirish
-      </button>
-
-      <p
-        id="loginMessage"
-        class="form-message"
-      ></p>
-
-    </form>
-
-  </div>
-
-</section>
+      <p style="color:#777783; margin-top:-10px;">
+        Admin hisobingiz bilan kiring
+      </p>
 
 
-<section
-  id="adminView"
-  class="hidden"
->
+      <form id="loginForm">
 
-  <div class="admin-shell">
-
-    <header class="admin-head">
-
-      <div>
-
-        <span class="market-category">
-          MODEX.UZ
-        </span>
-
-        <h1>
-          Admin Panel
-        </h1>
-
-        <p id="adminEmail"></p>
-
-      </div>
-
-      <div class="admin-top-actions">
-
-        <a
-          href="./index.html"
-          class="small-btn"
-        >
-          🏠 Sayt
-        </a>
-
-        <a
-          href="./operator.html"
-          class="small-btn"
-        >
-          👨‍💻 Operator
-        </a>
-
-        <button
-          id="refreshAdminBtn"
-          class="small-btn"
-          type="button"
-        >
-          🔄
-        </button>
-
-        <button
-          id="logoutBtn"
-          class="small-btn"
-          type="button"
-        >
-          Chiqish
-        </button>
-
-      </div>
-
-    </header>
-
-
-    <div class="stats-row">
-
-      <div class="stat">
-        <span>Mahsulotlar</span>
-        <b id="aProducts">0</b>
-      </div>
-
-      <div class="stat">
-        <span>Buyurtmalar</span>
-        <b id="aOrders">0</b>
-      </div>
-
-      <div class="stat">
-        <span>Yangi</span>
-        <b id="aNew">0</b>
-      </div>
-
-      <div class="stat">
-        <span>Operatorlar</span>
-        <b id="aOperators">0</b>
-      </div>
-
-    </div>
-
-
-    <div class="admin-order-stats">
-
-      <article class="order-stat-card">
-        <span>Bugungi</span>
-        <strong id="todayOrdersCount">0</strong>
-      </article>
-
-      <article class="order-stat-card">
-        <span>🔴 Yangi</span>
-        <strong id="newOrdersCount">0</strong>
-      </article>
-
-      <article class="order-stat-card">
-        <span>🟠 Gaplashildi</span>
-        <strong id="talkedOrdersCount">0</strong>
-      </article>
-
-      <article class="order-stat-card">
-        <span>🔵 Tasdiqlandi</span>
-        <strong id="confirmedOrdersCount">0</strong>
-      </article>
-
-      <article class="order-stat-card">
-        <span>🟣 Yetkazishda</span>
-        <strong id="deliveryOrdersCount">0</strong>
-      </article>
-
-      <article class="order-stat-card">
-        <span>🟢 Yakunlandi</span>
-        <strong id="doneOrdersCount">0</strong>
-      </article>
-
-    </div>
-
-
-    <div class="admin-grid">
-
-      <section class="panel">
-
-        <h2 id="productFormTitle">
-          Mahsulot qo‘shish
-        </h2>
-
-        <form
-          id="productForm"
-          class="admin-form"
-        >
+        <label>
+          Email
 
           <input
-            id="editProductId"
-            type="hidden"
+            id="email"
+            type="email"
+            placeholder="admin@email.com"
+            autocomplete="email"
+            required
+          >
+        </label>
+
+
+        <label>
+          Parol
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Parol"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+
+        <button
+          class="main-btn full-btn"
+          type="submit"
+        >
+          Kirish
+        </button>
+
+
+        <p
+          id="loginMessage"
+          class="form-message"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       ADMIN PANEL
+  ====================================================== -->
+
+  <section
+    id="adminView"
+    class="hidden"
+  >
+
+    <div class="admin-shell">
+
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
+
+      <header class="admin-head">
+
+        <div>
+
+          <span class="market-category">
+            MODEX.UZ
+          </span>
+
+          <h1>
+            Admin Panel
+          </h1>
+
+          <p id="adminEmail">
+            Admin
+          </p>
+
+        </div>
+
+
+        <div class="admin-top-actions">
+
+          <a
+            href="./index.html"
+            class="small-btn"
+          >
+            🏠 Sayt
+          </a>
+
+          <a
+            href="./operator.html"
+            class="small-btn"
+          >
+            👨‍💻 Operator
+          </a>
+
+          <button
+            id="refreshAdminBtn"
+            class="small-btn"
+            type="button"
+          >
+            🔄
+          </button>
+
+          <button
+            id="logoutBtn"
+            class="small-btn"
+            type="button"
+          >
+            Chiqish
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- =================================================
+           MAIN STATISTICS
+      ================================================== -->
+
+      <section class="stats-row">
+
+        <article class="stat">
+
+          <span>
+            Mahsulotlar
+          </span>
+
+          <b id="aProducts">
+            0
+          </b>
+
+        </article>
+
+
+        <article class="stat">
+
+          <span>
+            Buyurtmalar
+          </span>
+
+          <b id="aOrders">
+            0
+          </b>
+
+        </article>
+
+
+        <article class="stat">
+
+          <span>
+            Yangi zayavkalar
+          </span>
+
+          <b id="aNew">
+            0
+          </b>
+
+        </article>
+
+
+        <article class="stat">
+
+          <span>
+            Operatorlar
+          </span>
+
+          <b id="aOperators">
+            0
+          </b>
+
+        </article>
+
+      </section>
+
+
+      <!-- =================================================
+           ORDER STATISTICS
+      ================================================== -->
+
+      <section class="admin-order-stats">
+
+        <article class="order-stat-card">
+
+          <span>
+            Bugungi
+          </span>
+
+          <strong id="todayOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+
+        <article class="order-stat-card">
+
+          <span>
+            🔴 Yangi
+          </span>
+
+          <strong id="newOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+
+        <article class="order-stat-card">
+
+          <span>
+            🟠 Gaplashildi
+          </span>
+
+          <strong id="talkedOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+
+        <article class="order-stat-card">
+
+          <span>
+            🔵 Tasdiqlandi
+          </span>
+
+          <strong id="confirmedOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+
+        <article class="order-stat-card">
+
+          <span>
+            🟣 Yo‘lda
+          </span>
+
+          <strong id="deliveryOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+
+        <article class="order-stat-card">
+
+          <span>
+            🟢 Yakunlandi
+          </span>
+
+          <strong id="doneOrdersCount">
+            0
+          </strong>
+
+        </article>
+
+      </section>
+
+
+      <!-- =================================================
+           BUGUNGI OPERATOR NATIJALARI
+      ================================================== -->
+
+      <section class="panel wide-panel">
+
+        <div class="section-title">
+
+          <div>
+
+            <span class="market-category">
+              OPERATOR NATIJALARI
+            </span>
+
+            <h2>
+              Bugungi gaplashilgan zayavkalar
+            </h2>
+
+            <p
+              style="
+                margin:5px 0 0;
+                color:#777783;
+                font-size:12px;
+              "
+            >
+              Har bir operator bugun nechta mijoz bilan gaplashgani
+            </p>
+
+          </div>
+
+
+          <span
+            id="todayOperatorsTotal"
+            class="badge"
+          >
+            0 ta
+          </span>
+
+        </div>
+
+
+        <div
+          id="operatorDailyStats"
+          class="operator-daily-stats"
+        >
+          <!-- admin.js -->
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PRODUCT + OPERATORS
+      ================================================== -->
+
+      <div class="admin-grid">
+
+
+        <!-- PRODUCT -->
+
+        <section class="panel">
+
+          <span class="market-category">
+            MAHSULOTLAR
+          </span>
+
+          <h2 id="productFormTitle">
+            Mahsulot qo‘shish
+          </h2>
+
+
+          <form
+            id="productForm"
+            class="admin-form"
           >
 
-          <label>
-            Mahsulot nomi
             <input
-              id="pName"
-              type="text"
-              required
+              id="editProductId"
+              type="hidden"
             >
-          </label>
 
-          <label>
-            Kategoriya
-            <input
-              id="pCategory"
-              type="text"
-              required
-            >
-          </label>
-
-          <div class="admin-form-two">
 
             <label>
-              Narx
+              Mahsulot nomi
+
               <input
-                id="pPrice"
-                type="number"
+                id="pName"
+                type="text"
+                placeholder="Mahsulot nomi"
                 required
               >
             </label>
 
+
             <label>
-              Eski narx
+              Kategoriya
+
               <input
-                id="pOldPrice"
-                type="number"
+                id="pCategory"
+                type="text"
+                placeholder="Masalan: Bolalar kiyimi"
+                required
               >
             </label>
 
-          </div>
 
-          <div class="admin-form-two">
+            <div class="admin-form-two">
+
+              <label>
+                Narx
+
+                <input
+                  id="pPrice"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  required
+                >
+              </label>
+
+
+              <label>
+                Eski narx
+
+                <input
+                  id="pOldPrice"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                >
+              </label>
+
+            </div>
+
+
+            <div class="admin-form-two">
+
+              <label>
+                Chegirma %
+
+                <input
+                  id="pDiscount"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value="0"
+                >
+              </label>
+
+
+              <label>
+                Omborda
+
+                <input
+                  id="pStock"
+                  type="number"
+                  min="0"
+                  value="0"
+                >
+              </label>
+
+            </div>
+
 
             <label>
-              Chegirma %
+              Tavsif
+
+              <textarea
+                id="pDesc"
+                rows="5"
+                placeholder="Mahsulot haqida..."
+              ></textarea>
+            </label>
+
+
+            <label>
+              Rasm
+
               <input
-                id="pDiscount"
-                type="number"
-                min="0"
-                max="100"
+                id="pImage"
+                type="file"
+                accept="image/*"
               >
             </label>
 
-            <label>
-              Omborda
-              <input
-                id="pStock"
-                type="number"
-                min="0"
-                value="0"
-              >
-            </label>
 
-          </div>
-
-          <label>
-            Tavsif
-            <textarea
-              id="pDesc"
-              rows="5"
-            ></textarea>
-          </label>
-
-          <label>
-            Rasm
-            <input
-              id="pImage"
-              type="file"
-              accept="image/*"
+            <button
+              id="productSubmitBtn"
+              class="main-btn"
+              type="submit"
             >
-          </label>
+              Mahsulot qo‘shish
+            </button>
 
-          <button
-            id="productSubmitBtn"
-            class="main-btn"
-            type="submit"
+
+            <button
+              id="cancelEditBtn"
+              class="small-btn hidden"
+              type="button"
+            >
+              Bekor qilish
+            </button>
+
+
+            <p
+              id="productMessage"
+              class="form-message"
+            ></p>
+
+          </form>
+
+
+          <div
+            id="adminProducts"
+            class="product-admin-list"
           >
-            Mahsulot qo‘shish
-          </button>
+            <!-- admin.js -->
+          </div>
+
+        </section>
+
+
+        <!-- OPERATORS -->
+
+        <section class="panel">
+
+          <span class="market-category">
+            OPERATORLAR
+          </span>
+
+          <h2>
+            Operator boshqaruvi
+          </h2>
+
+
+          <form
+            id="operatorCreateForm"
+            class="admin-form"
+          >
+
+            <label>
+              Operator ismi
+
+              <input
+                id="opName"
+                type="text"
+                placeholder="Masalan: Lazizbek"
+                required
+              >
+            </label>
+
+
+            <label>
+              Email
+
+              <input
+                id="newOpEmail"
+                type="email"
+                placeholder="operator@email.com"
+                required
+              >
+            </label>
+
+
+            <label>
+              Parol
+
+              <input
+                id="newOpPassword"
+                type="password"
+                minlength="6"
+                placeholder="Kamida 6 belgi"
+                required
+              >
+            </label>
+
+
+            <button
+              class="main-btn"
+              type="submit"
+            >
+              Operator yaratish
+            </button>
+
+
+            <p
+              id="operatorCreateMessage"
+              class="form-message"
+            ></p>
+
+          </form>
+
+
+          <div id="operatorsList">
+            <!-- admin.js -->
+          </div>
+
+        </section>
+
+      </div>
+
+
+      <!-- =================================================
+           ORDERS
+      ================================================== -->
+
+      <section class="panel wide-panel orders-panel">
+
+        <div class="section-title">
+
+          <div>
+
+            <span class="market-category">
+              ZAYAVKALAR
+            </span>
+
+            <h2>
+              Buyurtmalar
+            </h2>
+
+          </div>
+
+
+          <span
+            id="visibleOrderCount"
+            class="badge"
+          >
+            0 ta
+          </span>
+
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div class="order-status-filters">
 
           <button
-            id="cancelEditBtn"
-            class="small-btn hidden"
+            class="order-filter-btn active"
+            data-status="all"
             type="button"
           >
-            Bekor qilish
+            Barchasi
           </button>
-
-          <p
-            id="productMessage"
-            class="form-message"
-          ></p>
-
-        </form>
-
-        <div
-          id="adminProducts"
-          class="product-admin-list"
-        ></div>
-
-      </section>
-
-
-      <section class="panel">
-
-        <h2>
-          Operatorlar
-        </h2>
-
-        <form
-          id="operatorCreateForm"
-          class="admin-form"
-        >
-
-          <label>
-            Ism
-            <input
-              id="opName"
-              type="text"
-              required
-            >
-          </label>
-
-          <label>
-            Email
-            <input
-              id="newOpEmail"
-              type="email"
-              required
-            >
-          </label>
-
-          <label>
-            Parol
-            <input
-              id="newOpPassword"
-              type="password"
-              minlength="6"
-              required
-            >
-          </label>
 
           <button
-            class="main-btn"
-            type="submit"
+            class="order-filter-btn"
+            data-status="new"
+            type="button"
           >
-            Operator yaratish
+            🔴 Yangi
           </button>
 
-          <p
-            id="operatorCreateMessage"
-            class="form-message"
-          ></p>
+          <button
+            class="order-filter-btn"
+            data-status="talked"
+            type="button"
+          >
+            🟠 Gaplashildi
+          </button>
 
-        </form>
+          <button
+            class="order-filter-btn"
+            data-status="confirmed"
+            type="button"
+          >
+            🔵 Tasdiqlandi
+          </button>
 
-        <div id="operatorsList"></div>
+          <button
+            class="order-filter-btn"
+            data-status="delivery"
+            type="button"
+          >
+            🟣 Yo‘lda
+          </button>
+
+          <button
+            class="order-filter-btn"
+            data-status="done"
+            type="button"
+          >
+            🟢 Yakunlandi
+          </button>
+
+          <button
+            class="order-filter-btn"
+            data-status="cancelled"
+            type="button"
+          >
+            ⚪ Bekor
+          </button>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="admin-order-tools">
+
+          <input
+            id="adminOrderSearch"
+            type="search"
+            placeholder="Ism, telefon yoki mahsulot..."
+            autocomplete="off"
+          >
+
+          <button
+            id="clearOrderSearch"
+            class="small-btn"
+            type="button"
+          >
+            Tozalash
+          </button>
+
+        </div>
+
+
+        <!-- DESKTOP TABLE -->
+
+        <div class="table-wrap">
+
+          <table class="orders-table">
+
+            <thead>
+
+              <tr>
+                <th>ID</th>
+                <th>Mijoz</th>
+                <th>Telefon</th>
+                <th>Mahsulot</th>
+                <th>Soni</th>
+                <th>Razmer</th>
+                <th>Rang</th>
+                <th>Status</th>
+                <th>Amal</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="ordersBody">
+              <!-- admin.js -->
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <p
+          id="ordersMessage"
+          class="form-message"
+        ></p>
 
       </section>
+
+
+      <!-- MOBILE ORDERS -->
+
+      <section
+        id="mobileOrders"
+        class="mobile-orders"
+      >
+        <!-- admin.js -->
+      </section>
+
+
+      <!-- =================================================
+           SUPPORT
+      ================================================== -->
+
+      <section class="panel wide-panel">
+
+        <span class="market-category">
+          YORDAM
+        </span>
+
+        <h2>
+          Mijoz murojaatlari
+        </h2>
+
+
+        <div
+          id="adminSupportList"
+          class="support-list"
+        >
+          <!-- admin.js -->
+        </div>
+
+      </section>
+
 
     </div>
 
-
-    <section class="panel wide-panel orders-panel">
-
-      <div class="section-title">
-
-        <h2>
-          Buyurtmalar
-        </h2>
-
-        <span
-          id="visibleOrderCount"
-          class="badge"
-        >
-          0 ta
-        </span>
-
-      </div>
+  </section>
 
 
-      <div class="order-status-filters">
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
 
-        <button
-          class="order-filter-btn active"
-          data-status="all"
-        >
-          Barchasi
-        </button>
+  <script src="./config.js?v=20260815-1300"></script>
 
-        <button
-          class="order-filter-btn"
-          data-status="new"
-        >
-          🔴 Yangi
-        </button>
+  <script src="./admin.js?v=20260815-1300"></script>
 
-        <button
-          class="order-filter-btn"
-          data-status="talked"
-        >
-          🟠 Gaplashildi
-        </button>
-
-        <button
-          class="order-filter-btn"
-          data-status="confirmed"
-        >
-          🔵 Tasdiqlandi
-        </button>
-
-        <button
-          class="order-filter-btn"
-          data-status="delivery"
-        >
-          🟣 Yetkazishda
-        </button>
-
-        <button
-          class="order-filter-btn"
-          data-status="done"
-        >
-          🟢 Yakunlandi
-        </button>
-
-        <button
-          class="order-filter-btn"
-          data-status="cancelled"
-        >
-          Bekor
-        </button>
-
-      </div>
-
-
-      <div class="admin-order-tools">
-
-        <input
-          id="adminOrderSearch"
-          type="search"
-          placeholder="Ism yoki telefon..."
-        >
-
-        <button
-          id="clearOrderSearch"
-          class="small-btn"
-        >
-          Tozalash
-        </button>
-
-      </div>
-
-
-      <div class="table-wrap">
-
-        <table class="orders-table">
-
-          <thead>
-
-            <tr>
-              <th>ID</th>
-              <th>Mijoz</th>
-              <th>Telefon</th>
-              <th>Mahsulot</th>
-              <th>Soni</th>
-              <th>Razmer</th>
-              <th>Rang</th>
-              <th>Status</th>
-              <th>Amal</th>
-            </tr>
-
-          </thead>
-
-          <tbody id="ordersBody"></tbody>
-
-        </table>
-
-      </div>
-
-
-      <p
-        id="ordersMessage"
-        class="form-message"
-      ></p>
-
-    </section>
-
-
-    <section
-      id="mobileOrders"
-      class="mobile-orders"
-    ></section>
-
-
-    <section class="panel wide-panel">
-
-      <h2>
-        Yordam murojaatlari
-      </h2>
-
-      <div
-        id="adminSupportList"
-        class="support-list"
-      ></div>
-
-    </section>
-
-  </div>
-
-</section>
-
-
-<script src="./config.js?v=20260815-0605"></script>
-<script src="./admin.js?v=20260815-0605"></script>
 
 </body>
 </html>
