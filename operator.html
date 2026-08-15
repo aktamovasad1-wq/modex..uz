@@ -6,23 +6,19 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
   >
 
   <title>MODEX.UZ — Operator Panel</title>
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0500"
+    href="./style.css?v=20260815-0605"
   >
 </head>
 
 <body>
 
-
-<!-- =========================
-     LOGIN
-========================= -->
 
 <section
   id="operatorLoginView"
@@ -36,42 +32,35 @@
     </span>
 
     <h2>
-      Operator panelga kirish
+      Operator panel
     </h2>
 
     <form id="operatorLoginForm">
 
       <label>
         Email
-
         <input
           id="operatorEmail"
           type="email"
-          autocomplete="email"
           required
         >
       </label>
-
 
       <label>
         Parol
-
         <input
           id="operatorPassword"
           type="password"
-          autocomplete="current-password"
           required
         >
       </label>
 
-
       <button
-        type="submit"
         class="main-btn full-btn"
+        type="submit"
       >
         Kirish
       </button>
-
 
       <p
         id="operatorLoginMessage"
@@ -85,19 +74,12 @@
 </section>
 
 
-<!-- =========================
-     OPERATOR PANEL
-========================= -->
-
 <section
   id="operatorView"
   class="hidden"
 >
 
   <div class="operator-shell">
-
-
-    <!-- HEADER -->
 
     <header class="operator-header">
 
@@ -117,22 +99,18 @@
 
       </div>
 
-
       <div class="operator-header-buttons">
 
         <button
           id="operatorRefreshBtn"
           class="small-btn"
-          type="button"
         >
           🔄
         </button>
 
-
         <button
           id="operatorLogoutBtn"
           class="small-btn"
-          type="button"
         >
           Chiqish
         </button>
@@ -142,69 +120,30 @@
     </header>
 
 
-    <!-- =========================
-         STATISTIKA
-    ========================= -->
-
     <section class="operator-stats">
 
       <article class="operator-stat operator-stat-new">
-
-        <span>
-          🔴 Yangi
-        </span>
-
-        <strong id="operatorNewCount">
-          0
-        </strong>
-
+        <span>🔴 Yangi</span>
+        <strong id="operatorNewCount">0</strong>
       </article>
-
 
       <article class="operator-stat operator-stat-talked">
-
-        <span>
-          🟠 Gaplashildi
-        </span>
-
-        <strong id="operatorTalkedCount">
-          0
-        </strong>
-
+        <span>🟠 Gaplashildi</span>
+        <strong id="operatorTalkedCount">0</strong>
       </article>
-
 
       <article class="operator-stat operator-stat-confirmed">
-
-        <span>
-          🔵 Tasdiqlandi
-        </span>
-
-        <strong id="operatorConfirmedCount">
-          0
-        </strong>
-
+        <span>🔵 Tasdiqlandi</span>
+        <strong id="operatorConfirmedCount">0</strong>
       </article>
 
-
       <article class="operator-stat operator-stat-done">
-
-        <span>
-          🟢 Yakunlandi
-        </span>
-
-        <strong id="operatorDoneCount">
-          0
-        </strong>
-
+        <span>🟢 Yakunlandi</span>
+        <strong id="operatorDoneCount">0</strong>
       </article>
 
     </section>
 
-
-    <!-- =========================
-         SEARCH
-    ========================= -->
 
     <section class="operator-toolbar">
 
@@ -231,7 +170,6 @@
         <button
           class="operator-filter-btn active"
           data-status="all"
-          type="button"
         >
           Barchasi
         </button>
@@ -239,7 +177,6 @@
         <button
           class="operator-filter-btn"
           data-status="new"
-          type="button"
         >
           🔴 Yangi
         </button>
@@ -247,7 +184,6 @@
         <button
           class="operator-filter-btn"
           data-status="talked"
-          type="button"
         >
           🟠 Gaplashildi
         </button>
@@ -255,7 +191,6 @@
         <button
           class="operator-filter-btn"
           data-status="confirmed"
-          type="button"
         >
           🔵 Tasdiqlandi
         </button>
@@ -263,7 +198,6 @@
         <button
           class="operator-filter-btn"
           data-status="delivery"
-          type="button"
         >
           🟣 Yetkazishda
         </button>
@@ -271,7 +205,6 @@
         <button
           class="operator-filter-btn"
           data-status="done"
-          type="button"
         >
           🟢 Yakunlandi
         </button>
@@ -279,7 +212,6 @@
         <button
           class="operator-filter-btn"
           data-status="cancelled"
-          type="button"
         >
           Bekor
         </button>
@@ -288,10 +220,6 @@
 
     </section>
 
-
-    <!-- =========================
-         BUYURTMALAR
-    ========================= -->
 
     <section class="operator-orders-section">
 
@@ -309,7 +237,6 @@
 
         </div>
 
-
         <span
           id="operatorVisibleCount"
           class="badge"
@@ -319,12 +246,10 @@
 
       </div>
 
-
       <div
         id="operatorOrders"
         class="operator-orders"
       ></div>
-
 
       <p
         id="operatorOrdersMessage"
@@ -337,10 +262,6 @@
 
 </section>
 
-
-<!-- =========================
-     ZAYAVKA MODAL
-========================= -->
 
 <dialog
   id="operatorOrderDialog"
@@ -357,11 +278,9 @@
       ×
     </button>
 
-
     <span class="order-edit-label">
       ZAYAVKA
     </span>
-
 
     <h2 id="operatorOrderTitle">
       Buyurtma
@@ -390,7 +309,6 @@
           >
         </label>
 
-
         <label>
           Familiya
 
@@ -409,7 +327,6 @@
         <input
           id="operatorEditPhone"
           type="tel"
-          inputmode="tel"
         >
       </label>
 
@@ -437,7 +354,6 @@
           >
         </label>
 
-
         <label>
           Razmer
 
@@ -446,7 +362,6 @@
             type="text"
           >
         </label>
-
 
         <label>
           Rang
@@ -524,8 +439,8 @@
 
       <a
         id="operatorCallCustomer"
-        href="#"
         class="operator-big-call"
+        href="#"
       >
         📞 Mijozga qo‘ng‘iroq qilish
       </a>
@@ -534,17 +449,16 @@
       <div class="order-edit-actions">
 
         <button
-          type="submit"
           class="order-edit-save"
+          type="submit"
         >
           💾 Saqlash
         </button>
 
-
         <button
           id="operatorQrBtn"
-          type="button"
           class="order-edit-qr"
+          type="button"
         >
           QR etiketka
         </button>
@@ -554,7 +468,7 @@
 
       <p
         id="operatorOrderMessage"
-        class="order-edit-message"
+        class="form-message"
       ></p>
 
     </form>
@@ -564,10 +478,6 @@
 </dialog>
 
 
-<!-- =========================
-     MOBILE NAV
-========================= -->
-
 <nav
   id="operatorMobileNav"
   class="operator-mobile-nav hidden"
@@ -576,37 +486,30 @@
   <button
     class="operator-mobile-nav-btn active"
     data-mobile-filter="all"
-    type="button"
   >
     <span>▦</span>
     <small>Barchasi</small>
   </button>
 
-
   <button
     class="operator-mobile-nav-btn"
     data-mobile-filter="new"
-    type="button"
   >
     <span>🔴</span>
     <small>Yangi</small>
   </button>
 
-
   <button
     class="operator-mobile-nav-btn"
     data-mobile-filter="talked"
-    type="button"
   >
     <span>🟠</span>
     <small>Gaplashildi</small>
   </button>
 
-
   <button
     class="operator-mobile-nav-btn"
     data-mobile-filter="confirmed"
-    type="button"
   >
     <span>🔵</span>
     <small>Tasdiq</small>
@@ -615,12 +518,8 @@
 </nav>
 
 
-<!-- =========================
-     SCRIPT
-========================= -->
-
-<script src="./config.js?v=20260815-0515"></script>
-<script src="./operator.js?v=20260815-0515"></script>
+<script src="./config.js?v=20260815-0605"></script>
+<script src="./operator.js?v=20260815-0605"></script>
 
 </body>
 </html>
