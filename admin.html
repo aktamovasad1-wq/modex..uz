@@ -6,23 +6,19 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
+    content="width=device-width,initial-scale=1"
   >
 
   <title>MODEX.UZ — Admin Panel</title>
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0437"
+    href="./style.css?v=20260815-0605"
   >
 </head>
 
 <body>
 
-
-<!-- =========================
-     LOGIN
-========================= -->
 
 <section
   id="loginView"
@@ -36,9 +32,8 @@
     </span>
 
     <h2>
-      Admin panelga kirish
+      Admin panel
     </h2>
-
 
     <form id="loginForm">
 
@@ -52,7 +47,6 @@
         >
       </label>
 
-
       <label>
         Parol
 
@@ -63,14 +57,12 @@
         >
       </label>
 
-
       <button
-        type="submit"
         class="main-btn full-btn"
+        type="submit"
       >
         Kirish
       </button>
-
 
       <p
         id="loginMessage"
@@ -84,10 +76,6 @@
 </section>
 
 
-<!-- =========================
-     ADMIN
-========================= -->
-
 <section
   id="adminView"
   class="hidden"
@@ -95,10 +83,7 @@
 
   <div class="admin-shell">
 
-
-    <!-- HEADER -->
-
-    <div class="admin-head">
+    <header class="admin-head">
 
       <div>
 
@@ -114,7 +99,6 @@
 
       </div>
 
-
       <div class="admin-top-actions">
 
         <a
@@ -124,15 +108,6 @@
           🏠 Sayt
         </a>
 
-
-        <a
-          href="./settings.html"
-          class="small-btn"
-        >
-          ⚙️ Sozlamalar
-        </a>
-
-
         <a
           href="./operator.html"
           class="small-btn"
@@ -140,15 +115,13 @@
           👨‍💻 Operator
         </a>
 
-
         <button
           id="refreshAdminBtn"
           class="small-btn"
           type="button"
         >
-          🔄 Yangilash
+          🔄
         </button>
-
 
         <button
           id="logoutBtn"
@@ -160,180 +133,76 @@
 
       </div>
 
-    </div>
+    </header>
 
-
-    <!-- =========================
-         STATS
-    ========================= -->
 
     <div class="stats-row">
 
       <div class="stat">
-
-        <span>
-          Mahsulotlar
-        </span>
-
-        <b id="aProducts">
-          0
-        </b>
-
+        <span>Mahsulotlar</span>
+        <b id="aProducts">0</b>
       </div>
-
 
       <div class="stat">
-
-        <span>
-          Buyurtmalar
-        </span>
-
-        <b id="aOrders">
-          0
-        </b>
-
+        <span>Buyurtmalar</span>
+        <b id="aOrders">0</b>
       </div>
-
-
-      <div class="stat stat-danger">
-
-        <span>
-          Yangi
-        </span>
-
-        <b id="aNew">
-          0
-        </b>
-
-      </div>
-
 
       <div class="stat">
+        <span>Yangi</span>
+        <b id="aNew">0</b>
+      </div>
 
-        <span>
-          Operatorlar
-        </span>
-
-        <b id="aOperators">
-          0
-        </b>
-
+      <div class="stat">
+        <span>Operatorlar</span>
+        <b id="aOperators">0</b>
       </div>
 
     </div>
 
-
-    <!-- ORDER STATS -->
 
     <div class="admin-order-stats">
 
       <article class="order-stat-card">
-
-        <span>
-          📅 Bugungi
-        </span>
-
-        <strong id="todayOrdersCount">
-          0
-        </strong>
-
+        <span>Bugungi</span>
+        <strong id="todayOrdersCount">0</strong>
       </article>
 
-
-      <article class="order-stat-card danger">
-
-        <span>
-          🔴 Yangi
-        </span>
-
-        <strong id="newOrdersCount">
-          0
-        </strong>
-
+      <article class="order-stat-card">
+        <span>🔴 Yangi</span>
+        <strong id="newOrdersCount">0</strong>
       </article>
 
-
-      <article class="order-stat-card warning">
-
-        <span>
-          🟠 Gaplashildi
-        </span>
-
-        <strong id="talkedOrdersCount">
-          0
-        </strong>
-
+      <article class="order-stat-card">
+        <span>🟠 Gaplashildi</span>
+        <strong id="talkedOrdersCount">0</strong>
       </article>
 
-
-      <article class="order-stat-card info">
-
-        <span>
-          🔵 Tasdiqlandi
-        </span>
-
-        <strong id="confirmedOrdersCount">
-          0
-        </strong>
-
+      <article class="order-stat-card">
+        <span>🔵 Tasdiqlandi</span>
+        <strong id="confirmedOrdersCount">0</strong>
       </article>
 
-
-      <article class="order-stat-card purple">
-
-        <span>
-          🟣 Yetkazishda
-        </span>
-
-        <strong id="deliveryOrdersCount">
-          0
-        </strong>
-
+      <article class="order-stat-card">
+        <span>🟣 Yetkazishda</span>
+        <strong id="deliveryOrdersCount">0</strong>
       </article>
 
-
-      <article class="order-stat-card success">
-
-        <span>
-          🟢 Yakunlandi
-        </span>
-
-        <strong id="doneOrdersCount">
-          0
-        </strong>
-
+      <article class="order-stat-card">
+        <span>🟢 Yakunlandi</span>
+        <strong id="doneOrdersCount">0</strong>
       </article>
 
     </div>
 
 
-    <!-- =========================
-         PRODUCT + OPERATOR
-    ========================= -->
-
     <div class="admin-grid">
-
-
-      <!-- PRODUCT -->
 
       <section class="panel">
 
-        <div class="panel-title">
-
-          <div>
-
-            <span class="market-category">
-              KATALOG
-            </span>
-
-            <h2 id="productFormTitle">
-              Mahsulot qo‘shish
-            </h2>
-
-          </div>
-
-        </div>
-
+        <h2 id="productFormTitle">
+          Mahsulot qo‘shish
+        </h2>
 
         <form
           id="productForm"
@@ -345,10 +214,8 @@
             type="hidden"
           >
 
-
           <label>
             Mahsulot nomi
-
             <input
               id="pName"
               type="text"
@@ -356,10 +223,8 @@
             >
           </label>
 
-
           <label>
             Kategoriya
-
             <input
               id="pCategory"
               type="text"
@@ -367,39 +232,31 @@
             >
           </label>
 
-
           <div class="admin-form-two">
 
             <label>
               Narx
-
               <input
                 id="pPrice"
                 type="number"
-                min="0"
                 required
               >
             </label>
 
-
             <label>
               Eski narx
-
               <input
                 id="pOldPrice"
                 type="number"
-                min="0"
               >
             </label>
 
           </div>
 
-
           <div class="admin-form-two">
 
             <label>
               Chegirma %
-
               <input
                 id="pDiscount"
                 type="number"
@@ -408,10 +265,8 @@
               >
             </label>
 
-
             <label>
               Omborda
-
               <input
                 id="pStock"
                 type="number"
@@ -422,20 +277,16 @@
 
           </div>
 
-
           <label>
             Tavsif
-
             <textarea
               id="pDesc"
               rows="5"
             ></textarea>
           </label>
 
-
           <label>
             Rasm
-
             <input
               id="pImage"
               type="file"
@@ -443,28 +294,21 @@
             >
           </label>
 
+          <button
+            id="productSubmitBtn"
+            class="main-btn"
+            type="submit"
+          >
+            Mahsulot qo‘shish
+          </button>
 
-          <div class="product-form-buttons">
-
-            <button
-              id="productSubmitBtn"
-              class="main-btn"
-              type="submit"
-            >
-              Mahsulot qo‘shish
-            </button>
-
-
-            <button
-              id="cancelEditBtn"
-              class="product-secondary-btn hidden"
-              type="button"
-            >
-              Bekor qilish
-            </button>
-
-          </div>
-
+          <button
+            id="cancelEditBtn"
+            class="small-btn hidden"
+            type="button"
+          >
+            Bekor qilish
+          </button>
 
           <p
             id="productMessage"
@@ -472,7 +316,6 @@
           ></p>
 
         </form>
-
 
         <div
           id="adminProducts"
@@ -482,26 +325,11 @@
       </section>
 
 
-      <!-- OPERATOR -->
-
       <section class="panel">
 
-        <div class="panel-title">
-
-          <div>
-
-            <span class="market-category">
-              XODIMLAR
-            </span>
-
-            <h2>
-              Operatorlar
-            </h2>
-
-          </div>
-
-        </div>
-
+        <h2>
+          Operatorlar
+        </h2>
 
         <form
           id="operatorCreateForm"
@@ -509,8 +337,7 @@
         >
 
           <label>
-            Operator ismi
-
+            Ism
             <input
               id="opName"
               type="text"
@@ -518,10 +345,8 @@
             >
           </label>
 
-
           <label>
             Email
-
             <input
               id="newOpEmail"
               type="email"
@@ -529,10 +354,8 @@
             >
           </label>
 
-
           <label>
             Parol
-
             <input
               id="newOpPassword"
               type="password"
@@ -541,14 +364,12 @@
             >
           </label>
 
-
           <button
             class="main-btn"
             type="submit"
           >
             Operator yaratish
           </button>
-
 
           <p
             id="operatorCreateMessage"
@@ -557,7 +378,6 @@
 
         </form>
 
-
         <div id="operatorsList"></div>
 
       </section>
@@ -565,26 +385,13 @@
     </div>
 
 
-    <!-- =========================
-         ORDERS
-    ========================= -->
-
     <section class="panel wide-panel orders-panel">
 
-      <div class="orders-panel-header">
+      <div class="section-title">
 
-        <div>
-
-          <span class="market-category">
-            BUYURTMALAR
-          </span>
-
-          <h2>
-            Buyurtmalar boshqaruvi
-          </h2>
-
-        </div>
-
+        <h2>
+          Buyurtmalar
+        </h2>
 
         <span
           id="visibleOrderCount"
@@ -596,98 +403,77 @@
       </div>
 
 
-      <!-- FILTERS -->
-
       <div class="order-status-filters">
 
         <button
           class="order-filter-btn active"
           data-status="all"
-          type="button"
         >
           Barchasi
         </button>
 
-
         <button
-          class="order-filter-btn filter-new"
+          class="order-filter-btn"
           data-status="new"
-          type="button"
         >
           🔴 Yangi
         </button>
 
-
         <button
-          class="order-filter-btn filter-talked"
+          class="order-filter-btn"
           data-status="talked"
-          type="button"
         >
           🟠 Gaplashildi
         </button>
 
-
         <button
-          class="order-filter-btn filter-confirmed"
+          class="order-filter-btn"
           data-status="confirmed"
-          type="button"
         >
           🔵 Tasdiqlandi
         </button>
 
-
         <button
-          class="order-filter-btn filter-delivery"
+          class="order-filter-btn"
           data-status="delivery"
-          type="button"
         >
           🟣 Yetkazishda
         </button>
 
-
         <button
-          class="order-filter-btn filter-done"
+          class="order-filter-btn"
           data-status="done"
-          type="button"
         >
           🟢 Yakunlandi
         </button>
 
-
         <button
-          class="order-filter-btn filter-cancelled"
+          class="order-filter-btn"
           data-status="cancelled"
-          type="button"
         >
-          Bekor qilindi
+          Bekor
         </button>
 
       </div>
 
-
-      <!-- SEARCH -->
 
       <div class="admin-order-tools">
 
         <input
           id="adminOrderSearch"
           type="search"
-          placeholder="Ism, telefon, mahsulot..."
+          placeholder="Ism yoki telefon..."
         >
-
 
         <button
           id="clearOrderSearch"
           class="small-btn"
-          type="button"
         >
           Tozalash
         </button>
 
       </div>
 
-
-      <!-- DESKTOP TABLE -->
 
       <div class="table-wrap">
 
@@ -696,29 +482,18 @@
           <thead>
 
             <tr>
-
               <th>ID</th>
-
               <th>Mijoz</th>
-
               <th>Telefon</th>
-
               <th>Mahsulot</th>
-
               <th>Soni</th>
-
-              <th>O‘lcham</th>
-
+              <th>Razmer</th>
               <th>Rang</th>
-
               <th>Status</th>
-
               <th>Amal</th>
-
             </tr>
 
           </thead>
-
 
           <tbody id="ordersBody"></tbody>
 
@@ -735,36 +510,17 @@
     </section>
 
 
-    <!-- MOBILE ORDERS -->
-
     <section
       id="mobileOrders"
       class="mobile-orders"
     ></section>
 
 
-    <!-- =========================
-         SUPPORT
-    ========================= -->
-
     <section class="panel wide-panel">
 
-      <div class="panel-title">
-
-        <div>
-
-          <span class="market-category">
-            YORDAM
-          </span>
-
-          <h2>
-            Yordam murojaatlari
-          </h2>
-
-        </div>
-
-      </div>
-
+      <h2>
+        Yordam murojaatlari
+      </h2>
 
       <div
         id="adminSupportList"
@@ -778,183 +534,8 @@
 </section>
 
 
-<!-- ======================================
-     ZAYAVKA / ORDER EDIT MODAL
-====================================== -->
-
-<dialog
-  id="orderEditDialog"
-  class="order-edit-modal"
->
-
-  <div class="order-edit-box">
-
-    <button
-      id="closeOrderEdit"
-      class="order-edit-close"
-      type="button"
-    >
-      ×
-    </button>
-
-
-    <span class="order-edit-label">
-      ZAYAVKA
-    </span>
-
-
-    <h2 id="editOrderTitle">
-      Buyurtma
-    </h2>
-
-
-    <form
-      id="orderEditForm"
-      class="order-edit-form"
-    >
-
-      <input
-        id="editOrderId"
-        type="hidden"
-      >
-
-
-      <div class="order-edit-grid">
-
-        <label>
-          Ism
-
-          <input
-            id="editOrderName"
-            type="text"
-          >
-        </label>
-
-
-        <label>
-          Familiya
-
-          <input
-            id="editOrderSurname"
-            type="text"
-          >
-        </label>
-
-      </div>
-
-
-      <label>
-        Telefon
-
-        <input
-          id="editOrderPhone"
-          type="tel"
-        >
-      </label>
-
-
-      <label>
-        Viloyat / shahar
-
-        <input
-          id="editOrderRegion"
-          type="text"
-        >
-      </label>
-
-
-      <label>
-        Yetkazib berish manzili
-
-        <textarea
-          id="editOrderAddress"
-        ></textarea>
-      </label>
-
-
-      <label>
-        Izoh
-
-        <textarea
-          id="editOrderNote"
-        ></textarea>
-      </label>
-
-
-      <label>
-        Status
-
-        <select id="editOrderStatus">
-
-          <option value="new">
-            🔴 Yangi
-          </option>
-
-          <option value="talked">
-            🟠 Gaplashildi
-          </option>
-
-          <option value="confirmed">
-            🔵 Tasdiqlandi
-          </option>
-
-          <option value="delivery">
-            🟣 Yetkazishda
-          </option>
-
-          <option value="done">
-            🟢 Yakunlandi
-          </option>
-
-          <option value="cancelled">
-            ⚪ Bekor qilindi
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <div class="order-edit-actions">
-
-        <button
-          type="submit"
-          class="order-edit-save"
-        >
-          Saqlash
-        </button>
-
-
-        <button
-          id="orderQrBtn"
-          type="button"
-          class="order-edit-qr"
-        >
-          QR etiketka
-        </button>
-
-      </div>
-
-
-      <p
-        id="orderEditMessage"
-        class="order-edit-message"
-      ></p>
-
-    </form>
-
-  </div>
-
-</dialog>
-
-
-<!-- =========================
-     SCRIPTS
-========================= -->
-
-<script src="./config.js?v=20260815-0437"></script>
-
-<script src="./admin.js?v=20260815-0437"></script>
+<script src="./config.js?v=20260815-0605"></script>
+<script src="./admin.js?v=20260815-0605"></script>
 
 </body>
 </html>
