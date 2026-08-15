@@ -1,13 +1,12 @@
 :root{
   --bg:#f6f7fb;
-  --panel:#fff;
+  --panel:#ffffff;
   --text:#18181f;
   --muted:#777783;
   --line:#e7e7ee;
 
   --brand:#6f35e8;
   --brand2:#8b5cf6;
-  --brand-dark:#5424c7;
   --soft:#f2edff;
 
   --success:#16835a;
@@ -49,11 +48,6 @@ button{
   cursor:pointer;
 }
 
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
 img{
   max-width:100%;
 }
@@ -63,33 +57,18 @@ img{
 }
 
 
-/* =========================================
+/* =========================
    UMUMIY
-========================================= */
+========================= */
 
 .main-btn{
   min-height:44px;
   padding:0 15px;
-
   border:0;
   border-radius:12px;
-
-  background:linear-gradient(
-    135deg,
-    var(--brand),
-    var(--brand2)
-  );
-
+  background:linear-gradient(135deg,var(--brand),var(--brand2));
   color:#fff;
   font-weight:900;
-}
-
-.main-btn:hover{
-  background:linear-gradient(
-    135deg,
-    var(--brand-dark),
-    var(--brand)
-  );
 }
 
 .full-btn{
@@ -99,23 +78,14 @@ img{
 .small-btn{
   min-height:38px;
   padding:7px 11px;
-
   display:inline-flex;
   align-items:center;
   justify-content:center;
-
   border:1px solid var(--line);
   border-radius:10px;
-
   background:#fff;
-  color:var(--text);
-
   font-size:12px;
   font-weight:800;
-}
-
-.small-btn:hover{
-  background:var(--soft);
 }
 
 .market-category{
@@ -123,80 +93,119 @@ img{
   font-size:10px;
   font-weight:900;
   letter-spacing:1.2px;
-  text-transform:uppercase;
 }
 
 .form-message{
   min-height:18px;
   margin:7px 0 0;
-
   font-size:12px;
   font-weight:800;
 }
 
-.form-message.success{
-  color:var(--success);
-}
-
-.form-message.error{
+.error{
   color:var(--danger);
 }
 
+.success{
+  color:var(--success);
+}
+
 .badge{
-  display:inline-flex;
-  padding:5px 8px;
-
+  padding:5px 9px;
   border-radius:999px;
-
   background:#eeeef3;
-
   font-size:10px;
+  font-weight:900;
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-wrap{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
+
+.login-box{
+  width:min(420px,100%);
+  padding:25px;
+  border:1px solid var(--line);
+  border-radius:21px;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+.login-box h2{
+  margin:8px 0 20px;
+}
+
+.login-box label{
+  display:block;
+  margin-bottom:13px;
+  font-size:12px;
   font-weight:850;
+}
+
+.login-box input{
+  width:100%;
+  min-height:46px;
+  margin-top:6px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fafafd;
+  outline:none;
+}
+
+.login-box input:focus{
+  border-color:#bca4fa;
+  box-shadow:0 0 0 4px rgba(111,53,232,.08);
 }
 
 
 /* =========================================
-   MARKET HEADER
+   ASOSIY SAYT
 ========================================= */
 
 .market-header{
   position:sticky;
   top:0;
   z-index:200;
-
-  background:rgba(255,255,255,.96);
-  backdrop-filter:blur(14px);
-
   border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(15px);
 }
 
 .header-inner{
   max-width:1280px;
   margin:auto;
   padding:10px 20px;
-
   display:grid;
   grid-template-columns:auto auto 1fr auto;
-  align-items:center;
   gap:12px;
+  align-items:center;
 }
 
 .brand{
   display:flex;
   align-items:center;
   gap:6px;
+  white-space:nowrap;
 }
 
 .brand-mini{
+  color:#8b8b95;
   font-size:8px;
   font-weight:700;
-  color:#8b8b95;
 }
 
 .brand-main{
   font-size:25px;
   font-weight:950;
-  letter-spacing:-1.2px;
 }
 
 .brand-uz{
@@ -206,38 +215,28 @@ img{
 .catalog-btn{
   min-height:45px;
   padding:0 16px;
-
   border:0;
   border-radius:13px;
-
   background:var(--soft);
   color:var(--brand);
-
   font-weight:900;
 }
 
 .header-search{
   height:47px;
-
   display:flex;
-
   overflow:hidden;
-
   border:1px solid var(--line);
   border-radius:14px;
-
   background:#f8f8fb;
 }
 
 .header-search input{
   flex:1;
   min-width:0;
-
   padding:0 15px;
-
   border:0;
-  outline:0;
-
+  outline:none;
   background:transparent;
 }
 
@@ -255,46 +254,28 @@ img{
 .header-btn{
   min-height:44px;
   padding:7px 10px;
-
   display:flex;
   align-items:center;
   gap:5px;
-
   border:0;
   border-radius:12px;
-
   background:transparent;
-
-  font-weight:750;
-}
-
-.header-btn:hover{
-  background:#f3f2f8;
 }
 
 .header-btn b{
   min-width:19px;
   height:19px;
-
   display:grid;
   place-items:center;
-
   border-radius:50%;
-
   background:var(--brand);
   color:#fff;
-
   font-size:10px;
 }
 
 .mobile-search{
   display:none;
 }
-
-
-/* =========================================
-   MARKET MAIN
-========================================= */
 
 body > main{
   max-width:1280px;
@@ -314,26 +295,11 @@ body > main{
 .hero-main{
   min-height:360px;
   padding:44px;
-
   display:flex;
   align-items:center;
-
   border-radius:28px;
-
+  background:linear-gradient(135deg,#6632df,#8c5cf6);
   color:#fff;
-
-  background:
-    radial-gradient(
-      circle at 85% 15%,
-      rgba(255,255,255,.2),
-      transparent 25%
-    ),
-    linear-gradient(
-      135deg,
-      #6632df,
-      #8c5cf6
-    );
-
   box-shadow:var(--shadow);
 }
 
@@ -343,30 +309,22 @@ body > main{
 
 .hero-label{
   display:inline-block;
-
   padding:7px 10px;
-
-  border:1px solid rgba(255,255,255,.2);
   border-radius:999px;
-
-  background:rgba(255,255,255,.13);
-
+  background:rgba(255,255,255,.14);
   font-size:10px;
   font-weight:900;
 }
 
 .hero-text h1{
   margin:16px 0 15px;
-
   font-size:clamp(40px,5vw,68px);
   line-height:1;
 }
 
 .hero-text p{
   max-width:590px;
-
   color:#eee9ff;
-
   line-height:1.6;
 }
 
@@ -374,40 +332,30 @@ body > main{
   min-height:48px;
   margin-top:8px;
   padding:0 20px;
-
   display:inline-flex;
   align-items:center;
   justify-content:center;
-
   border-radius:13px;
-
   background:#fff;
   color:var(--brand);
-
   font-weight:900;
 }
 
 .hero-side{
   min-height:360px;
   padding:26px;
-
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
-
   border:1px solid var(--line);
   border-radius:28px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
 .hero-side > span{
   margin-bottom:auto;
-
   color:var(--brand);
-
   font-size:10px;
   font-weight:900;
 }
@@ -421,7 +369,7 @@ body > main{
 }
 
 
-/* SECTION */
+/* KATEGORIYA */
 
 .market-section{
   padding-top:44px;
@@ -429,7 +377,6 @@ body > main{
 
 .section-title{
   margin-bottom:17px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -448,14 +395,6 @@ body > main{
   font-weight:900;
 }
 
-.product-count{
-  color:var(--muted);
-  font-size:13px;
-}
-
-
-/* CATEGORIES */
-
 .category-grid{
   display:grid;
   grid-template-columns:repeat(6,1fr);
@@ -465,31 +404,22 @@ body > main{
 .category-card{
   min-height:112px;
   padding:15px;
-
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-
   border:1px solid var(--line);
   border-radius:17px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
 .category-icon{
   width:42px;
   height:42px;
-
   display:grid;
   place-items:center;
-
   border-radius:12px;
-
   background:var(--soft);
-
-  font-size:20px;
 }
 
 
@@ -507,15 +437,13 @@ body > main{
 .filter-row select{
   min-height:43px;
   padding:0 14px;
-
   border:1px solid var(--line);
   border-radius:12px;
-
   background:#fff;
 }
 
 
-/* PRODUCTS */
+/* MAHSULOT */
 
 .market-products{
   display:grid;
@@ -525,12 +453,9 @@ body > main{
 
 .market-product-card{
   overflow:hidden;
-
   border:1px solid var(--line);
   border-radius:18px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
@@ -550,24 +475,15 @@ body > main{
   position:absolute;
   top:9px;
   right:9px;
-
   width:37px;
   height:37px;
-
-  display:grid;
-  place-items:center;
-
   border:1px solid var(--line);
   border-radius:50%;
-
   background:#fff;
-
-  font-size:20px;
 }
 
 .market-product-info{
   padding:12px;
-
   display:flex;
   flex-direction:column;
   gap:7px;
@@ -575,16 +491,13 @@ body > main{
 
 .market-product-title{
   min-height:38px;
-
   font-size:14px;
   font-weight:700;
 }
 
 .market-description{
   margin:0;
-
   color:var(--muted);
-
   font-size:11px;
 }
 
@@ -594,21 +507,17 @@ body > main{
 }
 
 .old-price{
-  color:#96969f;
+  color:#999;
   font-size:12px;
   text-decoration:line-through;
 }
 
 .discount-badge{
   width:max-content;
-
   padding:5px 8px;
-
   border-radius:999px;
-
   background:#ffedf2;
   color:#d92f5c;
-
   font-size:10px;
   font-weight:900;
 }
@@ -622,106 +531,14 @@ body > main{
 .cart-circle{
   width:43px;
   height:43px;
-
   border:1px solid var(--line);
   border-radius:12px;
-
   background:#fff;
 }
 
 
-/* SUPPORT */
-
-.support-section{
-  margin-top:50px;
-  padding:35px;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:30px;
-
-  border-radius:25px;
-
-  background:#18171f;
-  color:#fff;
-}
-
-.support-form{
-  display:grid;
-  gap:10px;
-}
-
-.support-form input,
-.support-form textarea{
-  width:100%;
-  padding:12px;
-
-  border:1px solid #3c3945;
-  border-radius:12px;
-
-  background:rgba(255,255,255,.06);
-  color:#fff;
-}
-
-.support-form textarea{
-  min-height:110px;
-}
-
-
 /* =========================================
-   LOGIN
-========================================= */
-
-.login-wrap{
-  min-height:100vh;
-
-  display:grid;
-  place-items:center;
-
-  padding:20px;
-}
-
-.login-box{
-  width:min(420px,100%);
-  padding:25px;
-
-  border:1px solid var(--line);
-  border-radius:21px;
-
-  background:#fff;
-
-  box-shadow:var(--shadow);
-}
-
-.login-box h2{
-  margin:8px 0 20px;
-}
-
-.login-box label{
-  display:block;
-
-  margin-bottom:13px;
-
-  font-size:12px;
-  font-weight:850;
-}
-
-.login-box input{
-  width:100%;
-  min-height:46px;
-
-  margin-top:6px;
-  padding:0 12px;
-
-  border:1px solid var(--line);
-  border-radius:11px;
-
-  background:#fafafd;
-}
-
-
-/* =========================================
-   ADMIN FAQAT ADMIN
+   ADMIN
 ========================================= */
 
 .admin-shell{
@@ -732,22 +549,14 @@ body > main{
 
 .admin-head{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:20px;
-
   padding:18px 20px;
-
   border:1px solid var(--line);
   border-radius:20px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
-}
-
-.admin-head h1{
-  margin:5px 0;
 }
 
 .admin-top-actions{
@@ -760,21 +569,17 @@ body > main{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:12px;
-
   margin:16px 0;
 }
 
 .stat{
   min-height:100px;
   padding:18px;
-
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-
   border:1px solid var(--line);
   border-radius:17px;
-
   background:#fff;
 }
 
@@ -786,21 +591,17 @@ body > main{
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:10px;
-
   margin-bottom:20px;
 }
 
 .order-stat-card{
   min-height:90px;
   padding:14px;
-
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-
   border:1px solid var(--line);
   border-radius:16px;
-
   background:#fff;
 }
 
@@ -816,12 +617,9 @@ body > main{
 
 .panel{
   padding:20px;
-
   border:1px solid var(--line);
   border-radius:19px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
@@ -832,7 +630,6 @@ body > main{
 .admin-form label{
   display:block;
   margin-bottom:12px;
-
   font-size:12px;
   font-weight:850;
 }
@@ -841,13 +638,10 @@ body > main{
 .admin-form textarea,
 .admin-form select{
   width:100%;
-
   margin-top:6px;
   padding:11px 12px;
-
   border:1px solid var(--line);
   border-radius:11px;
-
   background:#fafafd;
 }
 
@@ -865,11 +659,9 @@ body > main{
 
 .product-admin-item{
   padding:10px;
-
   display:grid;
   grid-template-columns:62px 1fr auto;
   gap:10px;
-
   border:1px solid var(--line);
   border-radius:14px;
 }
@@ -890,21 +682,16 @@ body > main{
 .order-status-filters{
   display:flex;
   gap:7px;
-
   overflow-x:auto;
-
   margin-bottom:12px;
 }
 
 .order-filter-btn{
   min-height:38px;
   padding:0 13px;
-
   border:1px solid var(--line);
   border-radius:999px;
-
   background:#fff;
-
   font-size:11px;
   font-weight:850;
 }
@@ -923,9 +710,7 @@ body > main{
 .admin-order-tools input{
   flex:1;
   min-height:44px;
-
   padding:0 13px;
-
   border:1px solid var(--line);
   border-radius:12px;
 }
@@ -937,22 +722,19 @@ body > main{
 .orders-table{
   width:100%;
   min-width:980px;
-
   border-collapse:collapse;
 }
 
 .orders-table th,
 .orders-table td{
   padding:10px;
-
   border-bottom:1px solid var(--line);
-
   text-align:left;
 }
 
 
 /* =========================================
-   OPERATOR FAQAT OPERATOR
+   OPERATOR
 ========================================= */
 
 .operator-shell{
@@ -963,17 +745,13 @@ body > main{
 
 .operator-header{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:16px;
-
   padding:18px;
-
   border:1px solid var(--line);
   border-radius:20px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
@@ -995,21 +773,17 @@ body > main{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:10px;
-
   margin:16px 0;
 }
 
 .operator-stat{
   min-height:90px;
   padding:14px;
-
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-
   border:1px solid var(--line);
   border-radius:16px;
-
   background:#fff;
 }
 
@@ -1040,10 +814,8 @@ body > main{
 .operator-toolbar{
   margin-bottom:18px;
   padding:14px;
-
   border:1px solid var(--line);
   border-radius:17px;
-
   background:#fff;
 }
 
@@ -1056,20 +828,16 @@ body > main{
   flex:1;
   min-width:0;
   min-height:44px;
-
   padding:0 12px;
-
   border:1px solid var(--line);
   border-radius:12px 0 0 12px;
 }
 
 .operator-search button{
   width:45px;
-
   border:1px solid var(--line);
   border-left:0;
   border-radius:0 12px 12px 0;
-
   background:#fff;
 }
 
@@ -1081,15 +849,11 @@ body > main{
 
 .operator-filter-btn{
   flex:0 0 auto;
-
   min-height:38px;
   padding:0 12px;
-
   border:1px solid var(--line);
   border-radius:999px;
-
   background:#fff;
-
   font-size:11px;
   font-weight:850;
 }
@@ -1101,21 +865,16 @@ body > main{
 
 .operator-orders-section{
   padding:18px;
-
   border:1px solid var(--line);
   border-radius:19px;
-
   background:#fff;
-
   box-shadow:var(--shadow-small);
 }
 
 .operator-section-title{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:12px;
-
+  align-items:center;
   margin-bottom:14px;
 }
 
@@ -1127,10 +886,8 @@ body > main{
 
 .operator-order-card{
   padding:14px;
-
   border:1px solid var(--line);
   border-radius:17px;
-
   background:#fff;
 }
 
@@ -1164,7 +921,6 @@ body > main{
   justify-content:space-between;
   align-items:flex-start;
   gap:10px;
-
   margin-bottom:12px;
 }
 
@@ -1184,11 +940,8 @@ body > main{
 
 .operator-order-status{
   padding:6px 9px;
-
   border-radius:999px;
-
   background:#f1f1f5;
-
   font-size:10px;
   font-weight:900;
 }
@@ -1196,18 +949,14 @@ body > main{
 .operator-product-box{
   padding:10px;
   margin-bottom:9px;
-
   border:1px solid var(--line);
   border-radius:11px;
-
   background:#fff;
 }
 
 .operator-product-box span{
   display:block;
-
   color:var(--muted);
-
   font-size:9px;
 }
 
@@ -1215,68 +964,48 @@ body > main{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:7px;
-
   margin-bottom:9px;
 }
 
 .operator-order-info-grid > div{
   padding:8px;
-
   border:1px solid var(--line);
   border-radius:10px;
-
   background:#fff;
 }
 
 .operator-order-info-grid span{
   display:block;
-
   color:var(--muted);
   font-size:9px;
 }
 
 .operator-call-btn{
   min-height:44px;
-
+  margin-bottom:8px;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  margin-bottom:8px;
-
   border-radius:11px;
-
   background:#eaf8f1;
   color:var(--success);
-
   font-weight:900;
 }
 
 .operator-edit-order-btn{
   width:100%;
   min-height:43px;
-
   border:0;
   border-radius:11px;
-
-  background:linear-gradient(
-    135deg,
-    var(--brand),
-    var(--brand2)
-  );
-
+  background:linear-gradient(135deg,var(--brand),var(--brand2));
   color:#fff;
-
   font-weight:900;
 }
 
 .operator-order-date{
   display:block;
-
   margin-top:8px;
-
   color:var(--muted);
-
   font-size:9px;
 }
 
@@ -1288,18 +1017,12 @@ body > main{
 .order-edit-modal{
   width:min(560px,calc(100% - 24px));
   max-height:90vh;
-
   padding:0;
-
   overflow:auto;
-
   border:0;
   border-radius:24px;
-
   background:#fff;
-
-  box-shadow:
-    0 30px 90px rgba(0,0,0,.28);
+  box-shadow:0 30px 90px rgba(0,0,0,.28);
 }
 
 .order-edit-modal::backdrop{
@@ -1316,21 +1039,16 @@ body > main{
   position:absolute;
   top:14px;
   right:14px;
-
   width:40px;
   height:40px;
-
   border:0;
   border-radius:50%;
-
   background:#f1f1f5;
-
   font-size:24px;
 }
 
 .order-edit-label{
   color:var(--brand);
-
   font-size:11px;
   font-weight:900;
 }
@@ -1348,7 +1066,6 @@ body > main{
   display:flex;
   flex-direction:column;
   gap:7px;
-
   font-size:12px;
   font-weight:850;
 }
@@ -1358,10 +1075,8 @@ body > main{
 .order-edit-form select{
   width:100%;
   padding:12px 13px;
-
   border:1px solid var(--line);
   border-radius:12px;
-
   background:#fafafd;
 }
 
@@ -1388,16 +1103,12 @@ body > main{
 
 .operator-big-call{
   min-height:47px;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   border-radius:12px;
-
   background:#eaf8f1;
   color:var(--success);
-
   font-weight:900;
 }
 
@@ -1409,30 +1120,19 @@ body > main{
 
 .order-edit-save{
   min-height:48px;
-
   border:0;
   border-radius:13px;
-
-  background:linear-gradient(
-    135deg,
-    var(--brand),
-    var(--brand2)
-  );
-
+  background:linear-gradient(135deg,var(--brand),var(--brand2));
   color:#fff;
-
   font-weight:900;
 }
 
 .order-edit-qr{
   min-height:48px;
-
   border:1px solid #ded5f7;
   border-radius:13px;
-
   background:#f4f0ff;
   color:#6431d8;
-
   font-weight:900;
 }
 
@@ -1477,31 +1177,26 @@ body > main{
   .mobile-search{
     display:flex;
     padding:7px 10px 9px;
-
     background:#fff;
   }
 
   .mobile-search input{
     flex:1;
     min-height:43px;
-
     border:1px solid var(--line);
     border-radius:12px 0 0 12px;
   }
 
   .mobile-search button{
     width:48px;
-
     border:0;
     border-radius:0 12px 12px 0;
-
     background:var(--soft);
   }
 
   .hero-main{
     min-height:275px;
     padding:25px 18px;
-
     border-radius:20px;
   }
 
@@ -1540,13 +1235,8 @@ body > main{
     display:none;
   }
 
-  .support-section{
-    grid-template-columns:1fr;
-    padding:20px;
-  }
 
-
-  /* ADMIN MOBILE */
+  /* ADMIN */
 
   .admin-shell{
     padding:10px 8px 75px;
@@ -1583,7 +1273,7 @@ body > main{
   }
 
 
-  /* OPERATOR MOBILE */
+  /* OPERATOR */
 
   .operator-shell{
     padding:10px 8px 80px;
@@ -1647,29 +1337,21 @@ body > main{
     right:0;
     bottom:0;
     z-index:350;
-
     height:64px;
-
     display:grid;
     grid-template-columns:repeat(4,1fr);
-
     border-top:1px solid var(--line);
-
     background:#fff;
-
-    box-shadow:
-      0 -7px 24px rgba(30,30,60,.07);
+    box-shadow:0 -7px 24px rgba(30,30,60,.07);
   }
 
   .operator-mobile-nav-btn{
     border:0;
     background:transparent;
-
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-
     color:#7d7d87;
   }
 
@@ -1678,12 +1360,11 @@ body > main{
   }
 
 
-  /* MODAL MOBILE */
+  /* MODAL */
 
   .order-edit-modal{
     width:calc(100% - 18px);
     max-height:92vh;
-
     border-radius:22px;
   }
 
