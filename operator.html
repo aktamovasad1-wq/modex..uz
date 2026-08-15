@@ -18,7 +18,7 @@
 
   <link
     rel="stylesheet"
-    href="./operator.css?v=20260815-1200"
+    href="./operator.css?v=20260816-0030"
   >
 </head>
 
@@ -42,16 +42,15 @@
       </div>
 
       <span class="operator-label">
-        OPERATOR
+        OPERATOR PANEL
       </span>
 
       <h1>
-        Operator panel
+        Kirish
       </h1>
 
       <p class="operator-login-subtitle">
-        Buyurtmalar bilan ishlash uchun
-        operator hisobingizga kiring.
+        Buyurtmalar bilan ishlash uchun operator hisobingizga kiring.
       </p>
 
 
@@ -168,7 +167,7 @@
 
 
       <!-- =================================================
-           STATISTICS
+           STATISTIKA
       ================================================== -->
 
       <section class="operator-stats">
@@ -202,7 +201,7 @@
           </strong>
 
           <small>
-            Bugungi natija
+            Sizning bugungi natijangiz
           </small>
 
         </article>
@@ -211,7 +210,7 @@
         <article class="operator-stat operator-stat-confirmed">
 
           <span class="operator-stat-title">
-            🔵 Tasdiqlandi
+            🔵 Qadoqlanmoqda
           </span>
 
           <strong id="operatorConfirmedCount">
@@ -219,7 +218,7 @@
           </strong>
 
           <small>
-            Qadoqlashga tayyor
+            Tasdiqlangan buyurtmalar
           </small>
 
         </article>
@@ -228,7 +227,7 @@
         <article class="operator-stat operator-stat-done">
 
           <span class="operator-stat-title">
-            🟢 Yakunlandi
+            🟢 Yetkazildi
           </span>
 
           <strong id="operatorDoneCount">
@@ -236,17 +235,16 @@
           </strong>
 
           <small>
-            Yetkazilgan buyurtmalar
+            Yakunlangan buyurtmalar
           </small>
 
         </article>
-
 
       </section>
 
 
       <!-- =================================================
-           SEARCH + FILTER
+           QIDIRUV + FILTER
       ================================================== -->
 
       <section class="operator-tools">
@@ -257,7 +255,7 @@
           <input
             id="operatorOrderSearch"
             type="search"
-            placeholder="Ism, telefon yoki mahsulot qidiring..."
+            placeholder="Ism, telefon, mahsulot yoki manzil..."
             autocomplete="off"
           >
 
@@ -307,7 +305,7 @@
             data-status="confirmed"
             type="button"
           >
-            🔵 Tasdiqlandi
+            🔵 Qadoqlanmoqda
           </button>
 
 
@@ -325,7 +323,7 @@
             data-status="done"
             type="button"
           >
-            🟢 Yakunlandi
+            🟢 Yetkazildi
           </button>
 
 
@@ -344,7 +342,7 @@
 
 
       <!-- =================================================
-           ORDERS
+           BUYURTMALAR
       ================================================== -->
 
       <section class="operator-orders-section">
@@ -363,7 +361,7 @@
             </h2>
 
             <p>
-              Zayavkani ochib, mijoz bilan ishlang.
+              Kerakli zayavkani ochib, mijoz bilan ishlang.
             </p>
 
           </div>
@@ -383,7 +381,7 @@
           id="operatorOrders"
           class="operator-orders"
         >
-          <!-- operator.js buyurtmalarni shu yerga chiqaradi -->
+          <!-- operator.js kartalarni shu yerga chiqaradi -->
         </div>
 
 
@@ -402,7 +400,7 @@
 
 
   <!-- =====================================================
-       ORDER EDIT MODAL
+       ZAYAVKA MODAL
   ====================================================== -->
 
   <dialog
@@ -412,8 +410,6 @@
 
     <div class="order-edit-box">
 
-
-      <!-- CLOSE -->
 
       <button
         id="operatorCloseOrder"
@@ -458,7 +454,6 @@
 
         <div class="order-edit-grid">
 
-
           <label>
             Ism
 
@@ -479,7 +474,6 @@
               placeholder="Familiya"
             >
           </label>
-
 
         </div>
 
@@ -506,16 +500,16 @@
 
 
         <!-- ===============================================
-             PRODUCT
+             MAHSULOT
         ================================================ -->
 
         <div class="operator-form-section">
-          📦 Mahsulot ma’lumotlari
+          📦 Mahsulot
         </div>
 
 
         <label>
-          Mahsulot
+          Mahsulot nomi
 
           <input
             id="operatorEditProduct"
@@ -567,7 +561,7 @@
 
 
         <!-- ===============================================
-             DELIVERY
+             YETKAZISH
         ================================================ -->
 
         <div class="operator-form-section">
@@ -597,7 +591,7 @@
 
 
         <!-- ===============================================
-             NOTE
+             IZOH
         ================================================ -->
 
         <div class="operator-form-section">
@@ -638,7 +632,7 @@
             </option>
 
             <option value="confirmed">
-              🔵 Tasdiqlandi / Qadoqlanmoqda
+              🔵 Qadoqlanmoqda
             </option>
 
             <option value="delivery">
@@ -654,6 +648,7 @@
             </option>
 
           </select>
+
         </label>
 
 
@@ -692,7 +687,6 @@
 
       </form>
 
-
     </div>
 
   </dialog>
@@ -713,13 +707,8 @@
       data-mobile-filter="all"
       type="button"
     >
-
       <span>▦</span>
-
-      <small>
-        Barchasi
-      </small>
-
+      <small>Barchasi</small>
     </button>
 
 
@@ -728,13 +717,8 @@
       data-mobile-filter="new"
       type="button"
     >
-
       <span>🔴</span>
-
-      <small>
-        Yangi
-      </small>
-
+      <small>Yangi</small>
     </button>
 
 
@@ -743,13 +727,8 @@
       data-mobile-filter="talked"
       type="button"
     >
-
       <span>🟠</span>
-
-      <small>
-        Bugun
-      </small>
-
+      <small>Bugun</small>
     </button>
 
 
@@ -758,13 +737,8 @@
       data-mobile-filter="confirmed"
       type="button"
     >
-
       <span>🔵</span>
-
-      <small>
-        Tasdiq
-      </small>
-
+      <small>Qadoq</small>
     </button>
 
 
@@ -775,9 +749,9 @@
        JAVASCRIPT
   ====================================================== -->
 
-  <script src="./config.js?v=20260815-1200"></script>
+  <script src="./config.js?v=20260816-0030"></script>
 
-  <script src="./operator.js?v=20260815-1200"></script>
+  <script src="./operator.js?v=20260816-0030"></script>
 
 
 </body>
