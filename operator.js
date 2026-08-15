@@ -1,1639 +1,1424 @@
-/* =========================================
-   MODEX.UZ OPERATOR PANEL
-========================================= */
+(() => {
+  "use strict";
 
-const CONFIG = window.MODEX_CONFIG || {};
+  const config = window.MODEX_CONFIG || {};
 
-const SUPABASE_URL = CONFIG.SUPABASE_URL;
-const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
+  const SUPABASE_URL = config.SUPABASE_URL;
+  const SUPABASE_KEY = config.SUPABASE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  alert("config.js topilmadi yoki noto‘g‘ri.");
-  throw new Error("MODEX_CONFIG topilmadi.");
-}
+  /* =====================================================
+     ELEMENTLAR
+  ===================================================== */
 
-const AUTH = `${SUPABASE_URL}/auth/v1`;
-const REST = `${SUPABASE_URL}/rest/v1`;
+  const loginView =
+    document.getElementById("operatorLoginView");
 
-let token = "";
-let currentUser = null;
-let currentProfile = null;
+  const operatorView =
+    document.getElementById("operatorView");
 
-let orders = [];
-let products = [];
+  const loginForm =
+    document.getElementById("operatorLoginForm");
 
-let currentFilter = "all";
+  const emailInput =
+    document.getElementById("operatorEmail");
 
+  const passwordInput =
+    document.getElementById("operatorPassword");
 
-/* =========================================
-   ELEMENTLAR
-========================================= */
+  const loginMessage =
+    document.getElementById("operatorLoginMessage");
 
-const operatorLoginView =
-  document.getElementById("operatorLoginView");
+  const operatorUserName =
+    document.getElementById("operatorUserName");
 
-const operatorView =
-  document.getElementById("operatorView");
+  const refreshBtn =
+    document.getElementById("operatorRefreshBtn");
 
-const operatorLoginForm =
-  document.getElementById("operatorLoginForm");
+  const logoutBtn =
+    document.getElementById("operatorLogoutBtn");
 
-const operatorEmail =
-  document.getElementById("operatorEmail");
+  const newCount =
+    document.getElementById("operatorNewCount");
 
-const operatorPassword =
-  document.getElementById("operatorPassword");
+  const talkedCount =
+    document.getElementById("operatorTalkedCount");
 
-const operatorLoginMessage =
-  document.getElementById("operatorLoginMessage");
+  const confirmedCount =
+    document.getElementById("operatorConfirmedCount");
 
-const operatorUserName =
-  document.getElementById("operatorUserName");
+  const doneCount =
+    document.getElementById("operatorDoneCount");
 
-const operatorRefreshBtn =
-  document.getElementById("operatorRefreshBtn");
+  const searchInput =
+    document.getElementById("operatorOrderSearch");
 
-const operatorLogoutBtn =
-  document.getElementById("operatorLogoutBtn");
+  const clearSearch =
+    document.getElementById("operatorClearSearch");
 
-const operatorNewCount =
-  document.getElementById("operatorNewCount");
+  const ordersContainer =
+    document.getElementById("operatorOrders");
 
-const operatorTalkedCount =
-  document.getElementById("operatorTalkedCount");
+  const ordersMessage =
+    document.getElementById("operatorOrdersMessage");
 
-const operatorConfirmedCount =
-  document.getElementById("operatorConfirmedCount");
+  const visibleCount =
+    document.getElementById("operatorVisibleCount");
 
-const operatorDoneCount =
-  document.getElementById("operatorDoneCount");
+  const dialog =
+    document.getElementById("operatorOrderDialog");
 
-const operatorOrderSearch =
-  document.getElementById("operatorOrderSearch");
+  const closeDialog =
+    document.getElementById("operatorCloseOrder");
 
-const operatorClearSearch =
-  document.getElementById("operatorClearSearch");
+  const orderTitle =
+    document.getElementById("operatorOrderTitle");
 
-const operatorVisibleCount =
-  document.getElementById("operatorVisibleCount");
+  const orderForm =
+    document.getElementById("operatorOrderForm");
 
-const operatorOrders =
-  document.getElementById("operatorOrders");
+  const editOrderId =
+    document.getElementById("operatorEditOrderId");
 
-const operatorOrdersMessage =
-  document.getElementById("operatorOrdersMessage");
+  const editName =
+    document.getElementById("operatorEditName");
 
-const operatorMobileNav =
-  document.getElementById("operatorMobileNav");
+  const editSurname =
+    document.getElementById("operatorEditSurname");
 
+  const editPhone =
+    document.getElementById("operatorEditPhone");
 
-/* MODAL */
+  const editProduct =
+    document.getElementById("operatorEditProduct");
 
-const operatorOrderDialog =
-  document.getElementById("operatorOrderDialog");
+  const editQuantity =
+    document.getElementById("operatorEditQuantity");
 
-const operatorCloseOrder =
-  document.getElementById("operatorCloseOrder");
+  const editSize =
+    document.getElementById("operatorEditSize");
 
-const operatorOrderTitle =
-  document.getElementById("operatorOrderTitle");
+  const editColor =
+    document.getElementById("operatorEditColor");
 
-const operatorOrderForm =
-  document.getElementById("operatorOrderForm");
+  const editRegion =
+    document.getElementById("operatorEditRegion");
 
-const operatorEditOrderId =
-  document.getElementById("operatorEditOrderId");
+  const editAddress =
+    document.getElementById("operatorEditAddress");
 
-const operatorEditName =
-  document.getElementById("operatorEditName");
+  const editNote =
+    document.getElementById("operatorEditNote");
 
-const operatorEditSurname =
-  document.getElementById("operatorEditSurname");
+  const editStatus =
+    document.getElementById("operatorEditStatus");
 
-const operatorEditPhone =
-  document.getElementById("operatorEditPhone");
+  const callCustomer =
+    document.getElementById("operatorCallCustomer");
 
-const operatorEditProduct =
-  document.getElementById("operatorEditProduct");
+  const qrBtn =
+    document.getElementById("operatorQrBtn");
 
-const operatorEditQuantity =
-  document.getElementById("operatorEditQuantity");
+  const orderMessage =
+    document.getElementById("operatorOrderMessage");
 
-const operatorEditSize =
-  document.getElementById("operatorEditSize");
+  const mobileNav =
+    document.getElementById("operatorMobileNav");
 
-const operatorEditColor =
-  document.getElementById("operatorEditColor");
 
-const operatorEditRegion =
-  document.getElementById("operatorEditRegion");
+  /* =====================================================
+     STATE
+  ===================================================== */
 
-const operatorEditAddress =
-  document.getElementById("operatorEditAddress");
+  let currentUser = null;
+  let currentProfile = null;
 
-const operatorEditNote =
-  document.getElementById("operatorEditNote");
+  let allOrders = [];
 
-const operatorEditStatus =
-  document.getElementById("operatorEditStatus");
+  let activeFilter = "all";
 
-const operatorCallCustomer =
-  document.getElementById("operatorCallCustomer");
+  let currentEditingOrder = null;
 
-const operatorQrBtn =
-  document.getElementById("operatorQrBtn");
 
-const operatorOrderMessage =
-  document.getElementById("operatorOrderMessage");
+  /* =====================================================
+     STATUS
+  ===================================================== */
 
+  const statusMap = {
+    new: {
+      text: "🔴 Yangi"
+    },
 
-/* =========================================
-   HELPERS
-========================================= */
+    talked: {
+      text: "🟠 Gaplashildi"
+    },
 
-function esc(value = "") {
-  return String(value).replace(/[&<>"']/g, ch => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[ch]);
-}
+    confirmed: {
+      text: "🔵 Tasdiqlandi"
+    },
 
+    delivery: {
+      text: "🟣 Yetkazishda"
+    },
 
-function setMessage(el, text, type = "") {
-  if (!el) return;
+    done: {
+      text: "🟢 Yakunlandi"
+    },
 
-  el.textContent = text;
-  el.className = `form-message ${type}`.trim();
-}
-
-
-function phoneClean(value = "") {
-  return String(value).replace(/[^\d+]/g, "");
-}
-
-
-function formatDate(value) {
-  if (!value) return "-";
-
-  try {
-    return new Date(value).toLocaleString("uz-UZ");
-  } catch {
-    return "-";
-  }
-}
-
-
-function showLogin() {
-  operatorLoginView.classList.remove("hidden");
-  operatorView.classList.add("hidden");
-
-  if (operatorMobileNav) {
-    operatorMobileNav.classList.add("hidden");
-  }
-}
-
-
-function showPanel() {
-  operatorLoginView.classList.add("hidden");
-  operatorView.classList.remove("hidden");
-
-  if (operatorMobileNav) {
-    operatorMobileNav.classList.remove("hidden");
-  }
-}
-
-
-/* =========================================
-   AUTH
-========================================= */
-
-async function signIn(email, password) {
-  const response = await fetch(
-    `${AUTH}/token?grant_type=password`,
-    {
-      method: "POST",
-
-      headers: {
-        apikey: SUPABASE_KEY,
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        email,
-        password
-      })
+    cancelled: {
+      text: "⚪ Bekor"
     }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error_description ||
-      data.msg ||
-      data.message ||
-      "Email yoki parol noto‘g‘ri."
-    );
-  }
-
-  return data;
-}
+  };
 
 
-async function getCurrentUser() {
-  const response = await fetch(
-    `${AUTH}/user`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${token}`
-      }
+  /* =====================================================
+     YORDAMCHI FUNKSIYALAR
+  ===================================================== */
+
+  function showMessage(element, text, type = "") {
+    if (!element) return;
+
+    element.textContent = text;
+
+    element.className =
+      element === loginMessage
+        ? "operator-message"
+        : "form-message";
+
+    if (type) {
+      element.classList.add(type);
     }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error("Sessiya tugagan.");
   }
 
-  return data;
-}
 
-
-/* =========================================
-   API
-========================================= */
-
-async function api(path, options = {}) {
-  const response = await fetch(
-    `${REST}/${path}`,
-    {
-      ...options,
-
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${token}`,
-        ...(options.headers || {})
-      }
-    }
-  );
-
-  if (!response.ok) {
-    const text = await response.text();
-
-    throw new Error(
-      text || `HTTP ${response.status}`
-    );
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
-  if (response.status === 204) {
-    return null;
+
+  function escapeAttribute(value) {
+    return escapeHtml(value);
   }
 
-  const text = await response.text();
 
-  return text ? JSON.parse(text) : null;
-}
-
-
-/* =========================================
-   OPERATOR PROFILE
-========================================= */
-
-async function checkOperator(uid) {
-  const rows = await api(
-    `profiles?select=id,name,role,active&id=eq.${encodeURIComponent(uid)}&limit=1`
-  );
-
-  const profile = rows?.[0];
-
-  if (!profile) {
-    throw new Error("Operator profili topilmadi.");
-  }
-
-  if (profile.role !== "operator") {
-    throw new Error("Bu akkaunt operator emas.");
-  }
-
-  if (profile.active !== true) {
-    throw new Error("Operator akkaunti bloklangan.");
-  }
-
-  return profile;
-}
-
-
-/* =========================================
-   LOGIN
-========================================= */
-
-operatorLoginForm.addEventListener(
-  "submit",
-  async event => {
-
-    event.preventDefault();
-
-    const button =
-      operatorLoginForm.querySelector(
-        'button[type="submit"]'
-      );
-
-    button.disabled = true;
-    button.textContent = "Kirilmoqda...";
-
-    setMessage(
-      operatorLoginMessage,
-      "Tekshirilmoqda..."
-    );
+  function formatDate(value) {
+    if (!value) return "—";
 
     try {
-
-      const auth = await signIn(
-        operatorEmail.value.trim(),
-        operatorPassword.value
+      return new Date(value).toLocaleString(
+        "uz-UZ",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }
       );
-
-      token = auth.access_token;
-      currentUser = auth.user;
-
-      currentProfile =
-        await checkOperator(currentUser.id);
-
-      sessionStorage.setItem(
-        "modex_operator_token",
-        token
-      );
-
-      operatorUserName.textContent =
-        currentProfile.name ||
-        currentUser.email ||
-        "Operator";
-
-      setMessage(
-        operatorLoginMessage,
-        ""
-      );
-
-      showPanel();
-
-      await loadAll();
-
-    } catch (error) {
-
-      console.error(
-        "OPERATOR LOGIN:",
-        error
-      );
-
-      token = "";
-      currentUser = null;
-      currentProfile = null;
-
-      sessionStorage.removeItem(
-        "modex_operator_token"
-      );
-
-      showLogin();
-
-      setMessage(
-        operatorLoginMessage,
-        error.message ||
-        "Kirishda xato.",
-        "error"
-      );
-
-    } finally {
-
-      button.disabled = false;
-      button.textContent = "Kirish";
-
+    } catch (_) {
+      return "—";
     }
   }
-);
 
 
-/* =========================================
-   SESSION
-========================================= */
+  function normalizePhone(phone) {
+    return String(phone || "")
+      .replace(/[^\d+]/g, "");
+  }
 
-async function restoreSession() {
-  const saved =
-    sessionStorage.getItem(
+
+  /* =====================================================
+     BUGUNMI?
+  ===================================================== */
+
+  function isToday(value) {
+    if (!value) {
+      return false;
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return false;
+    }
+
+    const now = new Date();
+
+    return (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate()
+    );
+  }
+
+
+  /* =====================================================
+     SUPABASE REQUEST
+  ===================================================== */
+
+  async function apiRequest(
+    path,
+    options = {},
+    token = SUPABASE_KEY
+  ) {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      throw new Error(
+        "Supabase config topilmadi."
+      );
+    }
+
+    const response = await fetch(
+      `${SUPABASE_URL}/${path}`,
+      {
+        ...options,
+
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${token}`,
+          ...(options.headers || {})
+        }
+      }
+    );
+
+    if (!response.ok) {
+      let message =
+        `Server xatosi (${response.status})`;
+
+      try {
+        const errorData =
+          await response.json();
+
+        if (errorData?.message) {
+          message = errorData.message;
+        }
+
+        if (errorData?.details) {
+          message +=
+            ` — ${errorData.details}`;
+        }
+
+      } catch (_) {}
+
+      throw new Error(message);
+    }
+
+    if (response.status === 204) {
+      return null;
+    }
+
+    const text =
+      await response.text();
+
+    if (!text) {
+      return null;
+    }
+
+    return JSON.parse(text);
+  }
+
+
+  /* =====================================================
+     TOKEN
+  ===================================================== */
+
+  function saveSession(session) {
+    if (!session) return;
+
+    sessionStorage.setItem(
+      "modex_operator_token",
+      session.access_token
+    );
+
+    sessionStorage.setItem(
+      "modex_operator_refresh",
+      session.refresh_token || ""
+    );
+  }
+
+
+  function clearSession() {
+    sessionStorage.removeItem(
       "modex_operator_token"
     );
 
-  if (!saved) {
-    showLogin();
-    return;
+    sessionStorage.removeItem(
+      "modex_operator_refresh"
+    );
+
+    currentUser = null;
+    currentProfile = null;
   }
 
-  token = saved;
 
-  try {
+  function getToken() {
+    return sessionStorage.getItem(
+      "modex_operator_token"
+    );
+  }
 
-    currentUser =
-      await getCurrentUser();
 
-    currentProfile =
-      await checkOperator(
-        currentUser.id
+  /* =====================================================
+     LOGIN
+  ===================================================== */
+
+  async function login(email, password) {
+    const data = await apiRequest(
+      "auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+
+        body: JSON.stringify({
+          email,
+          password
+        })
+      }
+    );
+
+    if (!data?.access_token) {
+      throw new Error(
+        "Login token olinmadi."
       );
+    }
+
+    saveSession(data);
+
+    return data;
+  }
+
+
+  /* =====================================================
+     USERNI OLISH
+  ===================================================== */
+
+  async function loadCurrentUser() {
+    const token = getToken();
+
+    if (!token) {
+      throw new Error(
+        "Operator sessiyasi topilmadi."
+      );
+    }
+
+    const user = await apiRequest(
+      "auth/v1/user",
+      {
+        method: "GET"
+      },
+      token
+    );
+
+    if (!user?.id) {
+      throw new Error(
+        "Operator aniqlanmadi."
+      );
+    }
+
+    currentUser = user;
+
+    return user;
+  }
+
+
+  /* =====================================================
+     PROFILE
+  ===================================================== */
+
+  async function loadProfile() {
+    const token = getToken();
+
+    const data = await apiRequest(
+      `rest/v1/profiles?id=eq.${encodeURIComponent(currentUser.id)}&select=id,name,role,active`,
+      {
+        method: "GET"
+      },
+      token
+    );
+
+    const profile =
+      Array.isArray(data)
+        ? data[0]
+        : null;
+
+    if (!profile) {
+      throw new Error(
+        "Operator profili topilmadi."
+      );
+    }
+
+    if (profile.role !== "operator") {
+      throw new Error(
+        "Bu akkaunt operator emas."
+      );
+    }
+
+    if (profile.active !== true) {
+      throw new Error(
+        "Operator bloklangan."
+      );
+    }
+
+    currentProfile = profile;
+
+    return profile;
+  }
+
+
+  /* =====================================================
+     PANELNI OCHISH
+  ===================================================== */
+
+  async function openOperatorPanel() {
+    await loadCurrentUser();
+    await loadProfile();
+
+    loginView.classList.add("hidden");
+    operatorView.classList.remove("hidden");
+
+    if (mobileNav) {
+      mobileNav.classList.remove("hidden");
+    }
 
     operatorUserName.textContent =
       currentProfile.name ||
       currentUser.email ||
       "Operator";
 
-    showPanel();
-
-    await loadAll();
-
-  } catch (error) {
-
-    console.error(
-      "OPERATOR SESSION:",
-      error
-    );
-
-    token = "";
-    currentUser = null;
-    currentProfile = null;
-
-    sessionStorage.removeItem(
-      "modex_operator_token"
-    );
-
-    showLogin();
+    await loadOrders();
   }
-}
 
 
-/* =========================================
-   LOGOUT
-========================================= */
+  /* =====================================================
+     BUYURTMALARNI YUKLASH
+  ===================================================== */
 
-operatorLogoutBtn.addEventListener(
-  "click",
-  async () => {
+  async function loadOrders() {
+    const token = getToken();
+
+    showMessage(
+      ordersMessage,
+      "Buyurtmalar yuklanmoqda..."
+    );
 
     try {
-
-      await fetch(
-        `${AUTH}/logout`,
+      const data = await apiRequest(
+        "rest/v1/orders?select=*&order=id.desc",
         {
-          method: "POST",
-
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
-      );
-
-    } catch {}
-
-    token = "";
-    currentUser = null;
-    currentProfile = null;
-
-    sessionStorage.removeItem(
-      "modex_operator_token"
-    );
-
-    showLogin();
-  }
-);
-
-
-/* =========================================
-   LOAD ALL
-========================================= */
-
-async function loadAll() {
-  setMessage(
-    operatorOrdersMessage,
-    "Yuklanmoqda..."
-  );
-
-  try {
-
-    await Promise.all([
-      loadProducts(),
-      loadOrders()
-    ]);
-
-    updateStats();
-
-    setMessage(
-      operatorOrdersMessage,
-      ""
-    );
-
-  } catch (error) {
-
-    console.error(
-      "LOAD ALL:",
-      error
-    );
-
-    setMessage(
-      operatorOrdersMessage,
-      error.message ||
-      "Ma’lumotlarni yuklab bo‘lmadi.",
-      "error"
-    );
-  }
-}
-
-
-operatorRefreshBtn.addEventListener(
-  "click",
-  async () => {
-
-    operatorRefreshBtn.disabled = true;
-    operatorRefreshBtn.textContent = "⏳";
-
-    try {
-
-      await loadAll();
-
-    } finally {
-
-      operatorRefreshBtn.disabled = false;
-      operatorRefreshBtn.textContent = "🔄";
-
-    }
-  }
-);
-
-
-/* =========================================
-   PRODUCTS
-========================================= */
-
-async function loadProducts() {
-  try {
-
-    products = await api(
-      "products?select=id,name,stock&order=id.desc"
-    );
-
-  } catch (error) {
-
-    console.error(
-      "PRODUCTS:",
-      error
-    );
-
-    products = [];
-  }
-}
-
-
-/* =========================================
-   ORDERS
-========================================= */
-
-async function loadOrders() {
-  try {
-
-    orders = await api(
-      "orders?select=*&order=id.desc"
-    );
-
-    renderOrders();
-
-  } catch (error) {
-
-    console.error(
-      "ORDERS:",
-      error
-    );
-
-    orders = [];
-
-    renderOrders();
-
-    throw new Error(
-      "Buyurtmalarni yuklab bo‘lmadi."
-    );
-  }
-}
-
-
-/* =========================================
-   STATUS
-========================================= */
-
-function statusInfo(status = "new") {
-  const statuses = {
-
-    new: {
-      icon: "🔴",
-      text: "Yangi",
-      className: "status-new"
-    },
-
-    talked: {
-      icon: "🟠",
-      text: "Gaplashildi",
-      className: "status-talked"
-    },
-
-    confirmed: {
-      icon: "🔵",
-      text: "Tasdiqlandi",
-      className: "status-confirmed"
-    },
-
-    delivery: {
-      icon: "🟣",
-      text: "Yetkazishda",
-      className: "status-delivery"
-    },
-
-    done: {
-      icon: "🟢",
-      text: "Yakunlandi",
-      className: "status-done"
-    },
-
-    cancelled: {
-      icon: "⚪",
-      text: "Bekor qilindi",
-      className: "status-cancelled"
-    }
-
-  };
-
-  return statuses[status] ||
-    statuses.new;
-}
-
-
-function usesStock(status) {
-  return [
-    "confirmed",
-    "delivery",
-    "done"
-  ].includes(status);
-}
-
-
-/* =========================================
-   STATS
-========================================= */
-
-function updateStats() {
-  operatorNewCount.textContent =
-    orders.filter(
-      order =>
-        (order.status || "new") ===
-        "new"
-    ).length;
-
-
-  operatorTalkedCount.textContent =
-    orders.filter(
-      order =>
-        order.status === "talked"
-    ).length;
-
-
-  operatorConfirmedCount.textContent =
-    orders.filter(
-      order =>
-        order.status === "confirmed"
-    ).length;
-
-
-  operatorDoneCount.textContent =
-    orders.filter(
-      order =>
-        order.status === "done"
-    ).length;
-}
-
-
-/* =========================================
-   FILTER
-========================================= */
-
-function filteredOrders() {
-  const search =
-    operatorOrderSearch.value
-      .trim()
-      .toLowerCase();
-
-  return orders.filter(order => {
-
-    const status =
-      order.status || "new";
-
-    const statusOk =
-      currentFilter === "all" ||
-      status === currentFilter;
-
-
-    const text = `
-      ${order.id || ""}
-      ${order.name || ""}
-      ${order.surname || ""}
-      ${order.phone || ""}
-      ${order.product || ""}
-      ${order.size || ""}
-      ${order.color || ""}
-      ${order.region || ""}
-      ${order.address || ""}
-    `.toLowerCase();
-
-
-    return (
-      statusOk &&
-      text.includes(search)
-    );
-  });
-}
-
-
-/* =========================================
-   RENDER ORDERS
-========================================= */
-
-function renderOrders() {
-  const list =
-    filteredOrders();
-
-  operatorVisibleCount.textContent =
-    `${list.length} ta`;
-
-
-  if (!list.length) {
-
-    operatorOrders.innerHTML = `
-      <div class="drawer-empty">
-        Zayavka topilmadi.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  operatorOrders.innerHTML =
-    list.map(order => {
-
-      const status =
-        statusInfo(
-          order.status || "new"
-        );
-
-      return `
-
-        <article
-          class="operator-order-card ${status.className}"
-        >
-
-          <div class="operator-order-top">
-
-            <div>
-
-              <span class="operator-order-id">
-                #${order.id}
-              </span>
-
-              <strong class="operator-order-name">
-                ${esc(order.name || "Mijoz")}
-                ${esc(order.surname || "")}
-              </strong>
-
-            </div>
-
-
-            <span
-              class="operator-order-status ${status.className}"
-            >
-              ${status.icon}
-              ${status.text}
-            </span>
-
-          </div>
-
-
-          <div class="operator-product-box">
-
-            <span>
-              Mahsulot
-            </span>
-
-            <strong>
-              ${esc(order.product || "-")}
-            </strong>
-
-          </div>
-
-
-          <div class="operator-order-info-grid">
-
-            <div>
-
-              <span>
-                Soni
-              </span>
-
-              <strong>
-                ${Number(order.quantity || 1)}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Razmer
-              </span>
-
-              <strong>
-                ${esc(order.size || "-")}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Rang
-              </span>
-
-              <strong>
-                ${esc(order.color || "-")}
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          ${
-            order.region
-              ? `
-                <div class="operator-location">
-                  📍 ${esc(order.region)}
-                </div>
-              `
-              : ""
-          }
-
-
-          <a
-            href="tel:${esc(phoneClean(order.phone))}"
-            class="operator-call-btn"
-          >
-            📞 ${esc(order.phone || "Telefon yo‘q")}
-          </a>
-
-
-          <button
-            class="operator-edit-order-btn"
-            data-id="${order.id}"
-            type="button"
-          >
-            ✏️ Zayavkani ochish
-          </button>
-
-
-          <small class="operator-order-date">
-            ${esc(formatDate(order.created_at))}
-          </small>
-
-        </article>
-
-      `;
-
-    }).join("");
-
-
-  document
-    .querySelectorAll(
-      ".operator-edit-order-btn"
-    )
-    .forEach(button => {
-
-      button.onclick = () => {
-
-        openOrder(
-          button.dataset.id
-        );
-
-      };
-
-    });
-}
-
-
-/* =========================================
-   OPEN MODAL
-========================================= */
-
-function openOrder(id) {
-  const order =
-    orders.find(
-      item =>
-        Number(item.id) === Number(id)
-    );
-
-  if (!order) return;
-
-
-  operatorEditOrderId.value =
-    order.id;
-
-
-  operatorEditName.value =
-    order.name || "";
-
-
-  operatorEditSurname.value =
-    order.surname || "";
-
-
-  operatorEditPhone.value =
-    order.phone || "";
-
-
-  operatorEditProduct.value =
-    order.product || "";
-
-
-  operatorEditQuantity.value =
-    Math.max(
-      1,
-      Number(order.quantity || 1)
-    );
-
-
-  operatorEditSize.value =
-    order.size || "";
-
-
-  operatorEditColor.value =
-    order.color || "";
-
-
-  operatorEditRegion.value =
-    order.region || "";
-
-
-  operatorEditAddress.value =
-    order.address || "";
-
-
-  operatorEditNote.value =
-    order.note || "";
-
-
-  operatorEditStatus.value =
-    order.status || "new";
-
-
-  operatorOrderTitle.textContent =
-    `Buyurtma #${order.id}`;
-
-
-  operatorCallCustomer.href =
-    `tel:${phoneClean(order.phone)}`;
-
-
-  updateModalStatusColor();
-
-
-  setMessage(
-    operatorOrderMessage,
-    ""
-  );
-
-
-  operatorOrderDialog.showModal();
-}
-
-
-/* =========================================
-   CLOSE MODAL
-========================================= */
-
-operatorCloseOrder.addEventListener(
-  "click",
-  () => {
-
-    operatorOrderDialog.close();
-
-  }
-);
-
-
-operatorOrderDialog.addEventListener(
-  "click",
-  event => {
-
-    if (
-      event.target ===
-      operatorOrderDialog
-    ) {
-
-      operatorOrderDialog.close();
-
-    }
-  }
-);
-
-
-/* =========================================
-   MODAL STATUS COLOR
-========================================= */
-
-function updateModalStatusColor() {
-  operatorEditStatus.classList.remove(
-    "status-new",
-    "status-talked",
-    "status-confirmed",
-    "status-delivery",
-    "status-done",
-    "status-cancelled"
-  );
-
-
-  operatorEditStatus.classList.add(
-    statusInfo(
-      operatorEditStatus.value
-    ).className
-  );
-}
-
-
-operatorEditStatus.addEventListener(
-  "change",
-  updateModalStatusColor
-);
-
-
-/* =========================================
-   STOCK
-========================================= */
-
-async function syncStock(
-  order,
-  newStatus,
-  quantity
-) {
-
-  if (!order.product_id) {
-    return order.stock_adjusted === true;
-  }
-
-
-  let adjusted =
-    order.stock_adjusted === true;
-
-
-  const shouldUse =
-    usesStock(newStatus);
-
-
-  /* KAMAYTIRISH */
-
-  if (
-    shouldUse &&
-    !adjusted
-  ) {
-
-    const rows = await api(
-      `products?select=id,stock&id=eq.${encodeURIComponent(order.product_id)}&limit=1`
-    );
-
-
-    const product =
-      rows?.[0];
-
-
-    if (!product) {
-
-      throw new Error(
-        "Mahsulot topilmadi."
-      );
-
-    }
-
-
-    const stock =
-      Number(product.stock || 0);
-
-
-    if (stock < quantity) {
-
-      throw new Error(
-        `Omborda yetarli mahsulot yo‘q. Omborda ${stock} dona.`
-      );
-
-    }
-
-
-    await api(
-      `products?id=eq.${encodeURIComponent(order.product_id)}`,
-      {
-        method: "PATCH",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          Prefer:
-            "return=minimal"
+          method: "GET"
         },
-
-        body: JSON.stringify({
-          stock:
-            stock - quantity
-        })
-      }
-    );
-
-
-    adjusted = true;
-  }
-
-
-  /* QAYTARISH */
-
-  if (
-    !shouldUse &&
-    adjusted
-  ) {
-
-    const rows = await api(
-      `products?select=id,stock&id=eq.${encodeURIComponent(order.product_id)}&limit=1`
-    );
-
-
-    const product =
-      rows?.[0];
-
-
-    if (product) {
-
-      await api(
-        `products?id=eq.${encodeURIComponent(order.product_id)}`,
-        {
-          method: "PATCH",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=minimal"
-          },
-
-          body: JSON.stringify({
-            stock:
-              Number(product.stock || 0)
-              + quantity
-          })
-        }
+        token
       );
 
-    }
+      allOrders =
+        Array.isArray(data)
+          ? data
+          : [];
 
+      updateStats();
+      renderOrders();
 
-    adjusted = false;
-  }
-
-
-  return adjusted;
-}
-
-
-/* =========================================
-   SAVE ORDER
-========================================= */
-
-operatorOrderForm.addEventListener(
-  "submit",
-  async event => {
-
-    event.preventDefault();
-
-
-    const id =
-      operatorEditOrderId.value;
-
-
-    const order =
-      orders.find(
-        item =>
-          Number(item.id) === Number(id)
+      showMessage(
+        ordersMessage,
+        ""
       );
 
+    } catch (error) {
+      console.error(error);
 
-    if (!order) {
-
-      setMessage(
-        operatorOrderMessage,
-        "Buyurtma topilmadi.",
+      showMessage(
+        ordersMessage,
+        error.message ||
+        "Buyurtmalarni yuklab bo‘lmadi.",
         "error"
       );
+    }
+  }
+
+
+  /* =====================================================
+     STATISTIKA
+  ===================================================== */
+
+  function updateStats() {
+    const newOrders =
+      allOrders.filter(
+        order => order.status === "new"
+      );
+
+    /*
+      MUHIM:
+      Gaplashildi faqat BUGUNGI talked_at
+    */
+    const todayTalked =
+      allOrders.filter(
+        order =>
+          order.status === "talked" &&
+          isToday(order.talked_at)
+      );
+
+    const confirmedOrders =
+      allOrders.filter(
+        order =>
+          order.status === "confirmed"
+      );
+
+    const doneOrders =
+      allOrders.filter(
+        order =>
+          order.status === "done"
+      );
+
+    newCount.textContent =
+      newOrders.length;
+
+    talkedCount.textContent =
+      todayTalked.length;
+
+    confirmedCount.textContent =
+      confirmedOrders.length;
+
+    doneCount.textContent =
+      doneOrders.length;
+  }
+
+
+  /* =====================================================
+     FILTER
+  ===================================================== */
+
+  function getFilteredOrders() {
+    let orders =
+      [...allOrders];
+
+    /*
+      Gaplashildi filteri:
+      faqat bugungi gaplashilganlar
+    */
+    if (activeFilter === "talked") {
+      orders =
+        orders.filter(
+          order =>
+            order.status === "talked" &&
+            isToday(order.talked_at)
+        );
+
+    } else if (
+      activeFilter !== "all"
+    ) {
+      orders =
+        orders.filter(
+          order =>
+            order.status === activeFilter
+        );
+    }
+
+
+    const query =
+      searchInput?.value
+        ?.trim()
+        ?.toLowerCase() || "";
+
+
+    if (query) {
+      orders =
+        orders.filter(order => {
+          const text = `
+            ${order.id || ""}
+            ${order.name || ""}
+            ${order.surname || ""}
+            ${order.phone || ""}
+            ${order.product || ""}
+            ${order.region || ""}
+            ${order.address || ""}
+          `.toLowerCase();
+
+          return text.includes(query);
+        });
+    }
+
+    return orders;
+  }
+
+
+  /* =====================================================
+     ORDER CARD
+  ===================================================== */
+
+  function renderOrders() {
+    const orders =
+      getFilteredOrders();
+
+    visibleCount.textContent =
+      `${orders.length} ta`;
+
+    ordersContainer.innerHTML = "";
+
+    if (orders.length === 0) {
+      ordersContainer.innerHTML = `
+        <div style="
+          padding:35px 15px;
+          text-align:center;
+          color:#777783;
+          border:1px dashed #dddde6;
+          border-radius:15px;
+          grid-column:1/-1;
+        ">
+          Hozircha buyurtma yo‘q.
+        </div>
+      `;
 
       return;
     }
 
 
-    const saveButton =
-      operatorOrderForm.querySelector(
-        'button[type="submit"]'
+    orders.forEach(order => {
+      const status =
+        order.status || "new";
+
+      const statusInfo =
+        statusMap[status] ||
+        statusMap.new;
+
+      const phone =
+        normalizePhone(order.phone);
+
+      const card =
+        document.createElement("article");
+
+      card.className =
+        `operator-order-card status-${status}`;
+
+      card.innerHTML = `
+
+        <div class="operator-order-top">
+
+          <div>
+
+            <span class="operator-order-id">
+              BUYURTMA #${escapeHtml(order.id)}
+            </span>
+
+            <strong class="operator-order-name">
+              ${escapeHtml(order.name || "Mijoz")}
+              ${order.surname
+                ? escapeHtml(" " + order.surname)
+                : ""
+              }
+            </strong>
+
+          </div>
+
+          <span class="operator-order-status">
+            ${statusInfo.text}
+          </span>
+
+        </div>
+
+
+        <div class="operator-product-box">
+
+          <span>
+            MAHSULOT
+          </span>
+
+          <strong>
+            ${escapeHtml(
+              order.product || "Mahsulot"
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="operator-order-info-grid">
+
+          <div>
+            <span>SONI</span>
+            <strong>
+              ${escapeHtml(
+                order.quantity || 1
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>RAZMER</span>
+            <strong>
+              ${escapeHtml(
+                order.size || "—"
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>RANG</span>
+            <strong>
+              ${escapeHtml(
+                order.color || "—"
+              )}
+            </strong>
+          </div>
+
+        </div>
+
+
+        ${
+          order.region || order.address
+            ? `
+              <div class="operator-location">
+                📍
+                ${escapeHtml(order.region || "")}
+                ${order.address
+                  ? " — " +
+                    escapeHtml(order.address)
+                  : ""
+                }
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          phone
+            ? `
+              <a
+                href="tel:${escapeAttribute(phone)}"
+                class="operator-call-btn"
+              >
+                📞 ${escapeHtml(order.phone)}
+              </a>
+            `
+            : ""
+        }
+
+
+        <button
+          type="button"
+          class="operator-edit-order-btn"
+          data-order-id="${order.id}"
+        >
+          Zayavkani ochish
+        </button>
+
+
+        <small class="operator-order-date">
+          ${formatDate(order.created_at)}
+        </small>
+      `;
+
+      ordersContainer.appendChild(card);
+    });
+
+
+    document
+      .querySelectorAll(
+        ".operator-edit-order-btn"
+      )
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => {
+            openOrder(
+              Number(button.dataset.orderId)
+            );
+          }
+        );
+      });
+  }
+
+
+  /* =====================================================
+     MODALNI OCHISH
+  ===================================================== */
+
+  function openOrder(orderId) {
+    const order =
+      allOrders.find(
+        item =>
+          Number(item.id) === Number(orderId)
       );
 
+    if (!order) {
+      return;
+    }
 
-    saveButton.disabled = true;
-    saveButton.textContent =
-      "Saqlanmoqda...";
+    currentEditingOrder = order;
+
+    editOrderId.value =
+      order.id;
+
+    orderTitle.textContent =
+      `Buyurtma #${order.id}`;
+
+    editName.value =
+      order.name || "";
+
+    editSurname.value =
+      order.surname || "";
+
+    editPhone.value =
+      order.phone || "";
+
+    editProduct.value =
+      order.product || "";
+
+    editQuantity.value =
+      order.quantity || 1;
+
+    editSize.value =
+      order.size || "";
+
+    editColor.value =
+      order.color || "";
+
+    editRegion.value =
+      order.region || "";
+
+    editAddress.value =
+      order.address || "";
+
+    editNote.value =
+      order.note || "";
+
+    editStatus.value =
+      order.status || "new";
 
 
-    try {
+    if (order.phone) {
+      callCustomer.href =
+        `tel:${normalizePhone(order.phone)}`;
 
-      const newStatus =
-        operatorEditStatus.value;
+      callCustomer.classList.remove(
+        "hidden"
+      );
+
+    } else {
+      callCustomer.href = "#";
+
+      callCustomer.classList.add(
+        "hidden"
+      );
+    }
 
 
-      const quantity =
+    showMessage(
+      orderMessage,
+      ""
+    );
+
+
+    if (
+      typeof dialog.showModal ===
+      "function"
+    ) {
+      dialog.showModal();
+
+    } else {
+      dialog.setAttribute(
+        "open",
+        ""
+      );
+    }
+  }
+
+
+  /* =====================================================
+     MODALNI YOPISH
+  ===================================================== */
+
+  function closeOrderDialog() {
+    if (!dialog) return;
+
+    if (
+      typeof dialog.close ===
+      "function"
+    ) {
+      dialog.close();
+
+    } else {
+      dialog.removeAttribute(
+        "open"
+      );
+    }
+
+    currentEditingOrder = null;
+  }
+
+
+  /* =====================================================
+     BUYURTMANI SAQLASH
+  ===================================================== */
+
+  async function saveOrder(event) {
+    event.preventDefault();
+
+    if (
+      !currentEditingOrder ||
+      !currentUser
+    ) {
+      return;
+    }
+
+
+    const token =
+      getToken();
+
+    const orderId =
+      Number(editOrderId.value);
+
+    const oldStatus =
+      currentEditingOrder.status || "new";
+
+    const newStatus =
+      editStatus.value || "new";
+
+
+    const payload = {
+      name:
+        editName.value.trim(),
+
+      surname:
+        editSurname.value.trim() || null,
+
+      phone:
+        editPhone.value.trim(),
+
+      quantity:
         Math.max(
           1,
-          Number(
-            operatorEditQuantity.value || 1
-          )
-        );
+          Number(editQuantity.value || 1)
+        ),
+
+      size:
+        editSize.value.trim() || null,
+
+      color:
+        editColor.value.trim() || null,
+
+      region:
+        editRegion.value.trim() || null,
+
+      address:
+        editAddress.value.trim() || null,
+
+      note:
+        editNote.value.trim() || null,
+
+      status:
+        newStatus,
+
+      updated_at:
+        new Date().toISOString()
+    };
 
 
-      let stockAdjusted =
-        order.stock_adjusted === true;
+    /*
+      ===============================
+      GAPLAShILDI
+      ===============================
 
+      Status Gaplashildi bo‘lsa:
+      kim gaplashgani + vaqt yoziladi.
+    */
+
+    if (newStatus === "talked") {
 
       /*
-        Agar oldin stock kamaygan
-        va quantity o‘zgartirilgan bo‘lsa,
-        eski quantity qaytariladi.
+        Agar boshqa statusdan
+        Gaplashildiga o‘tayotgan bo‘lsa
       */
-
       if (
-        stockAdjusted &&
-        order.product_id &&
-        Number(order.quantity || 1) !==
-        quantity
+        oldStatus !== "talked" ||
+        !currentEditingOrder.talked_at ||
+        !currentEditingOrder.operator_id
       ) {
-
-        const rows = await api(
-          `products?select=id,stock&id=eq.${encodeURIComponent(order.product_id)}&limit=1`
-        );
-
-
-        const product =
-          rows?.[0];
-
-
-        if (product) {
-
-          await api(
-            `products?id=eq.${encodeURIComponent(order.product_id)}`,
-            {
-              method: "PATCH",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-
-                Prefer:
-                  "return=minimal"
-              },
-
-              body: JSON.stringify({
-                stock:
-                  Number(product.stock || 0)
-                  +
-                  Number(order.quantity || 1)
-              })
-            }
-          );
-
-
-          stockAdjusted = false;
-        }
-      }
-
-
-      stockAdjusted =
-        await syncStock(
-          {
-            ...order,
-            stock_adjusted:
-              stockAdjusted
-          },
-          newStatus,
-          quantity
-        );
-
-
-      const payload = {
-
-        name:
-          operatorEditName.value.trim(),
-
-        surname:
-          operatorEditSurname.value.trim(),
-
-        phone:
-          operatorEditPhone.value.trim(),
-
-        quantity,
-
-        size:
-          operatorEditSize.value.trim(),
-
-        color:
-          operatorEditColor.value.trim(),
-
-        region:
-          operatorEditRegion.value.trim(),
-
-        address:
-          operatorEditAddress.value.trim(),
-
-        note:
-          operatorEditNote.value.trim(),
-
-        status:
-          newStatus,
-
-        stock_adjusted:
-          stockAdjusted,
-
-        updated_at:
-          new Date().toISOString()
-
-      };
-
-
-      if (
-        newStatus === "talked" &&
-        !order.talked_at
-      ) {
-
         payload.talked_at =
           new Date().toISOString();
 
+        payload.operator_id =
+          currentUser.id;
+      }
+
+    }
+
+
+    showMessage(
+      orderMessage,
+      "Saqlanmoqda..."
+    );
+
+
+    try {
+      const updated =
+        await apiRequest(
+          `rest/v1/orders?id=eq.${orderId}`,
+          {
+            method: "PATCH",
+
+            headers: {
+              "Prefer":
+                "return=representation"
+            },
+
+            body:
+              JSON.stringify(payload)
+          },
+          token
+        );
+
+
+      const savedOrder =
+        Array.isArray(updated)
+          ? updated[0]
+          : updated;
+
+
+      if (!savedOrder) {
+        throw new Error(
+          "Buyurtma yangilanmadi."
+        );
       }
 
 
-      await api(
-        `orders?id=eq.${encodeURIComponent(id)}`,
-        {
-          method: "PATCH",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-
-            Prefer:
-              "return=minimal"
-          },
-
-          body:
-            JSON.stringify(payload)
-        }
-      );
-
-
-      setMessage(
-        operatorOrderMessage,
-        "Zayavka saqlandi ✅",
+      showMessage(
+        orderMessage,
+        "✅ Saqlandi",
         "success"
       );
 
 
-      await Promise.all([
-        loadOrders(),
-        loadProducts()
-      ]);
+      /*
+        Local arrayni ham yangilaymiz
+      */
+
+      allOrders =
+        allOrders.map(order => {
+          if (
+            Number(order.id) ===
+            orderId
+          ) {
+            return {
+              ...order,
+              ...savedOrder
+            };
+          }
+
+          return order;
+        });
+
+
+      currentEditingOrder =
+        savedOrder;
 
 
       updateStats();
+      renderOrders();
 
 
       setTimeout(() => {
-
-        operatorOrderDialog.close();
-
+        closeOrderDialog();
       }, 500);
 
 
     } catch (error) {
+      console.error(error);
 
-      console.error(
-        "SAVE ORDER:",
-        error
-      );
-
-
-      setMessage(
-        operatorOrderMessage,
+      showMessage(
+        orderMessage,
         error.message ||
-        "Zayavkani saqlab bo‘lmadi.",
+        "Saqlashda xatolik.",
         "error"
       );
-
-
-    } finally {
-
-      saveButton.disabled = false;
-      saveButton.textContent =
-        "💾 Saqlash";
-
     }
   }
-);
 
 
-/* =========================================
-   QR
-========================================= */
+  /* =====================================================
+     FILTER BUTTONS
+  ===================================================== */
 
-operatorQrBtn.addEventListener(
-  "click",
-  () => {
+  function setFilter(status) {
+    activeFilter = status;
 
-    const id =
-      operatorEditOrderId.value;
-
-
-    if (!id) return;
-
-
-    alert(
-      `QR etiketka keyingi bosqichda ulanadi.\nBuyurtma #${id}`
-    );
-
-  }
-);
+    document
+      .querySelectorAll(
+        ".operator-filter-btn"
+      )
+      .forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.status ===
+            status
+        );
+      });
 
 
-/* =========================================
-   SEARCH
-========================================= */
+    document
+      .querySelectorAll(
+        ".operator-mobile-nav-btn"
+      )
+      .forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.mobileFilter ===
+            status
+        );
+      });
 
-operatorOrderSearch.addEventListener(
-  "input",
-  renderOrders
-);
-
-
-operatorClearSearch.addEventListener(
-  "click",
-  () => {
-
-    operatorOrderSearch.value = "";
 
     renderOrders();
-
-    operatorOrderSearch.focus();
-
   }
-);
 
 
-/* =========================================
-   FILTER
-========================================= */
+  /* =====================================================
+     LOGIN FORM
+  ===================================================== */
 
-document
-  .querySelectorAll(
-    ".operator-filter-btn"
-  )
-  .forEach(button => {
+  loginForm?.addEventListener(
+    "submit",
+    async event => {
+      event.preventDefault();
 
-    button.onclick = () => {
+      const email =
+        emailInput.value.trim();
 
-      currentFilter =
-        button.dataset.status;
-
-
-      document
-        .querySelectorAll(
-          ".operator-filter-btn"
-        )
-        .forEach(item => {
-
-          item.classList.remove(
-            "active"
-          );
-
-        });
+      const password =
+        passwordInput.value;
 
 
-      button.classList.add(
-        "active"
+      showMessage(
+        loginMessage,
+        "Kirilmoqda..."
       );
 
 
-      syncMobileFilter();
+      try {
+        await login(
+          email,
+          password
+        );
+
+        await openOperatorPanel();
+
+        loginForm.reset();
+
+        showMessage(
+          loginMessage,
+          ""
+        );
+
+      } catch (error) {
+        console.error(error);
+
+        clearSession();
+
+        showMessage(
+          loginMessage,
+          error.message ||
+          "Email yoki parol noto‘g‘ri.",
+          "error"
+        );
+      }
+    }
+  );
+
+
+  /* =====================================================
+     LOGOUT
+  ===================================================== */
+
+  logoutBtn?.addEventListener(
+    "click",
+    () => {
+      clearSession();
+
+      operatorView.classList.add(
+        "hidden"
+      );
+
+      loginView.classList.remove(
+        "hidden"
+      );
+
+      if (mobileNav) {
+        mobileNav.classList.add(
+          "hidden"
+        );
+      }
+
+      allOrders = [];
+
+      ordersContainer.innerHTML = "";
+    }
+  );
+
+
+  /* =====================================================
+     REFRESH
+  ===================================================== */
+
+  refreshBtn?.addEventListener(
+    "click",
+    loadOrders
+  );
+
+
+  /* =====================================================
+     SEARCH
+  ===================================================== */
+
+  searchInput?.addEventListener(
+    "input",
+    renderOrders
+  );
+
+
+  clearSearch?.addEventListener(
+    "click",
+    () => {
+      searchInput.value = "";
 
       renderOrders();
 
-    };
-
-  });
-
-
-document
-  .querySelectorAll(
-    ".operator-mobile-nav-btn"
-  )
-  .forEach(button => {
-
-    button.onclick = () => {
-
-      currentFilter =
-        button.dataset.mobileFilter;
+      searchInput.focus();
+    }
+  );
 
 
-      document
-        .querySelectorAll(
-          ".operator-mobile-nav-btn"
-        )
-        .forEach(item => {
-
-          item.classList.remove(
-            "active"
-          );
-
-        });
-
-
-      button.classList.add(
-        "active"
-      );
-
-
-      syncDesktopFilter();
-
-      renderOrders();
-
-    };
-
-  });
-
-
-function syncMobileFilter() {
-
-  document
-    .querySelectorAll(
-      ".operator-mobile-nav-btn"
-    )
-    .forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.mobileFilter ===
-        currentFilter
-      );
-
-    });
-}
-
-
-function syncDesktopFilter() {
+  /* =====================================================
+     DESKTOP FILTER
+  ===================================================== */
 
   document
     .querySelectorAll(
       ".operator-filter-btn"
     )
     .forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          setFilter(
+            button.dataset.status
+          );
+        }
+      );
+    });
 
-      button.classList.toggle(
-        "active",
-        button.dataset.status ===
-        currentFilter
+
+  /* =====================================================
+     MOBILE FILTER
+  ===================================================== */
+
+  document
+    .querySelectorAll(
+      ".operator-mobile-nav-btn"
+    )
+    .forEach(button => {
+      button.addEventListener(
+        "click",
+        () => {
+          setFilter(
+            button.dataset.mobileFilter
+          );
+        }
+      );
+    });
+
+
+  /* =====================================================
+     MODAL
+  ===================================================== */
+
+  closeDialog?.addEventListener(
+    "click",
+    closeOrderDialog
+  );
+
+
+  orderForm?.addEventListener(
+    "submit",
+    saveOrder
+  );
+
+
+  dialog?.addEventListener(
+    "click",
+    event => {
+      if (event.target === dialog) {
+        closeOrderDialog();
+      }
+    }
+  );
+
+
+  /* =====================================================
+     QR
+  ===================================================== */
+
+  qrBtn?.addEventListener(
+    "click",
+    () => {
+      if (!currentEditingOrder) {
+        return;
+      }
+
+      alert(
+        `QR etiketka keyingi bosqichda ulanadi.\nBuyurtma #${currentEditingOrder.id}`
+      );
+    }
+  );
+
+
+  /* =====================================================
+     SAHIFA OCHILGANDA SESSIONNI TEKSHIRISH
+  ===================================================== */
+
+  async function init() {
+    const token = getToken();
+
+    if (!token) {
+      loginView.classList.remove(
+        "hidden"
       );
 
-    });
-}
+      operatorView.classList.add(
+        "hidden"
+      );
+
+      return;
+    }
 
 
-/* =========================================
-   START
-========================================= */
+    try {
+      await openOperatorPanel();
 
-restoreSession();
+    } catch (error) {
+      console.error(error);
+
+      clearSession();
+
+      operatorView.classList.add(
+        "hidden"
+      );
+
+      loginView.classList.remove(
+        "hidden"
+      );
+
+      showMessage(
+        loginMessage,
+        "Qayta login qiling.",
+        "error"
+      );
+    }
+  }
+
+
+  init();
+
+})();
