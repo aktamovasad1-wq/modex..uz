@@ -6,29 +6,43 @@
 
   <meta
     name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="description"
+    content="MODEX.UZ — kiyimlar va boshqa mahsulotlarni onlayn buyurtma qilish."
   >
 
   <title>MODEX.UZ — Internet do‘kon</title>
 
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0700"
+    href="./style.css?v=20260815-0900"
   >
 </head>
 
+
 <body>
 
-  <!-- HEADER -->
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
 
   <header class="market-header">
 
     <div class="header-inner">
 
+
+      <!-- LOGO -->
+
       <a
         href="./index.html"
         class="brand"
+        aria-label="MODEX.UZ bosh sahifa"
       >
+
         <small class="brand-mini">
           ziza.kds
         </small>
@@ -36,8 +50,11 @@
         <span class="brand-main">
           MODEX<span class="brand-uz">.UZ</span>
         </span>
+
       </a>
 
+
+      <!-- KATALOG -->
 
       <button
         id="catalogBtn"
@@ -48,17 +65,21 @@
       </button>
 
 
+      <!-- DESKTOP SEARCH -->
+
       <div class="header-search">
 
         <input
           id="searchInput"
           type="search"
           placeholder="Mahsulot qidirish..."
+          autocomplete="off"
         >
 
         <button
           id="searchBtn"
           type="button"
+          aria-label="Qidirish"
         >
           🔍
         </button>
@@ -66,7 +87,10 @@
       </div>
 
 
+      <!-- HEADER ACTIONS -->
+
       <div class="header-buttons">
+
 
         <a
           href="./track.html"
@@ -84,7 +108,10 @@
         >
           ♡
           <span>Sevimlilar</span>
-          <b id="favoriteCount">0</b>
+
+          <b id="favoriteCount">
+            0
+          </b>
         </button>
 
 
@@ -95,8 +122,12 @@
         >
           🛒
           <span>Savat</span>
-          <b id="cartCount">0</b>
+
+          <b id="cartCount">
+            0
+          </b>
         </button>
+
 
       </div>
 
@@ -111,11 +142,13 @@
         id="mobileSearchInput"
         type="search"
         placeholder="Mahsulot qidirish..."
+        autocomplete="off"
       >
 
       <button
         id="mobileSearchBtn"
         type="button"
+        aria-label="Qidirish"
       >
         🔍
       </button>
@@ -125,13 +158,20 @@
   </header>
 
 
-  <!-- MAIN -->
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
   <main>
 
-    <!-- HERO -->
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section class="market-hero">
+
 
       <div class="hero-main">
 
@@ -142,12 +182,13 @@
           </span>
 
           <h1>
-            Kerakli mahsulotni tez va oson toping
+            Xaridingizni oson boshlang
           </h1>
 
           <p>
-            Mahsulotni tanlang, buyurtma qoldiring.
-            Operatorimiz siz bilan bog‘lanadi.
+            Kerakli mahsulotni tanlang va buyurtma qoldiring.
+            Operatorimiz siz bilan bog‘lanib,
+            buyurtmangizni tasdiqlaydi.
           </p>
 
           <a
@@ -162,6 +203,9 @@
       </div>
 
 
+
+      <!-- BUYURTMA KUZATISH -->
+
       <aside class="hero-side">
 
         <span>
@@ -169,17 +213,17 @@
         </span>
 
         <strong>
-          Buyurtma qayerdaligini tekshiring
+          Buyurtmangiz qayerda?
         </strong>
 
         <p>
           Buyurtma raqami va telefon orqali
-          holatini ko‘rishingiz mumkin.
+          hozirgi holatini tekshiring.
         </p>
 
         <a
           href="./track.html"
-          class="hero-button"
+          class="main-btn"
         >
           📦 Buyurtmam
         </a>
@@ -189,7 +233,10 @@
     </section>
 
 
-    <!-- CATEGORIES -->
+
+    <!-- ===================================================
+         CATEGORIES
+    ==================================================== -->
 
     <section class="market-section">
 
@@ -209,21 +256,31 @@
 
       </div>
 
+
       <div
         id="categoryList"
         class="category-grid"
-      ></div>
+      >
+        <!-- app.js -->
+      </div>
 
     </section>
 
 
-    <!-- FILTER -->
+
+    <!-- ===================================================
+         FILTERS
+    ==================================================== -->
 
     <section class="filter-section">
 
       <div class="filter-row">
 
-        <select id="categoryFilter">
+
+        <select
+          id="categoryFilter"
+          aria-label="Kategoriya"
+        >
 
           <option value="">
             Barcha kategoriyalar
@@ -232,7 +289,10 @@
         </select>
 
 
-        <select id="sortSelect">
+        <select
+          id="sortSelect"
+          aria-label="Saralash"
+        >
 
           <option value="new">
             Avval yangilari
@@ -248,12 +308,16 @@
 
         </select>
 
+
       </div>
 
     </section>
 
 
-    <!-- PRODUCTS -->
+
+    <!-- ===================================================
+         PRODUCTS
+    ==================================================== -->
 
     <section
       id="products"
@@ -279,7 +343,9 @@
       <div
         id="productsGrid"
         class="market-products"
-      ></div>
+      >
+        <!-- app.js -->
+      </div>
 
 
       <div
@@ -292,9 +358,15 @@
     </section>
 
 
-    <!-- TRACK CTA -->
+
+    <!-- ===================================================
+         TRACK + SUPPORT
+    ==================================================== -->
 
     <section class="support-section">
+
+
+      <!-- TRACK -->
 
       <div>
 
@@ -303,12 +375,13 @@
         </span>
 
         <h2>
-          Buyurtmangiz qayerda?
+          Buyurtmangizni kuzating
         </h2>
 
         <p>
-          Qadoqlanmoqda, yo‘lda yoki yetkazilganini
-          tekshirishingiz mumkin.
+          Buyurtmangiz qabul qilinganmi,
+          qadoqlanmoqdami, yo‘ldami yoki
+          yetkazilganmi — tekshirishingiz mumkin.
         </p>
 
         <a
@@ -320,6 +393,9 @@
 
       </div>
 
+
+
+      <!-- SUPPORT FORM -->
 
       <div>
 
@@ -336,60 +412,64 @@
           Operatorimiz siz bilan bog‘lanadi.
         </p>
 
+
+        <form
+          id="supportForm"
+          class="support-form"
+        >
+
+          <input
+            id="supportName"
+            type="text"
+            placeholder="Ismingiz"
+            required
+          >
+
+
+          <input
+            id="supportPhone"
+            type="tel"
+            inputmode="tel"
+            placeholder="+998 90 123 45 67"
+            required
+          >
+
+
+          <textarea
+            id="supportMessage"
+            placeholder="Savolingiz..."
+            required
+          ></textarea>
+
+
+          <button
+            class="main-btn"
+            type="submit"
+          >
+            Yuborish
+          </button>
+
+
+          <p
+            id="supportFormMessage"
+            class="form-message"
+          ></p>
+
+        </form>
+
       </div>
 
-    </section>
-
-
-    <!-- SUPPORT FORM -->
-
-    <section class="market-section">
-
-      <form
-        id="supportForm"
-        class="support-form"
-      >
-
-        <input
-          id="supportName"
-          type="text"
-          placeholder="Ismingiz"
-          required
-        >
-
-        <input
-          id="supportPhone"
-          type="tel"
-          placeholder="+998 90 123 45 67"
-          required
-        >
-
-        <textarea
-          id="supportMessage"
-          placeholder="Savolingiz..."
-          required
-        ></textarea>
-
-        <button
-          class="main-btn"
-          type="submit"
-        >
-          Yuborish
-        </button>
-
-        <p
-          id="supportFormMessage"
-          class="form-message"
-        ></p>
-
-      </form>
 
     </section>
+
 
   </main>
 
 
-  <!-- ORDER DIALOG -->
+
+  <!-- =====================================================
+       ORDER DIALOG
+  ====================================================== -->
 
   <dialog id="orderDialog">
 
@@ -398,10 +478,12 @@
       class="order-edit-box"
     >
 
+
       <button
         id="closeDialog"
         class="order-edit-close"
         type="button"
+        aria-label="Yopish"
       >
         ×
       </button>
@@ -425,46 +507,60 @@
 
       <div class="order-edit-form">
 
+
         <label>
           Ismingiz
 
           <input
             id="nameInput"
             type="text"
+            placeholder="Ismingiz"
+            autocomplete="name"
             required
           >
         </label>
 
 
         <label>
-          Telefon
+          Telefon raqami
 
           <input
             id="phoneInput"
             type="tel"
+            inputmode="tel"
+            placeholder="+998 90 123 45 67"
+            autocomplete="tel"
             required
           >
         </label>
 
 
-        <label>
-          Razmer
-
-          <input
-            id="sizeInput"
-            type="text"
-          >
-        </label>
+        <div class="order-edit-grid">
 
 
-        <label>
-          Rang
+          <label>
+            Razmer
 
-          <input
-            id="colorInput"
-            type="text"
-          >
-        </label>
+            <input
+              id="sizeInput"
+              type="text"
+              placeholder="Masalan: 140"
+            >
+          </label>
+
+
+          <label>
+            Rang
+
+            <input
+              id="colorInput"
+              type="text"
+              placeholder="Masalan: qora"
+            >
+          </label>
+
+
+        </div>
 
 
         <label>
@@ -473,8 +569,10 @@
           <input
             id="quantityInput"
             type="number"
+            inputmode="numeric"
             min="1"
             value="1"
+            required
           >
         </label>
 
@@ -493,6 +591,7 @@
           class="form-message"
         ></p>
 
+
       </div>
 
     </form>
@@ -500,41 +599,10 @@
   </dialog>
 
 
-  <!-- CART -->
 
-  <div
-    id="cartOverlay"
-    class="drawer-overlay hidden"
-  ></div>
-
-
-  <aside
-    id="cartDrawer"
-    class="market-drawer hidden"
-  >
-
-    <button
-      id="closeCart"
-      class="small-btn"
-      type="button"
-    >
-      ×
-    </button>
-
-    <h2>
-      Savat
-    </h2>
-
-    <div id="cartItems"></div>
-
-    <strong id="cartTotal">
-      0 so‘m
-    </strong>
-
-  </aside>
-
-
-  <!-- FAVORITES -->
+  <!-- =====================================================
+       FAVORITES DRAWER
+  ====================================================== -->
 
   <div
     id="favoritesOverlay"
@@ -552,21 +620,69 @@
       class="small-btn"
       type="button"
     >
-      ×
+      ✕
     </button>
 
+
     <h2>
-      Sevimlilar
+      ♡ Sevimlilar
     </h2>
 
-    <div id="favoriteItems"></div>
+
+    <div id="favoriteItems">
+    </div>
 
   </aside>
 
 
-  <!-- MOBILE BOTTOM NAV -->
+
+  <!-- =====================================================
+       CART DRAWER
+  ====================================================== -->
+
+  <div
+    id="cartOverlay"
+    class="drawer-overlay hidden"
+  ></div>
+
+
+  <aside
+    id="cartDrawer"
+    class="market-drawer hidden"
+  >
+
+    <button
+      id="closeCart"
+      class="small-btn"
+      type="button"
+    >
+      ✕
+    </button>
+
+
+    <h2>
+      🛒 Savat
+    </h2>
+
+
+    <div id="cartItems">
+    </div>
+
+
+    <strong id="cartTotal">
+      0 so‘m
+    </strong>
+
+  </aside>
+
+
+
+  <!-- =====================================================
+       MOBILE NAVIGATION
+  ====================================================== -->
 
   <nav class="mobile-bottom-nav">
+
 
     <a
       href="./index.html"
@@ -615,11 +731,19 @@
       <small>Savat</small>
     </button>
 
+
   </nav>
 
 
-  <script src="./config.js?v=20260815-0700"></script>
-  <script src="./app.js?v=20260815-0700"></script>
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script src="./config.js?v=20260815-0900"></script>
+
+  <script src="./app.js?v=20260815-0900"></script>
+
 
 </body>
 </html>
