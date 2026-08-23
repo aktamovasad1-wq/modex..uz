@@ -9,480 +9,2359 @@
 
   <title>MODEX.UZ — Operator Panel</title>
 
-  <link
-    rel="stylesheet"
-    href="./operator.css?v=20260823-2245"
-  >
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#17171d;
+      --muted:#777784;
+      --line:#e7e7ef;
+      --primary:#713cf0;
+      --primary-soft:#efe9ff;
+      --red:#e5484d;
+      --orange:#f59e0b;
+      --blue:#4f7cff;
+      --green:#20ad68;
+      --purple:#8b5cf6;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .message{
+      min-height:18px;
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .message.error{
+      color:#d7353c;
+    }
+
+    .message.success{
+      color:#159759;
+    }
+
+    /* LOGIN */
+
+    .login-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:
+        radial-gradient(circle at top left,#eee8ff,transparent 40%),
+        var(--bg);
+    }
+
+    .login-card{
+      width:100%;
+      max-width:430px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 15px 50px rgba(20,20,35,.09);
+    }
+
+    .logo{
+      font-size:26px;
+      font-weight:900;
+      margin-bottom:5px;
+    }
+
+    .logo span{
+      color:var(--primary);
+    }
+
+    .mini-label{
+      color:var(--primary);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+
+    .login-card h1{
+      margin:18px 0 7px;
+      font-size:30px;
+    }
+
+    .login-card p{
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .login-form{
+      display:grid;
+      gap:13px;
+      margin-top:18px;
+    }
+
+    label{
+      display:grid;
+      gap:6px;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    input,
+    select,
+    textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      outline:none;
+      background:#fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px var(--primary-soft);
+    }
+
+    textarea{
+      min-height:85px;
+      resize:vertical;
+    }
+
+    .primary-btn{
+      border:0;
+      border-radius:13px;
+      padding:13px;
+      background:var(--primary);
+      color:#fff;
+      font-weight:900;
+    }
+
+    /* PANEL */
+
+    .shell{
+      width:min(1280px,calc(100% - 24px));
+      margin:auto;
+      padding:20px 0 90px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:15px;
+      margin-bottom:18px;
+    }
+
+    .header h1{
+      margin:5px 0;
+      font-size:30px;
+    }
+
+    .header p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .header-actions{
+      display:flex;
+      gap:8px;
+    }
+
+    .secondary-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:11px;
+      padding:10px 13px;
+      font-weight:800;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:15px;
+    }
+
+    .stat{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:15px;
+    }
+
+    .stat span{
+      display:block;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:850;
+      margin-bottom:6px;
+    }
+
+    .stat strong{
+      font-size:28px;
+    }
+
+    .stat.new{
+      border-top:4px solid var(--red);
+    }
+
+    .stat.talked{
+      border-top:4px solid var(--orange);
+    }
+
+    .stat.confirmed{
+      border-top:4px solid var(--blue);
+    }
+
+    .stat.done{
+      border-top:4px solid var(--green);
+    }
+
+    .tools{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      margin-bottom:14px;
+    }
+
+    .search{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .search input{
+      flex:1;
+    }
+
+    .search button{
+      width:44px;
+      border:0;
+      border-radius:11px;
+      background:#f0f0f5;
+      font-size:20px;
+    }
+
+    .filters{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+    }
+
+    .filter-btn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:999px;
+      padding:9px 12px;
+      font-size:11px;
+      font-weight:850;
+    }
+
+    .filter-btn.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    .orders-section{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:15px;
+    }
+
+    .orders-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:13px;
+    }
+
+    .orders-head h2{
+      margin:0;
+    }
+
+    .count{
+      background:var(--primary-soft);
+      color:var(--primary);
+      border-radius:999px;
+      padding:7px 11px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .orders{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:11px;
+    }
+
+    .order-card{
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:13px;
+      background:#fff;
+    }
+
+    .order-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .order-id{
+      display:block;
+      font-size:9px;
+      font-weight:900;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .order-name{
+      font-size:14px;
+    }
+
+    .status{
+      font-size:9px;
+      font-weight:850;
+      background:#f2f2f7;
+      padding:6px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+
+    .product-box{
+      background:#f8f8fc;
+      border-radius:10px;
+      padding:9px;
+      margin-bottom:8px;
+    }
+
+    .product-box small{
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:900;
+      margin-bottom:3px;
+    }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+      margin-bottom:8px;
+    }
+
+    .info-grid div{
+      background:#f8f8fc;
+      border-radius:9px;
+      padding:7px;
+    }
+
+    .info-grid span{
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:900;
+    }
+
+    .info-grid strong{
+      font-size:11px;
+    }
+
+    .location{
+      font-size:11px;
+      margin:8px 0;
+      line-height:1.4;
+    }
+
+    .call-btn{
+      display:block;
+      text-decoration:none;
+      text-align:center;
+      background:#eaf9f1;
+      color:#168650;
+      border-radius:10px;
+      padding:10px;
+      margin-bottom:7px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .open-btn{
+      width:100%;
+      border:0;
+      background:var(--primary);
+      color:#fff;
+      border-radius:10px;
+      padding:10px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .date{
+      display:block;
+      margin-top:7px;
+      font-size:9px;
+      color:var(--muted);
+    }
+
+    dialog{
+      width:min(700px,calc(100% - 20px));
+      border:0;
+      padding:0;
+      border-radius:20px;
+      background:transparent;
+    }
+
+    dialog::backdrop{
+      background:rgba(15,15,22,.58);
+    }
+
+    .modal{
+      position:relative;
+      background:#fff;
+      border-radius:20px;
+      padding:20px;
+      max-height:90vh;
+      overflow:auto;
+    }
+
+    .close{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:50%;
+      background:#f0f0f5;
+      font-size:20px;
+    }
+
+    .edit-form{
+      display:grid;
+      gap:11px;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .three{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+
+    .section-title{
+      border-top:1px solid var(--line);
+      padding-top:9px;
+      margin-top:4px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .big-call{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      background:#eaf9f1;
+      color:#168650;
+      border-radius:11px;
+      padding:11px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .qr-btn{
+      border:0;
+      border-radius:12px;
+      background:#f0f0f5;
+      font-weight:900;
+    }
+
+    @media(max-width:900px){
+      .orders{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media(max-width:650px){
+      .shell{
+        width:calc(100% - 16px);
+      }
+
+      .header{
+        flex-direction:column;
+      }
+
+      .header-actions{
+        width:100%;
+      }
+
+      .header-actions button{
+        flex:1;
+      }
+
+      .stats{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .orders{
+        grid-template-columns:1fr;
+      }
+
+      .filters{
+        flex-wrap:nowrap;
+        overflow-x:auto;
+      }
+
+      .filter-btn{
+        flex:none;
+      }
+
+      .two{
+        grid-template-columns:1fr;
+      }
+
+      .three{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .actions{
+        grid-template-columns:1fr;
+      }
+
+      .qr-btn{
+        min-height:44px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- LOGIN -->
-  <section
-    id="operatorLoginView"
-    class="operator-login-page"
-  >
-    <div class="operator-login-card">
+<!-- LOGIN -->
 
-      <div class="operator-login-logo">
-        MODEX<span>.UZ</span>
-      </div>
+<section id="loginView" class="login-page">
 
-      <span class="operator-label">
-        OPERATOR PANEL
-      </span>
+  <div class="login-card">
 
-      <h1>Kirish</h1>
+    <div class="logo">
+      MODEX<span>.UZ</span>
+    </div>
 
-      <p class="operator-login-subtitle">
-        Buyurtmalar bilan ishlash uchun operator hisobingizga kiring.
-      </p>
+    <span class="mini-label">
+      OPERATOR PANEL
+    </span>
 
-      <form
-        id="operatorLoginForm"
-        class="operator-login-form"
-      >
+    <h1>Kirish</h1>
 
-        <label>
-          Email
-          <input
-            id="operatorEmail"
-            type="email"
-            autocomplete="email"
-            required
-          >
-        </label>
+    <p>
+      Operator hisobingizga kiring.
+    </p>
 
-        <label>
-          Parol
-          <input
-            id="operatorPassword"
-            type="password"
-            autocomplete="current-password"
-            required
-          >
-        </label>
+    <form id="loginForm" class="login-form">
 
-        <button
-          type="submit"
-          class="operator-login-submit"
+      <label>
+        Email
+        <input
+          id="email"
+          type="email"
+          autocomplete="email"
+          required
         >
-          Kirish
-        </button>
+      </label>
 
-        <p
-          id="operatorLoginMessage"
-          class="operator-message"
-        ></p>
-
-      </form>
-
-    </div>
-  </section>
-
-
-  <!-- PANEL -->
-  <section
-    id="operatorView"
-    class="hidden"
-  >
-
-    <div class="operator-shell">
-
-      <header class="operator-header">
-
-        <div class="operator-header-left">
-
-          <span class="operator-label">
-            MODEX.UZ
-          </span>
-
-          <h1>Operator Panel</h1>
-
-          <p>
-            Operator:
-            <strong id="operatorUserName">
-              Operator
-            </strong>
-          </p>
-
-        </div>
-
-        <div class="operator-header-actions">
-
-          <button
-            id="operatorRefreshBtn"
-            class="operator-btn"
-            type="button"
-          >
-            🔄 Yangilash
-          </button>
-
-          <button
-            id="operatorLogoutBtn"
-            class="operator-btn"
-            type="button"
-          >
-            Chiqish
-          </button>
-
-        </div>
-
-      </header>
-
-
-      <!-- STATS -->
-      <section class="operator-stats">
-
-        <article class="operator-stat operator-stat-new">
-          <span>🔴 Yangi</span>
-          <strong id="operatorNewCount">0</strong>
-          <small>Yangi zayavkalar</small>
-        </article>
-
-        <article class="operator-stat operator-stat-talked">
-          <span>🟠 Bugun gaplashildi</span>
-          <strong id="operatorTalkedCount">0</strong>
-          <small>Bugungi natija</small>
-        </article>
-
-        <article class="operator-stat operator-stat-confirmed">
-          <span>🔵 Qadoqlanmoqda</span>
-          <strong id="operatorConfirmedCount">0</strong>
-          <small>Tasdiqlanganlar</small>
-        </article>
-
-        <article class="operator-stat operator-stat-done">
-          <span>🟢 Yetkazildi</span>
-          <strong id="operatorDoneCount">0</strong>
-          <small>Yakunlanganlar</small>
-        </article>
-
-      </section>
-
-
-      <!-- SEARCH / FILTER -->
-      <section class="operator-tools">
-
-        <div class="operator-search">
-
-          <input
-            id="operatorOrderSearch"
-            type="search"
-            placeholder="Ism, telefon, mahsulot, hudud..."
-          >
-
-          <button
-            id="operatorClearSearch"
-            type="button"
-          >
-            ×
-          </button>
-
-        </div>
-
-        <div class="operator-filters">
-
-          <button
-            class="operator-filter-btn active"
-            data-status="all"
-            type="button"
-          >
-            Barchasi
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="new"
-            type="button"
-          >
-            🔴 Yangi
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="talked"
-            type="button"
-          >
-            🟠 Bugun gaplashildi
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="confirmed"
-            type="button"
-          >
-            🔵 Qadoq
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="delivery"
-            type="button"
-          >
-            🟣 Yo‘lda
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="done"
-            type="button"
-          >
-            🟢 Yetkazildi
-          </button>
-
-          <button
-            class="operator-filter-btn"
-            data-status="cancelled"
-            type="button"
-          >
-            ⚪ Bekor
-          </button>
-
-        </div>
-
-      </section>
-
-
-      <!-- ORDERS -->
-      <section class="operator-orders-section">
-
-        <div class="operator-orders-head">
-
-          <div>
-            <span class="operator-label">
-              ZAYAVKALAR
-            </span>
-
-            <h2>Buyurtmalar</h2>
-
-            <p>
-              Buyurtmani ochib mijoz bilan ishlang.
-            </p>
-          </div>
-
-          <span
-            id="operatorVisibleCount"
-            class="operator-count"
-          >
-            0 ta
-          </span>
-
-        </div>
-
-        <div
-          id="operatorOrders"
-          class="operator-orders"
-        ></div>
-
-        <p
-          id="operatorOrdersMessage"
-          class="operator-message"
-        ></p>
-
-      </section>
-
-    </div>
-
-  </section>
-
-
-  <!-- MODAL -->
-  <dialog
-    id="operatorOrderDialog"
-    class="order-edit-modal"
-  >
-
-    <div class="order-edit-box">
+      <label>
+        Parol
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </label>
 
       <button
-        id="operatorCloseOrder"
-        class="order-edit-close"
-        type="button"
+        id="loginButton"
+        class="primary-btn"
+        type="submit"
       >
-        ×
+        Kirish
       </button>
 
-      <span class="order-edit-label">
-        ZAYAVKA
-      </span>
+      <div
+        id="loginMessage"
+        class="message"
+      ></div>
 
-      <h2 id="operatorOrderTitle">
-        Buyurtma
-      </h2>
+    </form>
 
-      <form
-        id="operatorOrderForm"
-        class="order-edit-form"
-      >
+  </div>
+
+</section>
+
+
+<!-- PANEL -->
+
+<section
+  id="panelView"
+  class="hidden"
+>
+
+  <div class="shell">
+
+    <header class="header">
+
+      <div>
+
+        <span class="mini-label">
+          MODEX.UZ
+        </span>
+
+        <h1>
+          Operator Panel
+        </h1>
+
+        <p>
+          Operator:
+          <strong id="operatorName">
+            —
+          </strong>
+        </p>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          id="refreshBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          🔄 Yangilash
+        </button>
+
+        <button
+          id="logoutBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          Chiqish
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <section class="stats">
+
+      <article class="stat new">
+        <span>🔴 YANGI</span>
+        <strong id="newCount">0</strong>
+      </article>
+
+      <article class="stat talked">
+        <span>🟠 BUGUN GAPLASHILDI</span>
+        <strong id="talkedCount">0</strong>
+      </article>
+
+      <article class="stat confirmed">
+        <span>🔵 QADOQLANMOQDA</span>
+        <strong id="confirmedCount">0</strong>
+      </article>
+
+      <article class="stat done">
+        <span>🟢 YETKAZILDI</span>
+        <strong id="doneCount">0</strong>
+      </article>
+
+    </section>
+
+
+    <section class="tools">
+
+      <div class="search">
 
         <input
-          id="operatorEditOrderId"
-          type="hidden"
+          id="searchInput"
+          type="search"
+          placeholder="Ism, telefon, mahsulot, hudud..."
         >
 
-        <div class="operator-form-section">
-          👤 Mijoz
-        </div>
+        <button
+          id="clearSearch"
+          type="button"
+        >
+          ×
+        </button>
 
-        <div class="order-edit-grid">
+      </div>
 
-          <label>
-            Ism
-            <input id="operatorEditName">
-          </label>
+      <div class="filters">
 
-          <label>
-            Familiya
-            <input id="operatorEditSurname">
-          </label>
+        <button
+          class="filter-btn active"
+          data-status="all"
+          type="button"
+        >
+          Barchasi
+        </button>
 
-        </div>
+        <button
+          class="filter-btn"
+          data-status="new"
+          type="button"
+        >
+          🔴 Yangi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="talked"
+          type="button"
+        >
+          🟠 Gaplashildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="confirmed"
+          type="button"
+        >
+          🔵 Qadoq
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="delivery"
+          type="button"
+        >
+          🟣 Yo‘lda
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="done"
+          type="button"
+        >
+          🟢 Yetkazildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="cancelled"
+          type="button"
+        >
+          ⚪ Bekor
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <section class="orders-section">
+
+      <div class="orders-head">
+
+        <h2>
+          Buyurtmalar
+        </h2>
+
+        <span
+          id="visibleCount"
+          class="count"
+        >
+          0 ta
+        </span>
+
+      </div>
+
+      <div
+        id="orders"
+        class="orders"
+      ></div>
+
+      <div
+        id="ordersMessage"
+        class="message"
+      ></div>
+
+    </section>
+
+  </div>
+
+</section>
+
+
+<!-- MODAL -->
+
+<dialog id="orderDialog">
+
+  <div class="modal">
+
+    <button
+      id="closeDialog"
+      class="close"
+      type="button"
+    >
+      ×
+    </button>
+
+    <span class="mini-label">
+      ZAYAVKA
+    </span>
+
+    <h2 id="modalTitle">
+      Buyurtma
+    </h2>
+
+    <form
+      id="orderForm"
+      class="edit-form"
+    >
+
+      <input
+        id="editId"
+        type="hidden"
+      >
+
+
+      <div class="section-title">
+        👤 Mijoz
+      </div>
+
+
+      <div class="two">
 
         <label>
-          Telefon
+          Ism
+          <input id="editName">
+        </label>
+
+        <label>
+          Familiya
+          <input id="editSurname">
+        </label>
+
+      </div>
+
+
+      <label>
+        Telefon
+        <input
+          id="editPhone"
+          type="tel"
+        >
+      </label>
+
+
+      <a
+        id="callBtn"
+        class="big-call"
+        href="#"
+      >
+        📞 Mijozga qo‘ng‘iroq
+      </a>
+
+
+      <div class="section-title">
+        📦 Mahsulot
+      </div>
+
+
+      <label>
+        Mahsulot
+        <input
+          id="editProduct"
+          readonly
+        >
+      </label>
+
+
+      <div class="three">
+
+        <label>
+          Soni
           <input
-            id="operatorEditPhone"
-            type="tel"
+            id="editQuantity"
+            type="number"
+            min="1"
           >
         </label>
 
-        <a
-          id="operatorCallCustomer"
-          class="operator-big-call"
-          href="#"
-        >
-          📞 Mijozga qo‘ng‘iroq
-        </a>
-
-        <div class="operator-form-section">
-          📦 Mahsulot
-        </div>
-
         <label>
-          Mahsulot
-          <input
-            id="operatorEditProduct"
-            readonly
-          >
+          Razmer
+          <input id="editSize">
         </label>
 
-        <div class="operator-order-mini-grid">
+        <label>
+          Rang
+          <input id="editColor">
+        </label>
 
-          <label>
-            Soni
-            <input
-              id="operatorEditQuantity"
-              type="number"
-              min="1"
+      </div>
+
+
+      <div class="section-title">
+        🚚 Yetkazish
+      </div>
+
+
+      <label>
+        Viloyat / shahar
+        <input id="editRegion">
+      </label>
+
+
+      <label>
+        Manzil
+        <textarea id="editAddress"></textarea>
+      </label>
+
+
+      <div class="section-title">
+        📝 Izoh
+      </div>
+
+
+      <label>
+        Operator izohi
+        <textarea id="editNote"></textarea>
+      </label>
+
+
+      <div class="section-title">
+        📌 Status
+      </div>
+
+
+      <label>
+        Buyurtma holati
+
+        <select id="editStatus">
+
+          <option value="new">
+            🔴 Yangi
+          </option>
+
+          <option value="talked">
+            🟠 Gaplashildi
+          </option>
+
+          <option value="confirmed">
+            🔵 Qadoqlanmoqda
+          </option>
+
+          <option value="delivery">
+            🟣 Yo‘lda
+          </option>
+
+          <option value="done">
+            🟢 Yetkazildi
+          </option>
+
+          <option value="cancelled">
+            ⚪ Bekor
+          </option>
+
+        </select>
+
+      </label>
+
+
+      <div class="actions">
+
+        <button
+          class="primary-btn"
+          type="submit"
+        >
+          💾 Saqlash
+        </button>
+
+        <button
+          id="qrBtn"
+          class="qr-btn"
+          type="button"
+        >
+          QR etiketka
+        </button>
+
+      </div>
+
+
+      <div
+        id="orderMessage"
+        class="message"
+      ></div>
+
+    </form>
+
+  </div>
+
+</dialog>
+
+
+<!-- CONFIG -->
+<script src="./config.js?v=20260823-2244"></script>
+
+<script>
+(function(){
+
+  "use strict";
+
+  const config =
+    window.MODEX_CONFIG || {};
+
+  const SUPABASE_URL =
+    config.SUPABASE_URL || "";
+
+  const SUPABASE_KEY =
+    config.SUPABASE_KEY || "";
+
+  const $ =
+    id => document.getElementById(id);
+
+
+  let currentUser = null;
+  let currentProfile = null;
+  let currentOrder = null;
+
+  let allOrders = [];
+  let activeFilter = "all";
+
+
+  const statusNames = {
+    new:"🔴 Yangi",
+    talked:"🟠 Gaplashildi",
+    confirmed:"🔵 Qadoqlanmoqda",
+    delivery:"🟣 Yo‘lda",
+    done:"🟢 Yetkazildi",
+    cancelled:"⚪ Bekor"
+  };
+
+
+  function showMessage(
+    element,
+    text,
+    type
+  ){
+    if(!element){
+      return;
+    }
+
+    element.textContent =
+      text || "";
+
+    element.className =
+      "message";
+
+    if(type){
+      element.classList.add(type);
+    }
+  }
+
+
+  function escapeHtml(value){
+    return String(value ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+
+  function normalizePhone(value){
+    return String(value || "")
+      .replace(/[^\d+]/g,"");
+  }
+
+
+  function formatDate(value){
+
+    if(!value){
+      return "—";
+    }
+
+    const date =
+      new Date(value);
+
+    if(
+      Number.isNaN(
+        date.getTime()
+      )
+    ){
+      return "—";
+    }
+
+    return date.toLocaleString(
+      "uz-UZ",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    );
+  }
+
+
+  function isToday(value){
+
+    if(!value){
+      return false;
+    }
+
+    const date =
+      new Date(value);
+
+    const now =
+      new Date();
+
+    return (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate()
+    );
+  }
+
+
+  function getToken(){
+    return sessionStorage.getItem(
+      "modex_operator_token"
+    );
+  }
+
+
+  function saveToken(value){
+    sessionStorage.setItem(
+      "modex_operator_token",
+      value
+    );
+  }
+
+
+  function clearToken(){
+    sessionStorage.removeItem(
+      "modex_operator_token"
+    );
+  }
+
+
+  async function api(
+    path,
+    options,
+    token
+  ){
+
+    options =
+      options || {};
+
+    token =
+      token || SUPABASE_KEY;
+
+
+    if(
+      !SUPABASE_URL ||
+      !SUPABASE_KEY
+    ){
+      throw new Error(
+        "config.js ishlamayapti."
+      );
+    }
+
+
+    const response =
+      await fetch(
+        SUPABASE_URL + "/" + path,
+        {
+          method:
+            options.method || "GET",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "apikey":
+              SUPABASE_KEY,
+
+            "Authorization":
+              "Bearer " + token,
+
+            ...(options.headers || {})
+          },
+
+          body:
+            options.body
+        }
+      );
+
+
+    if(!response.ok){
+
+      let errorMessage =
+        "Server xatosi (" +
+        response.status +
+        ")";
+
+
+      try{
+
+        const data =
+          await response.json();
+
+        errorMessage =
+          data.message ||
+          data.error_description ||
+          data.error ||
+          errorMessage;
+
+      }catch(error){}
+
+
+      throw new Error(
+        errorMessage
+      );
+    }
+
+
+    if(
+      response.status === 204
+    ){
+      return null;
+    }
+
+
+    const text =
+      await response.text();
+
+
+    if(!text){
+      return null;
+    }
+
+
+    return JSON.parse(text);
+  }
+
+
+  /* =====================================
+     LOGIN
+  ===================================== */
+
+  async function login(){
+
+    const email =
+      $("email").value.trim();
+
+    const password =
+      $("password").value;
+
+
+    if(!email || !password){
+
+      showMessage(
+        $("loginMessage"),
+        "Email va parolni kiriting.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      $("loginMessage"),
+      "Kirilmoqda..."
+    );
+
+
+    $("loginButton").disabled =
+      true;
+
+
+    try{
+
+      const data =
+        await api(
+          "auth/v1/token?grant_type=password",
+          {
+            method:"POST",
+
+            body:
+              JSON.stringify({
+                email:email,
+                password:password
+              })
+          }
+        );
+
+
+      if(
+        !data ||
+        !data.access_token
+      ){
+        throw new Error(
+          "Token olinmadi."
+        );
+      }
+
+
+      saveToken(
+        data.access_token
+      );
+
+
+      await openPanel();
+
+
+      $("loginForm").reset();
+
+
+      showMessage(
+        $("loginMessage"),
+        ""
+      );
+
+
+    }catch(error){
+
+      console.error(error);
+
+
+      clearToken();
+
+
+      showMessage(
+        $("loginMessage"),
+        error.message ||
+        "Login bo‘lmadi.",
+        "error"
+      );
+
+
+    }finally{
+
+      $("loginButton").disabled =
+        false;
+    }
+  }
+
+
+  async function loadUser(){
+
+    currentUser =
+      await api(
+        "auth/v1/user",
+        {
+          method:"GET"
+        },
+        getToken()
+      );
+
+
+    if(
+      !currentUser ||
+      !currentUser.id
+    ){
+      throw new Error(
+        "Operator aniqlanmadi."
+      );
+    }
+  }
+
+
+  async function loadProfile(){
+
+    const data =
+      await api(
+        "rest/v1/profiles?id=eq." +
+        encodeURIComponent(
+          currentUser.id
+        ) +
+        "&select=*",
+        {
+          method:"GET"
+        },
+        getToken()
+      );
+
+
+    currentProfile =
+      Array.isArray(data)
+        ? data[0]
+        : null;
+
+
+    if(!currentProfile){
+      throw new Error(
+        "Operator profili topilmadi."
+      );
+    }
+
+
+    if(
+      currentProfile.role !==
+      "operator"
+    ){
+      throw new Error(
+        "Bu hisob operator emas."
+      );
+    }
+
+
+    if(
+      currentProfile.active !==
+      true
+    ){
+      throw new Error(
+        "Operator bloklangan."
+      );
+    }
+  }
+
+
+  async function openPanel(){
+
+    await loadUser();
+
+    await loadProfile();
+
+
+    $("loginView")
+      .classList.add(
+        "hidden"
+      );
+
+
+    $("panelView")
+      .classList.remove(
+        "hidden"
+      );
+
+
+    $("operatorName")
+      .textContent =
+        currentProfile.name ||
+        currentUser.email ||
+        "Operator";
+
+
+    await loadOrders();
+  }
+
+
+  /* =====================================
+     ORDERS
+  ===================================== */
+
+  async function loadOrders(){
+
+    showMessage(
+      $("ordersMessage"),
+      "Buyurtmalar yuklanmoqda..."
+    );
+
+
+    const data =
+      await api(
+        "rest/v1/orders?select=*&order=id.desc",
+        {
+          method:"GET"
+        },
+        getToken()
+      );
+
+
+    allOrders =
+      Array.isArray(data)
+        ? data
+        : [];
+
+
+    updateStats();
+    renderOrders();
+
+
+    showMessage(
+      $("ordersMessage"),
+      ""
+    );
+  }
+
+
+  function talkedTodayByMe(order){
+
+    return (
+      currentUser &&
+      order.operator_id ===
+        currentUser.id &&
+      isToday(
+        order.talked_at
+      )
+    );
+  }
+
+
+  function updateStats(){
+
+    $("newCount").textContent =
+      allOrders.filter(
+        order =>
+          order.status === "new"
+      ).length;
+
+
+    $("talkedCount").textContent =
+      allOrders.filter(
+        talkedTodayByMe
+      ).length;
+
+
+    $("confirmedCount").textContent =
+      allOrders.filter(
+        order =>
+          order.status ===
+          "confirmed"
+      ).length;
+
+
+    $("doneCount").textContent =
+      allOrders.filter(
+        order =>
+          order.status ===
+          "done"
+      ).length;
+  }
+
+
+  function getFilteredOrders(){
+
+    let list =
+      allOrders.slice();
+
+
+    if(
+      activeFilter ===
+      "talked"
+    ){
+
+      list =
+        list.filter(
+          talkedTodayByMe
+        );
+
+    }else if(
+      activeFilter !==
+      "all"
+    ){
+
+      list =
+        list.filter(
+          order =>
+            order.status ===
+            activeFilter
+        );
+    }
+
+
+    const query =
+      $("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    if(query){
+
+      list =
+        list.filter(order => {
+
+          const text = [
+            order.id,
+            order.name,
+            order.surname,
+            order.phone,
+            order.product,
+            order.region,
+            order.address
+          ]
+          .join(" ")
+          .toLowerCase();
+
+
+          return text.includes(
+            query
+          );
+        });
+    }
+
+
+    return list;
+  }
+
+
+  function renderOrders(){
+
+    const container =
+      $("orders");
+
+    const list =
+      getFilteredOrders();
+
+
+    $("visibleCount")
+      .textContent =
+        list.length + " ta";
+
+
+    container.innerHTML =
+      "";
+
+
+    if(
+      list.length === 0
+    ){
+
+      container.innerHTML = `
+        <div style="
+          grid-column:1/-1;
+          text-align:center;
+          padding:35px;
+          color:#777;
+        ">
+          Buyurtmalar yo‘q.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    list.forEach(order => {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "order-card";
+
+
+      card.innerHTML = `
+
+        <div class="order-top">
+
+          <div>
+
+            <span class="order-id">
+              BUYURTMA #${escapeHtml(order.id)}
+            </span>
+
+            <strong class="order-name">
+              ${escapeHtml(order.name || "Mijoz")}
+              ${escapeHtml(order.surname || "")}
+            </strong>
+
+          </div>
+
+          <span class="status">
+            ${
+              statusNames[
+                order.status
+              ] ||
+              order.status ||
+              "—"
+            }
+          </span>
+
+        </div>
+
+
+        <div class="product-box">
+
+          <small>
+            MAHSULOT
+          </small>
+
+          <strong>
+            ${escapeHtml(
+              order.product ||
+              "Mahsulot"
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="info-grid">
+
+          <div>
+            <span>SONI</span>
+            <strong>
+              ${escapeHtml(
+                order.quantity || 1
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>RAZMER</span>
+            <strong>
+              ${escapeHtml(
+                order.size || "—"
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>RANG</span>
+            <strong>
+              ${escapeHtml(
+                order.color || "—"
+              )}
+            </strong>
+          </div>
+
+        </div>
+
+
+        ${
+          order.region ||
+          order.address
+
+          ? `
+            <div class="location">
+              📍
+              ${escapeHtml(
+                order.region || ""
+              )}
+
+              ${
+                order.address
+                  ? " — " +
+                    escapeHtml(
+                      order.address
+                    )
+                  : ""
+              }
+            </div>
+          `
+
+          : ""
+        }
+
+
+        ${
+          order.phone
+
+          ? `
+            <a
+              class="call-btn"
+              href="tel:${normalizePhone(order.phone)}"
             >
-          </label>
+              📞 ${escapeHtml(order.phone)}
+            </a>
+          `
 
-          <label>
-            Razmer
-            <input id="operatorEditSize">
-          </label>
-
-          <label>
-            Rang
-            <input id="operatorEditColor">
-          </label>
-
-        </div>
-
-        <div class="operator-form-section">
-          🚚 Yetkazish
-        </div>
-
-        <label>
-          Viloyat / shahar
-          <input id="operatorEditRegion">
-        </label>
-
-        <label>
-          Manzil
-          <textarea id="operatorEditAddress"></textarea>
-        </label>
-
-        <div class="operator-form-section">
-          📝 Izoh
-        </div>
-
-        <label>
-          Operator izohi
-          <textarea id="operatorEditNote"></textarea>
-        </label>
-
-        <div class="operator-form-section">
-          📌 Status
-        </div>
-
-        <label>
-          Holat
-
-          <select id="operatorEditStatus">
-
-            <option value="new">
-              🔴 Yangi
-            </option>
-
-            <option value="talked">
-              🟠 Gaplashildi
-            </option>
-
-            <option value="confirmed">
-              🔵 Qadoqlanmoqda
-            </option>
-
-            <option value="delivery">
-              🟣 Yo‘lda
-            </option>
-
-            <option value="done">
-              🟢 Yetkazildi
-            </option>
-
-            <option value="cancelled">
-              ⚪ Bekor
-            </option>
-
-          </select>
-
-        </label>
-
-        <div class="order-edit-actions">
-
-          <button
-            type="submit"
-            class="order-edit-save"
-          >
-            💾 Saqlash
-          </button>
-
-          <button
-            id="operatorQrBtn"
-            type="button"
-            class="order-edit-qr"
-          >
-            QR etiketka
-          </button>
-
-        </div>
-
-        <p
-          id="operatorOrderMessage"
-          class="operator-message"
-        ></p>
-
-      </form>
-
-    </div>
-
-  </dialog>
+          : ""
+        }
 
 
-  <script src="./config.js?v=20260823-2245"></script>
-  <script src="./operator.js?v=20260823-2245"></script>
+        <button
+          class="open-btn"
+          type="button"
+          data-id="${order.id}"
+        >
+          Zayavkani ochish
+        </button>
+
+
+        <small class="date">
+          ${formatDate(
+            order.created_at
+          )}
+        </small>
+      `;
+
+
+      container.appendChild(
+        card
+      );
+    });
+
+
+    container
+      .querySelectorAll(
+        ".open-btn"
+      )
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          function(){
+
+            openOrder(
+              Number(
+                button.dataset.id
+              )
+            );
+          }
+        );
+      });
+  }
+
+
+  /* =====================================
+     OPEN ORDER
+  ===================================== */
+
+  function openOrder(id){
+
+    const order =
+      allOrders.find(
+        item =>
+          Number(item.id) ===
+          Number(id)
+      );
+
+
+    if(!order){
+      return;
+    }
+
+
+    currentOrder =
+      order;
+
+
+    $("modalTitle").textContent =
+      "Buyurtma #" +
+      order.id;
+
+
+    $("editId").value =
+      order.id;
+
+    $("editName").value =
+      order.name || "";
+
+    $("editSurname").value =
+      order.surname || "";
+
+    $("editPhone").value =
+      order.phone || "";
+
+    $("editProduct").value =
+      order.product || "";
+
+    $("editQuantity").value =
+      order.quantity || 1;
+
+    $("editSize").value =
+      order.size || "";
+
+    $("editColor").value =
+      order.color || "";
+
+    $("editRegion").value =
+      order.region || "";
+
+    $("editAddress").value =
+      order.address || "";
+
+    $("editNote").value =
+      order.note || "";
+
+    $("editStatus").value =
+      order.status || "new";
+
+
+    $("editQuantity").disabled =
+      order.stock_adjusted ===
+      true;
+
+
+    $("callBtn").href =
+      order.phone
+        ? "tel:" +
+          normalizePhone(
+            order.phone
+          )
+        : "#";
+
+
+    showMessage(
+      $("orderMessage"),
+      ""
+    );
+
+
+    if(
+      typeof
+      $("orderDialog").showModal ===
+      "function"
+    ){
+
+      $("orderDialog")
+        .showModal();
+
+    }else{
+
+      $("orderDialog")
+        .setAttribute(
+          "open",
+          ""
+        );
+    }
+  }
+
+
+  function closeOrder(){
+
+    if(
+      typeof
+      $("orderDialog").close ===
+      "function"
+    ){
+
+      $("orderDialog")
+        .close();
+
+    }else{
+
+      $("orderDialog")
+        .removeAttribute(
+          "open"
+        );
+    }
+
+
+    $("editQuantity")
+      .disabled =
+        false;
+
+
+    currentOrder =
+      null;
+  }
+
+
+  /* =====================================
+     SAVE ORDER
+  ===================================== */
+
+  async function saveOrder(event){
+
+    event.preventDefault();
+
+
+    if(!currentOrder){
+      return;
+    }
+
+
+    const orderId =
+      Number(
+        $("editId").value
+      );
+
+
+    const oldStatus =
+      currentOrder.status ||
+      "new";
+
+
+    const newStatus =
+      $("editStatus").value;
+
+
+    showMessage(
+      $("orderMessage"),
+      "Saqlanmoqda..."
+    );
+
+
+    try{
+
+      const details = {
+
+        name:
+          $("editName")
+            .value
+            .trim(),
+
+        surname:
+          $("editSurname")
+            .value
+            .trim() ||
+          null,
+
+        phone:
+          $("editPhone")
+            .value
+            .trim(),
+
+        quantity:
+          Math.max(
+            1,
+            Number(
+              $("editQuantity")
+                .value || 1
+            )
+          ),
+
+        size:
+          $("editSize")
+            .value
+            .trim() ||
+          null,
+
+        color:
+          $("editColor")
+            .value
+            .trim() ||
+          null,
+
+        region:
+          $("editRegion")
+            .value
+            .trim() ||
+          null,
+
+        address:
+          $("editAddress")
+            .value
+            .trim() ||
+          null,
+
+        note:
+          $("editNote")
+            .value
+            .trim() ||
+          null,
+
+        updated_at:
+          new Date()
+            .toISOString()
+      };
+
+
+      await api(
+        "rest/v1/orders?id=eq." +
+        orderId,
+        {
+          method:"PATCH",
+
+          headers:{
+            Prefer:
+              "return=minimal"
+          },
+
+          body:
+            JSON.stringify(
+              details
+            )
+        },
+        getToken()
+      );
+
+
+      if(
+        oldStatus !==
+        newStatus
+      ){
+
+        await api(
+          "rest/v1/rpc/update_order_status_with_stock",
+          {
+            method:"POST",
+
+            body:
+              JSON.stringify({
+                p_order_id:
+                  orderId,
+
+                p_new_status:
+                  newStatus,
+
+                p_operator_id:
+                  currentUser.id
+              })
+          },
+          getToken()
+        );
+      }
+
+
+      await loadOrders();
+
+
+      showMessage(
+        $("orderMessage"),
+        "✅ Saqlandi",
+        "success"
+      );
+
+
+      setTimeout(
+        closeOrder,
+        450
+      );
+
+
+    }catch(error){
+
+      console.error(error);
+
+
+      showMessage(
+        $("orderMessage"),
+        error.message ||
+        "Saqlashda xatolik.",
+        "error"
+      );
+    }
+  }
+
+
+  /* =====================================
+     QR
+  ===================================== */
+
+  function showQr(){
+
+    if(!currentOrder){
+      return;
+    }
+
+
+    const base =
+      window.location.href
+        .split("operator.html")[0];
+
+
+    const url =
+      base +
+      "track.html?id=" +
+      encodeURIComponent(
+        currentOrder.id
+      ) +
+      "&phone=" +
+      encodeURIComponent(
+        currentOrder.phone ||
+        ""
+      );
+
+
+    prompt(
+      "QR uchun tracking link:",
+      url
+    );
+  }
+
+
+  /* =====================================
+     EVENTS
+  ===================================== */
+
+  $("loginForm")
+    .addEventListener(
+      "submit",
+      function(event){
+
+        event.preventDefault();
+
+        login();
+      }
+    );
+
+
+  $("logoutBtn")
+    .addEventListener(
+      "click",
+      function(){
+
+        clearToken();
+
+        location.reload();
+      }
+    );
+
+
+  $("refreshBtn")
+    .addEventListener(
+      "click",
+      async function(){
+
+        try{
+
+          await loadOrders();
+
+        }catch(error){
+
+          alert(
+            error.message
+          );
+        }
+      }
+    );
+
+
+  $("searchInput")
+    .addEventListener(
+      "input",
+      renderOrders
+    );
+
+
+  $("clearSearch")
+    .addEventListener(
+      "click",
+      function(){
+
+        $("searchInput")
+          .value =
+            "";
+
+        renderOrders();
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".filter-btn"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        function(){
+
+          activeFilter =
+            button.dataset.status ||
+            "all";
+
+
+          document
+            .querySelectorAll(
+              ".filter-btn"
+            )
+            .forEach(item => {
+
+              item.classList.toggle(
+                "active",
+                item === button
+              );
+            });
+
+
+          renderOrders();
+        }
+      );
+    });
+
+
+  $("closeDialog")
+    .addEventListener(
+      "click",
+      closeOrder
+    );
+
+
+  $("orderForm")
+    .addEventListener(
+      "submit",
+      saveOrder
+    );
+
+
+  $("qrBtn")
+    .addEventListener(
+      "click",
+      showQr
+    );
+
+
+  /* =====================================
+     INIT
+  ===================================== */
+
+  async function init(){
+
+    if(!getToken()){
+      return;
+    }
+
+
+    try{
+
+      await openPanel();
+
+    }catch(error){
+
+      console.error(error);
+
+      clearToken();
+
+      showMessage(
+        $("loginMessage"),
+        "Qayta login qiling.",
+        "error"
+      );
+    }
+  }
+
+
+  init();
+
+})();
+</script>
 
 </body>
 </html>
