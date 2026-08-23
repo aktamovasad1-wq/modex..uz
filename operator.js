@@ -1,85 +1,1064 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  >
+
+  <title>MODEX.UZ — Operator</title>
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#fff;
+      --text:#17171d;
+      --muted:#777784;
+      --line:#e7e7ef;
+      --primary:#713cf0;
+      --primary-soft:#efe9ff;
+      --red:#e5484d;
+      --orange:#f59e0b;
+      --blue:#4f7cff;
+      --purple:#8b5cf6;
+      --green:#20ad68;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .message{
+      min-height:18px;
+      margin:8px 0 0;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .message.error{
+      color:#d63238;
+    }
+
+    .message.success{
+      color:#16965a;
+    }
+
+    /* LOGIN */
+
+    .login-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      background:
+        radial-gradient(circle at top left,#eee8ff,transparent 38%),
+        var(--bg);
+    }
+
+    .login-card{
+      width:100%;
+      max-width:420px;
+      padding:28px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 15px 50px rgba(20,20,35,.09);
+    }
+
+    .logo{
+      font-size:26px;
+      font-weight:950;
+      letter-spacing:-1px;
+    }
+
+    .logo span{
+      color:var(--primary);
+    }
+
+    .label{
+      display:inline-block;
+      margin-top:7px;
+      font-size:10px;
+      font-weight:900;
+      color:var(--primary);
+      letter-spacing:.12em;
+    }
+
+    .login-card h1{
+      margin:9px 0 6px;
+      font-size:29px;
+    }
+
+    .login-card p{
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .login-form{
+      display:grid;
+      gap:13px;
+      margin-top:20px;
+    }
+
+    .login-form label,
+    .edit-form label{
+      display:grid;
+      gap:6px;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    input,
+    select,
+    textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+      background:#fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px var(--primary-soft);
+    }
+
+    textarea{
+      min-height:85px;
+      resize:vertical;
+    }
+
+    .primary-btn{
+      border:0;
+      border-radius:13px;
+      padding:13px;
+      background:var(--primary);
+      color:#fff;
+      font-weight:900;
+    }
+
+    /* PANEL */
+
+    .shell{
+      width:min(1280px,calc(100% - 28px));
+      margin:0 auto;
+      padding:22px 0 100px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .header h1{
+      margin:4px 0;
+      font-size:30px;
+    }
+
+    .header p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .header-actions{
+      display:flex;
+      gap:8px;
+    }
+
+    .secondary-btn{
+      border:1px solid var(--line);
+      border-radius:11px;
+      padding:10px 13px;
+      background:#fff;
+      font-weight:800;
+    }
+
+    /* STATS */
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:15px;
+    }
+
+    .stat{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:15px;
+    }
+
+    .stat span{
+      display:block;
+      font-size:10px;
+      font-weight:850;
+      color:var(--muted);
+      margin-bottom:5px;
+    }
+
+    .stat strong{
+      font-size:27px;
+    }
+
+    .stat.new{
+      border-top:4px solid var(--red);
+    }
+
+    .stat.talked{
+      border-top:4px solid var(--orange);
+    }
+
+    .stat.confirmed{
+      border-top:4px solid var(--blue);
+    }
+
+    .stat.done{
+      border-top:4px solid var(--green);
+    }
+
+    /* SEARCH */
+
+    .tools{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:12px;
+      margin-bottom:14px;
+    }
+
+    .search{
+      display:flex;
+      gap:7px;
+      margin-bottom:10px;
+    }
+
+    .search input{
+      flex:1;
+    }
+
+    .search button{
+      width:43px;
+      border:0;
+      border-radius:11px;
+      background:#f0f0f5;
+      font-size:19px;
+    }
+
+    .filters{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+    }
+
+    .filter-btn{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:9px 12px;
+      background:#fff;
+      font-size:11px;
+      font-weight:850;
+    }
+
+    .filter-btn.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    /* ORDERS */
+
+    .orders-section{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:19px;
+      padding:15px;
+    }
+
+    .orders-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:13px;
+    }
+
+    .orders-head h2{
+      margin:0;
+    }
+
+    .count{
+      background:var(--primary-soft);
+      color:var(--primary);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .orders{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:11px;
+    }
+
+    .order-card{
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:13px;
+      background:#fff;
+    }
+
+    .order-top{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .order-id{
+      display:block;
+      font-size:9px;
+      font-weight:900;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .order-name{
+      font-size:14px;
+    }
+
+    .status{
+      font-size:9px;
+      font-weight:850;
+      background:#f3f3f8;
+      padding:6px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+
+    .product-box{
+      border-radius:11px;
+      background:#f8f8fc;
+      padding:10px;
+      margin-bottom:8px;
+    }
+
+    .product-box small{
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:900;
+      margin-bottom:3px;
+    }
+
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:6px;
+      margin-bottom:8px;
+    }
+
+    .info-grid div{
+      background:#f8f8fc;
+      border-radius:9px;
+      padding:7px;
+    }
+
+    .info-grid span{
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:900;
+    }
+
+    .info-grid strong{
+      font-size:11px;
+    }
+
+    .location{
+      font-size:11px;
+      line-height:1.4;
+      margin:8px 0;
+    }
+
+    .call-btn{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      padding:10px;
+      margin-bottom:7px;
+      border-radius:10px;
+      background:#eaf9f1;
+      color:#168650;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .open-btn{
+      width:100%;
+      border:0;
+      border-radius:10px;
+      padding:10px;
+      background:var(--primary);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .date{
+      display:block;
+      margin-top:7px;
+      font-size:9px;
+      color:var(--muted);
+    }
+
+    /* MODAL */
+
+    dialog{
+      width:min(700px,calc(100% - 20px));
+      padding:0;
+      border:0;
+      border-radius:20px;
+      background:transparent;
+    }
+
+    dialog::backdrop{
+      background:rgba(15,15,22,.58);
+      backdrop-filter:blur(3px);
+    }
+
+    .modal{
+      position:relative;
+      padding:20px;
+      background:#fff;
+      border-radius:20px;
+      max-height:90vh;
+      overflow:auto;
+    }
+
+    .close{
+      position:absolute;
+      right:12px;
+      top:12px;
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:50%;
+      background:#f0f0f5;
+      font-size:20px;
+    }
+
+    .modal h2{
+      margin:7px 0 17px;
+    }
+
+    .edit-form{
+      display:grid;
+      gap:11px;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .three{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+
+    .form-title{
+      border-top:1px solid var(--line);
+      padding-top:9px;
+      margin-top:3px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .big-call{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      border-radius:11px;
+      padding:11px;
+      background:#eaf9f1;
+      color:#168650;
+      font-weight:900;
+      font-size:12px;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .qr-btn{
+      border:0;
+      border-radius:12px;
+      background:#f0f0f5;
+      font-weight:900;
+    }
+
+    @media(max-width:900px){
+      .orders{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media(max-width:650px){
+      .shell{
+        width:calc(100% - 16px);
+        padding-top:12px;
+      }
+
+      .header{
+        flex-direction:column;
+      }
+
+      .header-actions{
+        width:100%;
+      }
+
+      .header-actions button{
+        flex:1;
+      }
+
+      .stats{
+        grid-template-columns:repeat(2,1fr);
+        gap:7px;
+      }
+
+      .stat{
+        padding:12px;
+      }
+
+      .orders{
+        grid-template-columns:1fr;
+      }
+
+      .filters{
+        flex-wrap:nowrap;
+        overflow-x:auto;
+      }
+
+      .filter-btn{
+        flex:none;
+      }
+
+      .two{
+        grid-template-columns:1fr;
+      }
+
+      .three{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .actions{
+        grid-template-columns:1fr;
+      }
+
+      .qr-btn{
+        min-height:44px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<section id="loginView" class="login-page">
+
+  <div class="login-card">
+
+    <div class="logo">
+      MODEX<span>.UZ</span>
+    </div>
+
+    <span class="label">
+      OPERATOR PANEL
+    </span>
+
+    <h1>Kirish</h1>
+
+    <p>
+      Buyurtmalar bilan ishlash uchun operator hisobingizga kiring.
+    </p>
+
+    <form id="loginForm" class="login-form">
+
+      <label>
+        Email
+
+        <input
+          id="email"
+          type="email"
+          autocomplete="email"
+          required
+        >
+      </label>
+
+      <label>
+        Parol
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </label>
+
+      <button class="primary-btn" type="submit">
+        Kirish
+      </button>
+
+      <div id="loginMessage" class="message"></div>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<!-- PANEL -->
+
+<section id="panelView" class="hidden">
+
+  <div class="shell">
+
+    <header class="header">
+
+      <div>
+
+        <span class="label">
+          MODEX.UZ
+        </span>
+
+        <h1>Operator Panel</h1>
+
+        <p>
+          Operator:
+          <strong id="operatorName">—</strong>
+        </p>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          id="refreshBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          🔄 Yangilash
+        </button>
+
+        <button
+          id="logoutBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          Chiqish
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <section class="stats">
+
+      <div class="stat new">
+        <span>🔴 YANGI</span>
+        <strong id="newCount">0</strong>
+      </div>
+
+      <div class="stat talked">
+        <span>🟠 BUGUN GAPLASHILDI</span>
+        <strong id="talkedCount">0</strong>
+      </div>
+
+      <div class="stat confirmed">
+        <span>🔵 QADOQLANMOQDA</span>
+        <strong id="confirmedCount">0</strong>
+      </div>
+
+      <div class="stat done">
+        <span>🟢 YETKAZILDI</span>
+        <strong id="doneCount">0</strong>
+      </div>
+
+    </section>
+
+
+    <section class="tools">
+
+      <div class="search">
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Ism, telefon, mahsulot, hudud..."
+        >
+
+        <button
+          id="clearSearch"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="filters">
+
+        <button
+          class="filter-btn active"
+          data-status="all"
+        >
+          Barchasi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="new"
+        >
+          🔴 Yangi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="talked"
+        >
+          🟠 Bugun gaplashildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="confirmed"
+        >
+          🔵 Qadoq
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="delivery"
+        >
+          🟣 Yo‘lda
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="done"
+        >
+          🟢 Yetkazildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-status="cancelled"
+        >
+          ⚪ Bekor
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <section class="orders-section">
+
+      <div class="orders-head">
+
+        <h2>Buyurtmalar</h2>
+
+        <span id="visibleCount" class="count">
+          0 ta
+        </span>
+
+      </div>
+
+      <div id="orders" class="orders"></div>
+
+      <div id="ordersMessage" class="message"></div>
+
+    </section>
+
+  </div>
+
+</section>
+
+
+<!-- ORDER MODAL -->
+
+<dialog id="orderDialog">
+
+  <div class="modal">
+
+    <button
+      id="closeDialog"
+      class="close"
+      type="button"
+    >
+      ×
+    </button>
+
+    <span class="label">
+      ZAYAVKA
+    </span>
+
+    <h2 id="modalTitle">
+      Buyurtma
+    </h2>
+
+
+    <form id="orderForm" class="edit-form">
+
+      <input
+        id="editId"
+        type="hidden"
+      >
+
+
+      <div class="form-title">
+        👤 Mijoz
+      </div>
+
+
+      <div class="two">
+
+        <label>
+          Ism
+          <input id="editName">
+        </label>
+
+        <label>
+          Familiya
+          <input id="editSurname">
+        </label>
+
+      </div>
+
+
+      <label>
+        Telefon
+        <input id="editPhone" type="tel">
+      </label>
+
+
+      <a
+        id="callBtn"
+        class="big-call"
+        href="#"
+      >
+        📞 Mijozga qo‘ng‘iroq
+      </a>
+
+
+      <div class="form-title">
+        📦 Mahsulot
+      </div>
+
+
+      <label>
+        Mahsulot
+        <input
+          id="editProduct"
+          readonly
+        >
+      </label>
+
+
+      <div class="three">
+
+        <label>
+          Soni
+          <input
+            id="editQuantity"
+            type="number"
+            min="1"
+          >
+        </label>
+
+        <label>
+          Razmer
+          <input id="editSize">
+        </label>
+
+        <label>
+          Rang
+          <input id="editColor">
+        </label>
+
+      </div>
+
+
+      <div class="form-title">
+        🚚 Yetkazish
+      </div>
+
+
+      <label>
+        Viloyat / shahar
+        <input id="editRegion">
+      </label>
+
+
+      <label>
+        Manzil
+        <textarea id="editAddress"></textarea>
+      </label>
+
+
+      <div class="form-title">
+        📝 Izoh
+      </div>
+
+
+      <label>
+        Operator izohi
+        <textarea id="editNote"></textarea>
+      </label>
+
+
+      <div class="form-title">
+        📌 Status
+      </div>
+
+
+      <label>
+        Buyurtma holati
+
+        <select id="editStatus">
+
+          <option value="new">
+            🔴 Yangi
+          </option>
+
+          <option value="talked">
+            🟠 Gaplashildi
+          </option>
+
+          <option value="confirmed">
+            🔵 Qadoqlanmoqda
+          </option>
+
+          <option value="delivery">
+            🟣 Yo‘lda
+          </option>
+
+          <option value="done">
+            🟢 Yetkazildi
+          </option>
+
+          <option value="cancelled">
+            ⚪ Bekor
+          </option>
+
+        </select>
+      </label>
+
+
+      <div class="actions">
+
+        <button
+          class="primary-btn"
+          type="submit"
+        >
+          💾 Saqlash
+        </button>
+
+        <button
+          id="qrBtn"
+          class="qr-btn"
+          type="button"
+        >
+          QR etiketka
+        </button>
+
+      </div>
+
+
+      <div id="orderMessage" class="message"></div>
+
+    </form>
+
+  </div>
+
+</dialog>
+
+
+<!-- FAQAT CONFIG TASHQARIDA -->
+
+<script src="./config.js?v=20260823-2300"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+
+<script>
 (() => {
   "use strict";
 
-  const config = window.MODEX_CONFIG || {};
+  const config =
+    window.MODEX_CONFIG || {};
 
-  const SUPABASE_URL = config.SUPABASE_URL;
-  const SUPABASE_KEY = config.SUPABASE_KEY;
+  const URL =
+    config.SUPABASE_URL;
 
-  const $ = id => document.getElementById(id);
+  const KEY =
+    config.SUPABASE_KEY;
 
-  /* =========================================
-     ELEMENTS
-  ========================================= */
+  const $ =
+    id => document.getElementById(id);
 
-  const loginView = $("operatorLoginView");
-  const operatorView = $("operatorView");
-
-  const loginForm = $("operatorLoginForm");
-  const emailInput = $("operatorEmail");
-  const passwordInput = $("operatorPassword");
-  const loginMessage = $("operatorLoginMessage");
-
-  const operatorUserName = $("operatorUserName");
-  const refreshBtn = $("operatorRefreshBtn");
-  const logoutBtn = $("operatorLogoutBtn");
-
-  const newCount = $("operatorNewCount");
-  const talkedCount = $("operatorTalkedCount");
-  const confirmedCount = $("operatorConfirmedCount");
-  const doneCount = $("operatorDoneCount");
-
-  const searchInput = $("operatorOrderSearch");
-  const clearSearch = $("operatorClearSearch");
-
-  const ordersContainer = $("operatorOrders");
-  const ordersMessage = $("operatorOrdersMessage");
-  const visibleCount = $("operatorVisibleCount");
-
-  const dialog = $("operatorOrderDialog");
-  const closeDialogBtn = $("operatorCloseOrder");
-  const orderTitle = $("operatorOrderTitle");
-
-  const orderForm = $("operatorOrderForm");
-
-  const editOrderId = $("operatorEditOrderId");
-  const editName = $("operatorEditName");
-  const editSurname = $("operatorEditSurname");
-  const editPhone = $("operatorEditPhone");
-  const editProduct = $("operatorEditProduct");
-  const editQuantity = $("operatorEditQuantity");
-  const editSize = $("operatorEditSize");
-  const editColor = $("operatorEditColor");
-  const editRegion = $("operatorEditRegion");
-  const editAddress = $("operatorEditAddress");
-  const editNote = $("operatorEditNote");
-  const editStatus = $("operatorEditStatus");
-
-  const callCustomer = $("operatorCallCustomer");
-  const qrBtn = $("operatorQrBtn");
-  const orderMessage = $("operatorOrderMessage");
-
-  const mobileNav = $("operatorMobileNav");
-
-
-  /* =========================================
-     STATE
-  ========================================= */
 
   let currentUser = null;
   let currentProfile = null;
 
-  let allOrders = [];
+  let orders = [];
   let activeFilter = "all";
+  let currentOrder = null;
 
-  let currentEditingOrder = null;
 
-
-  /* =========================================
-     STATUS
-  ========================================= */
-
-  const statusMap = {
+  const statusNames = {
     new: "🔴 Yangi",
     talked: "🟠 Gaplashildi",
     confirmed: "🔵 Qadoqlanmoqda",
@@ -89,57 +1068,66 @@
   };
 
 
-  /* =========================================
-     HELPERS
-  ========================================= */
+  function token(){
+    return sessionStorage.getItem(
+      "modex_operator_token"
+    );
+  }
 
-  function escapeHtml(value) {
+
+  function esc(value){
     return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
 
-  function normalizePhone(value) {
+  function phone(value){
     return String(value || "")
-      .replace(/[^\d+]/g, "");
+      .replace(/[^\d+]/g,"");
   }
 
 
-  function formatDate(value) {
-    if (!value) return "—";
+  function formatDate(value){
 
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
+    if(!value){
       return "—";
     }
 
-    return date.toLocaleString(
+    const d =
+      new Date(value);
+
+    if(Number.isNaN(d.getTime())){
+      return "—";
+    }
+
+    return d.toLocaleString(
       "uz-UZ",
       {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit"
       }
     );
   }
 
 
-  function isToday(value) {
-    if (!value) return false;
+  function isToday(value){
 
-    const date = new Date(value);
-    const now = new Date();
-
-    if (Number.isNaN(date.getTime())) {
+    if(!value){
       return false;
     }
+
+    const date =
+      new Date(value);
+
+    const now =
+      new Date();
 
     return (
       date.getFullYear() === now.getFullYear() &&
@@ -149,66 +1137,80 @@
   }
 
 
-  function showMessage(
+  function message(
     element,
     text,
-    type = ""
-  ) {
-    if (!element) return;
+    type=""
+  ){
 
-    element.textContent = text;
-    element.className = "operator-message";
+    if(!element){
+      return;
+    }
 
-    if (type) {
+    element.textContent =
+      text;
+
+    element.className =
+      "message";
+
+    if(type){
       element.classList.add(type);
     }
   }
 
 
-  /* =========================================
-     API
-  ========================================= */
-
-  async function apiRequest(
+  async function api(
     path,
-    options = {},
-    token = SUPABASE_KEY
-  ) {
-    const response = await fetch(
-      `${SUPABASE_URL}/${path}`,
-      {
-        ...options,
+    options={},
+    accessToken=KEY
+  ){
 
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${token}`,
-          ...(options.headers || {})
+    if(!URL || !KEY){
+      throw new Error(
+        "config.js ichida Supabase sozlamasi topilmadi."
+      );
+    }
+
+    const response =
+      await fetch(
+        `${URL}/${path}`,
+        {
+          ...options,
+
+          headers:{
+            "Content-Type":"application/json",
+            "apikey":KEY,
+            "Authorization":
+              `Bearer ${accessToken}`,
+            ...(options.headers || {})
+          }
         }
-      }
-    );
+      );
 
-    if (!response.ok) {
-      let message =
-        `Server xatosi (${response.status})`;
 
-      try {
+    if(!response.ok){
+
+      let msg =
+        `Server xatosi: ${response.status}`;
+
+      try{
+
         const data =
           await response.json();
 
-        message =
-          data?.message ||
-          data?.error_description ||
-          data?.error ||
-          message;
+        msg =
+          data.message ||
+          data.error_description ||
+          data.error ||
+          msg;
 
-      } catch (_) {}
+      }catch(_){}
 
-      throw new Error(message);
+      throw new Error(msg);
     }
 
 
-    if (response.status === 204) {
+    if(response.status === 204){
       return null;
     }
 
@@ -222,48 +1224,20 @@
   }
 
 
-  /* =========================================
-     SESSION
-  ========================================= */
+  /* LOGIN */
 
-  function saveSession(session) {
-    sessionStorage.setItem(
-      "modex_operator_token",
-      session.access_token
-    );
-  }
+  async function login(
+    email,
+    password
+  ){
 
-
-  function getToken() {
-    return sessionStorage.getItem(
-      "modex_operator_token"
-    );
-  }
-
-
-  function clearSession() {
-    sessionStorage.removeItem(
-      "modex_operator_token"
-    );
-
-    currentUser = null;
-    currentProfile = null;
-    allOrders = [];
-  }
-
-
-  /* =========================================
-     LOGIN
-  ========================================= */
-
-  async function login(email, password) {
     const data =
-      await apiRequest(
+      await api(
         "auth/v1/token?grant_type=password",
         {
-          method: "POST",
+          method:"POST",
 
-          body: JSON.stringify({
+          body:JSON.stringify({
             email,
             password
           })
@@ -271,33 +1245,33 @@
       );
 
 
-    if (!data?.access_token) {
+    if(!data?.access_token){
       throw new Error(
         "Login amalga oshmadi."
       );
     }
 
 
-    saveSession(data);
+    sessionStorage.setItem(
+      "modex_operator_token",
+      data.access_token
+    );
   }
 
 
-  /* =========================================
-     USER
-  ========================================= */
+  async function loadUser(){
 
-  async function loadCurrentUser() {
     currentUser =
-      await apiRequest(
+      await api(
         "auth/v1/user",
         {
-          method: "GET"
+          method:"GET"
         },
-        getToken()
+        token()
       );
 
 
-    if (!currentUser?.id) {
+    if(!currentUser?.id){
       throw new Error(
         "Operator aniqlanmadi."
       );
@@ -305,207 +1279,195 @@
   }
 
 
-  async function loadProfile() {
+  async function loadProfile(){
+
     const data =
-      await apiRequest(
-        `rest/v1/profiles?id=eq.${currentUser.id}&select=*`,
+      await api(
+        `rest/v1/profiles?id=eq.${encodeURIComponent(currentUser.id)}&select=*`,
         {
-          method: "GET"
+          method:"GET"
         },
-        getToken()
+        token()
       );
 
 
-    const profile =
+    currentProfile =
       Array.isArray(data)
         ? data[0]
         : null;
 
 
-    if (!profile) {
+    if(!currentProfile){
       throw new Error(
         "Operator profili topilmadi."
       );
     }
 
 
-    if (
-      profile.role !== "operator" ||
-      profile.active !== true
-    ) {
+    if(
+      currentProfile.role !== "operator"
+    ){
       throw new Error(
-        "Operator ruxsati yo‘q."
+        "Bu hisob operator emas."
       );
     }
 
 
-    currentProfile = profile;
+    if(
+      currentProfile.active !== true
+    ){
+      throw new Error(
+        "Operator bloklangan."
+      );
+    }
   }
 
 
-  /* =========================================
-     PANEL
-  ========================================= */
+  async function openPanel(){
 
-  async function openOperatorPanel() {
-    await loadCurrentUser();
+    await loadUser();
     await loadProfile();
 
-    loginView?.classList.add("hidden");
-    operatorView?.classList.remove("hidden");
-    mobileNav?.classList.remove("hidden");
 
-    if (operatorUserName) {
-      operatorUserName.textContent =
-        currentProfile.name ||
-        currentUser.email ||
-        "Operator";
-    }
+    $("loginView")
+      .classList.add("hidden");
+
+
+    $("panelView")
+      .classList.remove("hidden");
+
+
+    $("operatorName").textContent =
+      currentProfile.name ||
+      currentUser.email ||
+      "Operator";
+
 
     await loadOrders();
   }
 
 
-  /* =========================================
-     ORDERS
-  ========================================= */
+  /* ORDERS */
 
-  async function loadOrders() {
-    showMessage(
-      ordersMessage,
-      "Buyurtmalar yuklanmoqda..."
+  async function loadOrders(){
+
+    message(
+      $("ordersMessage"),
+      "Yuklanmoqda..."
     );
 
-    try {
-      const data =
-        await apiRequest(
-          "rest/v1/orders?select=*&order=id.desc",
-          {
-            method: "GET"
-          },
-          getToken()
-        );
 
-
-      allOrders =
-        Array.isArray(data)
-          ? data
-          : [];
-
-
-      updateStats();
-      renderOrders();
-
-      showMessage(
-        ordersMessage,
-        ""
+    const data =
+      await api(
+        "rest/v1/orders?select=*&order=id.desc",
+        {
+          method:"GET"
+        },
+        token()
       );
 
-    } catch (error) {
-      showMessage(
-        ordersMessage,
-        error.message,
-        "error"
-      );
-    }
+
+    orders =
+      Array.isArray(data)
+        ? data
+        : [];
+
+
+    updateStats();
+    renderOrders();
+
+
+    message(
+      $("ordersMessage"),
+      ""
+    );
   }
 
 
-  function talkedTodayByMe(order) {
+  function talkedTodayByMe(order){
+
     return (
-      currentUser &&
-      order.operator_id === currentUser.id &&
+      order.operator_id === currentUser?.id &&
       isToday(order.talked_at)
     );
   }
 
 
-  /* =========================================
-     STATS
-  ========================================= */
+  function updateStats(){
 
-  function updateStats() {
-    if (newCount) {
-      newCount.textContent =
-        allOrders.filter(
-          order =>
-            order.status === "new"
-        ).length;
-    }
+    $("newCount").textContent =
+      orders.filter(
+        o => o.status === "new"
+      ).length;
 
 
-    if (talkedCount) {
-      talkedCount.textContent =
-        allOrders.filter(
-          talkedTodayByMe
-        ).length;
-    }
+    $("talkedCount").textContent =
+      orders.filter(
+        talkedTodayByMe
+      ).length;
 
 
-    if (confirmedCount) {
-      confirmedCount.textContent =
-        allOrders.filter(
-          order =>
-            order.status === "confirmed"
-        ).length;
-    }
+    $("confirmedCount").textContent =
+      orders.filter(
+        o => o.status === "confirmed"
+      ).length;
 
 
-    if (doneCount) {
-      doneCount.textContent =
-        allOrders.filter(
-          order =>
-            order.status === "done"
-        ).length;
-    }
+    $("doneCount").textContent =
+      orders.filter(
+        o => o.status === "done"
+      ).length;
   }
 
 
-  /* =========================================
-     FILTER
-  ========================================= */
+  function filteredOrders(){
 
-  function getFilteredOrders() {
-    let list = [...allOrders];
+    let list =
+      [...orders];
 
 
-    if (activeFilter === "talked") {
+    if(activeFilter === "talked"){
+
       list =
         list.filter(
           talkedTodayByMe
         );
 
-    } else if (activeFilter !== "all") {
+    }else if(
+      activeFilter !== "all"
+    ){
+
       list =
         list.filter(
-          order =>
-            order.status === activeFilter
+          o => o.status === activeFilter
         );
     }
 
 
-    const query =
-      String(
-        searchInput?.value || ""
-      )
+    const q =
+      $("searchInput")
+        .value
         .trim()
         .toLowerCase();
 
 
-    if (query) {
+    if(q){
+
       list =
         list.filter(order => {
+
           const text = `
             ${order.id}
-            ${order.name}
-            ${order.surname}
-            ${order.phone}
-            ${order.product}
-            ${order.region}
-            ${order.address}
+            ${order.name || ""}
+            ${order.surname || ""}
+            ${order.phone || ""}
+            ${order.product || ""}
+            ${order.region || ""}
+            ${order.address || ""}
           `.toLowerCase();
 
-          return text.includes(query);
+
+          return text.includes(q);
         });
     }
 
@@ -514,31 +1476,29 @@
   }
 
 
-  /* =========================================
-     RENDER
-  ========================================= */
+  function renderOrders(){
 
-  function renderOrders() {
-    if (!ordersContainer) return;
+    const container =
+      $("orders");
 
     const list =
-      getFilteredOrders();
+      filteredOrders();
 
 
-    if (visibleCount) {
-      visibleCount.textContent =
-        `${list.length} ta`;
-    }
+    $("visibleCount").textContent =
+      `${list.length} ta`;
 
 
-    ordersContainer.innerHTML = "";
+    container.innerHTML = "";
 
 
-    if (!list.length) {
-      ordersContainer.innerHTML = `
+    if(!list.length){
+
+      container.innerHTML = `
         <div style="
-          padding:30px;
+          grid-column:1/-1;
           text-align:center;
+          padding:35px;
           color:#777;
         ">
           Buyurtmalar yo‘q.
@@ -550,61 +1510,70 @@
 
 
     list.forEach(order => {
+
       const card =
-        document.createElement(
-          "article"
-        );
+        document.createElement("article");
 
       card.className =
-        `operator-order-card status-${order.status || "new"}`;
+        "order-card";
 
 
       card.innerHTML = `
 
-        <div class="operator-order-top">
+        <div class="order-top">
 
           <div>
-            <span class="operator-order-id">
-              BUYURTMA #${escapeHtml(order.id)}
+
+            <span class="order-id">
+              BUYURTMA #${esc(order.id)}
             </span>
 
-            <strong class="operator-order-name">
-              ${escapeHtml(order.name || "Mijoz")}
-              ${escapeHtml(order.surname || "")}
+            <strong class="order-name">
+              ${esc(order.name || "Mijoz")}
+              ${esc(order.surname || "")}
             </strong>
+
           </div>
 
-          <span class="operator-order-status">
-            ${statusMap[order.status] || order.status}
+          <span class="status">
+            ${
+              statusNames[order.status] ||
+              order.status ||
+              "—"
+            }
           </span>
 
         </div>
 
 
-        <div class="operator-product-box">
-          <span>MAHSULOT</span>
+        <div class="product-box">
+
+          <small>
+            MAHSULOT
+          </small>
 
           <strong>
-            ${escapeHtml(order.product || "Mahsulot")}
+            ${esc(order.product || "Mahsulot")}
           </strong>
+
         </div>
 
 
-        <div class="operator-order-info-grid">
+        <div class="info-grid">
 
           <div>
             <span>SONI</span>
-            <strong>${order.quantity || 1}</strong>
+            <strong>${esc(order.quantity || 1)}</strong>
           </div>
 
           <div>
             <span>RAZMER</span>
-            <strong>${escapeHtml(order.size || "—")}</strong>
+            <strong>${esc(order.size || "—")}</strong>
           </div>
 
           <div>
             <span>RANG</span>
-            <strong>${escapeHtml(order.color || "—")}</strong>
+            <strong>${esc(order.color || "—")}</strong>
           </div>
 
         </div>
@@ -612,64 +1581,67 @@
 
         ${
           order.region || order.address
-            ? `
-              <div class="operator-location">
-                📍
-                ${escapeHtml(order.region || "")}
-                ${order.address ? " — " + escapeHtml(order.address) : ""}
-              </div>
-            `
-            : ""
+
+          ? `
+            <div class="location">
+              📍 ${esc(order.region || "")}
+              ${
+                order.address
+                  ? " — " + esc(order.address)
+                  : ""
+              }
+            </div>
+          `
+
+          : ""
         }
 
 
         ${
           order.phone
-            ? `
-              <a
-                class="operator-call-btn"
-                href="tel:${normalizePhone(order.phone)}"
-              >
-                📞 ${escapeHtml(order.phone)}
-              </a>
-            `
-            : ""
+
+          ? `
+            <a
+              class="call-btn"
+              href="tel:${esc(phone(order.phone))}"
+            >
+              📞 ${esc(order.phone)}
+            </a>
+          `
+
+          : ""
         }
 
 
         <button
+          class="open-btn"
           type="button"
-          class="operator-edit-order-btn"
-          data-order-id="${order.id}"
+          data-id="${order.id}"
         >
           Zayavkani ochish
         </button>
 
 
-        <small class="operator-order-date">
+        <small class="date">
           ${formatDate(order.created_at)}
         </small>
       `;
 
 
-      ordersContainer.appendChild(
-        card
-      );
+      container.appendChild(card);
     });
 
 
-    document
-      .querySelectorAll(
-        ".operator-edit-order-btn"
-      )
+    container
+      .querySelectorAll(".open-btn")
       .forEach(button => {
+
         button.addEventListener(
           "click",
           () => {
+
             openOrder(
-              Number(
-                button.dataset.orderId
-              )
+              Number(button.dataset.id)
             );
           }
         );
@@ -677,205 +1649,238 @@
   }
 
 
-  /* =========================================
-     OPEN ORDER
-  ========================================= */
+  /* MODAL */
 
-  function openOrder(id) {
+  function openOrder(id){
+
     const order =
-      allOrders.find(
-        item =>
-          Number(item.id) ===
-          Number(id)
+      orders.find(
+        o =>
+          Number(o.id) === Number(id)
       );
 
 
-    if (!order) return;
-
-
-    currentEditingOrder = order;
-
-
-    editOrderId.value = order.id;
-    editName.value = order.name || "";
-    editSurname.value = order.surname || "";
-    editPhone.value = order.phone || "";
-    editProduct.value = order.product || "";
-    editQuantity.value = order.quantity || 1;
-    editSize.value = order.size || "";
-    editColor.value = order.color || "";
-    editRegion.value = order.region || "";
-    editAddress.value = order.address || "";
-    editNote.value = order.note || "";
-    editStatus.value = order.status || "new";
-
-
-    if (orderTitle) {
-      orderTitle.textContent =
-        `Buyurtma #${order.id}`;
-    }
-
-
-    if (callCustomer) {
-      callCustomer.href =
-        order.phone
-          ? `tel:${normalizePhone(order.phone)}`
-          : "#";
-    }
-
-
-    if (editQuantity) {
-      editQuantity.disabled =
-        order.stock_adjusted === true;
-    }
-
-
-    showMessage(
-      orderMessage,
-      ""
-    );
-
-
-    if (
-      typeof dialog?.showModal ===
-      "function"
-    ) {
-      dialog.showModal();
-    } else {
-      dialog?.setAttribute(
-        "open",
-        ""
-      );
-    }
-  }
-
-
-  function closeOrderDialog() {
-    if (
-      typeof dialog?.close ===
-      "function"
-    ) {
-      dialog.close();
-    } else {
-      dialog?.removeAttribute(
-        "open"
-      );
-    }
-
-    currentEditingOrder = null;
-
-    if (editQuantity) {
-      editQuantity.disabled = false;
-    }
-  }
-
-
-  /* =========================================
-     SAVE ORDER
-  ========================================= */
-
-  async function saveOrder(event) {
-    event.preventDefault();
-
-    if (
-      !currentEditingOrder ||
-      !currentUser
-    ) {
+    if(!order){
       return;
     }
 
 
-    const orderId =
-      Number(editOrderId.value);
+    currentOrder =
+      order;
+
+
+    $("modalTitle").textContent =
+      `Buyurtma #${order.id}`;
+
+
+    $("editId").value =
+      order.id;
+
+    $("editName").value =
+      order.name || "";
+
+    $("editSurname").value =
+      order.surname || "";
+
+    $("editPhone").value =
+      order.phone || "";
+
+    $("editProduct").value =
+      order.product || "";
+
+    $("editQuantity").value =
+      order.quantity || 1;
+
+    $("editSize").value =
+      order.size || "";
+
+    $("editColor").value =
+      order.color || "";
+
+    $("editRegion").value =
+      order.region || "";
+
+    $("editAddress").value =
+      order.address || "";
+
+    $("editNote").value =
+      order.note || "";
+
+    $("editStatus").value =
+      order.status || "new";
+
+
+    $("editQuantity").disabled =
+      order.stock_adjusted === true;
+
+
+    $("callBtn").href =
+      order.phone
+        ? `tel:${phone(order.phone)}`
+        : "#";
+
+
+    message(
+      $("orderMessage"),
+      ""
+    );
+
+
+    $("orderDialog").showModal();
+  }
+
+
+  function closeModal(){
+
+    if(
+      $("orderDialog").open
+    ){
+      $("orderDialog").close();
+    }
+
+
+    $("editQuantity").disabled =
+      false;
+
+
+    currentOrder = null;
+  }
+
+
+  /* SAVE */
+
+  async function saveOrder(event){
+
+    event.preventDefault();
+
+
+    if(!currentOrder){
+      return;
+    }
+
+
+    const id =
+      Number($("editId").value);
 
 
     const oldStatus =
-      currentEditingOrder.status ||
-      "new";
+      currentOrder.status || "new";
 
 
     const newStatus =
-      editStatus.value ||
-      "new";
+      $("editStatus").value;
 
 
-    showMessage(
-      orderMessage,
+    const oldQty =
+      Math.max(
+        1,
+        Number(
+          currentOrder.quantity || 1
+        )
+      );
+
+
+    const newQty =
+      Math.max(
+        1,
+        Number(
+          $("editQuantity").value || 1
+        )
+      );
+
+
+    if(
+      currentOrder.stock_adjusted === true &&
+      newQty !== oldQty
+    ){
+
+      message(
+        $("orderMessage"),
+        "Tasdiqlangan buyurtmada sonini o‘zgartirib bo‘lmaydi.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    message(
+      $("orderMessage"),
       "Saqlanmoqda..."
     );
 
 
-    try {
+    try{
 
-      const payload = {
+      const details = {
+
         name:
-          editName.value.trim(),
+          $("editName").value.trim(),
 
         surname:
-          editSurname.value.trim() || null,
+          $("editSurname").value.trim() ||
+          null,
 
         phone:
-          editPhone.value.trim(),
+          $("editPhone").value.trim(),
 
         quantity:
-          Math.max(
-            1,
-            Number(editQuantity.value || 1)
-          ),
+          newQty,
 
         size:
-          editSize.value.trim() || null,
+          $("editSize").value.trim() ||
+          null,
 
         color:
-          editColor.value.trim() || null,
+          $("editColor").value.trim() ||
+          null,
 
         region:
-          editRegion.value.trim() || null,
+          $("editRegion").value.trim() ||
+          null,
 
         address:
-          editAddress.value.trim() || null,
+          $("editAddress").value.trim() ||
+          null,
 
         note:
-          editNote.value.trim() || null,
+          $("editNote").value.trim() ||
+          null,
 
         updated_at:
           new Date().toISOString()
       };
 
 
-      await apiRequest(
-        `rest/v1/orders?id=eq.${orderId}`,
+      await api(
+        `rest/v1/orders?id=eq.${id}`,
         {
-          method: "PATCH",
+          method:"PATCH",
 
-          headers: {
-            Prefer: "return=minimal"
+          headers:{
+            Prefer:"return=minimal"
           },
 
-          body:
-            JSON.stringify(payload)
+          body:JSON.stringify(details)
         },
-        getToken()
+        token()
       );
 
 
-      if (oldStatus !== newStatus) {
-        await apiRequest(
+      if(oldStatus !== newStatus){
+
+        await api(
           "rest/v1/rpc/update_order_status_with_stock",
           {
-            method: "POST",
+            method:"POST",
 
-            body:
-              JSON.stringify({
-                p_order_id: orderId,
-                p_new_status: newStatus,
-                p_operator_id:
-                  newStatus === "talked"
-                    ? currentUser.id
-                    : null
-              })
+            body:JSON.stringify({
+              p_order_id:id,
+              p_new_status:newStatus,
+              p_operator_id:currentUser.id
+            })
           },
-          getToken()
+          token()
         );
       }
 
@@ -883,58 +1888,68 @@
       await loadOrders();
 
 
-      showMessage(
-        orderMessage,
+      message(
+        $("orderMessage"),
         "✅ Saqlandi",
         "success"
       );
 
 
       setTimeout(
-        closeOrderDialog,
-        500
+        closeModal,
+        450
       );
 
 
-    } catch (error) {
-      showMessage(
-        orderMessage,
-        error.message,
+    }catch(error){
+
+      console.error(error);
+
+
+      message(
+        $("orderMessage"),
+        error.message ||
+        "Saqlashda xatolik.",
         "error"
       );
     }
   }
 
 
-  /* =========================================
-     QR LABEL
-  ========================================= */
+  /* QR */
 
-  function createQrLabel() {
-    if (!currentEditingOrder) {
+  function qrLabel(){
+
+    if(!currentOrder){
       return;
     }
 
 
     const order =
-      currentEditingOrder;
+      currentOrder;
 
 
-    const trackingUrl =
-      `${location.origin}${location.pathname.replace("operator.html", "track.html")}` +
+    const base =
+      location.href
+        .split("operator.html")[0];
+
+
+    const trackUrl =
+      `${base}track.html` +
       `?id=${encodeURIComponent(order.id)}` +
       `&phone=${encodeURIComponent(order.phone || "")}`;
 
 
-    const labelWindow =
+    const win =
       window.open(
         "",
         "_blank",
-        "width=520,height=760"
+        "width=500,height=720"
       );
 
 
-    if (!labelWindow) {
+    if(!win){
+
       alert(
         "Popup bloklangan. Brauzerda popupga ruxsat bering."
       );
@@ -943,320 +1958,188 @@
     }
 
 
-    labelWindow.document.write(`
+    win.document.write(`
 <!doctype html>
-
-<html lang="uz">
-
+<html>
 <head>
-
 <meta charset="utf-8">
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
-
 <title>
-  MODEX.UZ #${escapeHtml(order.id)}
+MODEX.UZ #${esc(order.id)}
 </title>
 
-
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
 body{
+  font-family:Arial,sans-serif;
   margin:0;
   padding:20px;
-  font-family:Arial,sans-serif;
-  background:#f4f4f6;
-  color:#111;
 }
 
 .label{
-  width:100%;
-  max-width:420px;
-  margin:0 auto;
-  background:#fff;
+  max-width:400px;
+  margin:auto;
   border:2px solid #111;
-  border-radius:14px;
+  border-radius:12px;
   padding:18px;
 }
 
 .logo{
-  font-size:25px;
+  font-size:24px;
   font-weight:900;
-  margin-bottom:4px;
 }
 
-.logo span{
-  color:#713cf0;
-}
-
-.order-id{
-  font-size:28px;
+.id{
+  font-size:30px;
   font-weight:900;
-  margin:15px 0;
+  margin:12px 0;
 }
 
-.section{
+.row{
   border-top:1px dashed #aaa;
-  padding-top:11px;
-  margin-top:11px;
+  padding-top:9px;
+  margin-top:9px;
 }
 
-.title{
-  font-size:10px;
+small{
+  display:block;
   color:#777;
-  font-weight:800;
-  margin-bottom:4px;
-}
-
-.value{
-  font-size:15px;
   font-weight:700;
-  line-height:1.4;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.qr-wrap{
-  display:flex;
-  justify-content:center;
-  margin-top:18px;
+strong{
+  display:block;
+  margin-top:3px;
 }
 
 #qr{
-  padding:8px;
-  background:#fff;
+  display:flex;
+  justify-content:center;
+  margin:18px 0;
 }
 
-.tip{
-  text-align:center;
-  font-size:10px;
-  color:#666;
-  margin-top:7px;
-}
-
-.print-btn{
+button{
   width:100%;
-  margin-top:18px;
-  border:none;
-  padding:13px;
+  border:0;
   border-radius:10px;
+  padding:12px;
   background:#713cf0;
   color:#fff;
   font-weight:800;
-  cursor:pointer;
 }
 
 @media print{
-
-  body{
-    padding:0;
-    background:#fff;
-  }
-
-  .label{
-    border:1px solid #111;
-    max-width:none;
-  }
-
-  .print-btn{
+  button{
     display:none;
   }
 
+  body{
+    padding:0;
+  }
 }
-
 </style>
-
 </head>
-
 
 <body>
 
 <div class="label">
 
   <div class="logo">
-    MODEX<span>.UZ</span>
+    MODEX.UZ
   </div>
 
-  <div class="order-id">
-    #${escapeHtml(order.id)}
+  <div class="id">
+    #${esc(order.id)}
   </div>
 
-
-  <div class="section">
-
-    <div class="title">
-      MIJOZ
-    </div>
-
-    <div class="value">
-      ${escapeHtml(order.name || "")}
-      ${escapeHtml(order.surname || "")}
-    </div>
-
+  <div class="row">
+    <small>MIJOZ</small>
+    <strong>
+      ${esc(order.name || "")}
+      ${esc(order.surname || "")}
+    </strong>
   </div>
 
-
-  <div class="section">
-
-    <div class="title">
-      HUDUD / MANZIL
-    </div>
-
-    <div class="value">
-      ${escapeHtml(order.region || "—")}
-      <br>
-      ${escapeHtml(order.address || "—")}
-    </div>
-
+  <div class="row">
+    <small>HUDUD / MANZIL</small>
+    <strong>
+      ${esc(order.region || "—")}<br>
+      ${esc(order.address || "—")}
+    </strong>
   </div>
 
-
-  <div class="section">
-
-    <div class="title">
-      MAHSULOT
-    </div>
-
-    <div class="value">
-      ${escapeHtml(order.product || "Mahsulot")}
-    </div>
-
+  <div class="row">
+    <small>MAHSULOT</small>
+    <strong>
+      ${esc(order.product || "Mahsulot")}
+    </strong>
   </div>
 
-
-  <div class="section grid">
-
-    <div>
-      <div class="title">
-        SONI
-      </div>
-
-      <div class="value">
-        ${escapeHtml(order.quantity || 1)}
-      </div>
-    </div>
-
-    <div>
-      <div class="title">
-        RAZMER
-      </div>
-
-      <div class="value">
-        ${escapeHtml(order.size || "—")}
-      </div>
-    </div>
-
-    <div>
-      <div class="title">
-        RANG
-      </div>
-
-      <div class="value">
-        ${escapeHtml(order.color || "—")}
-      </div>
-    </div>
-
-    <div>
-      <div class="title">
-        STATUS
-      </div>
-
-      <div class="value">
-        ${escapeHtml(
-          statusMap[order.status] ||
-          order.status ||
-          "—"
-        )}
-      </div>
-    </div>
-
+  <div class="row">
+    <small>SONI / RAZMER / RANG</small>
+    <strong>
+      ${esc(order.quantity || 1)}
+      /
+      ${esc(order.size || "—")}
+      /
+      ${esc(order.color || "—")}
+    </strong>
   </div>
 
+  <div id="qr"></div>
 
-  <div class="qr-wrap">
-    <div id="qr"></div>
-  </div>
-
-  <div class="tip">
-    QR orqali buyurtma holatini tekshirish mumkin
-  </div>
-
-
-  <button
-    class="print-btn"
-    onclick="window.print()"
-  >
-    🖨 Etiketkani chiqarish
+  <button onclick="window.print()">
+    🖨 Chop etish
   </button>
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
 
 <script>
+window.addEventListener(
+  "load",
+  function(){
 
-new QRCode(
-  document.getElementById("qr"),
-  {
-    text: ${JSON.stringify(trackingUrl)},
-    width: 150,
-    height: 150
+    if(window.QRCode){
+
+      new QRCode(
+        document.getElementById("qr"),
+        {
+          text:${JSON.stringify(trackUrl)},
+          width:150,
+          height:150
+        }
+      );
+
+    }
   }
 );
-
 <\/script>
 
 </body>
-
 </html>
     `);
 
 
-    labelWindow.document.close();
+    win.document.close();
   }
 
 
-  /* =========================================
-     FILTER BUTTONS
-  ========================================= */
+  /* FILTER */
 
-  function setFilter(status) {
+  function setFilter(status){
+
     activeFilter =
-      status || "all";
+      status;
 
 
     document
-      .querySelectorAll(
-        ".operator-filter-btn"
-      )
+      .querySelectorAll(".filter-btn")
       .forEach(button => {
+
         button.classList.toggle(
           "active",
-          button.dataset.status === activeFilter
-        );
-      });
-
-
-    document
-      .querySelectorAll(
-        ".operator-mobile-nav-btn"
-      )
-      .forEach(button => {
-        button.classList.toggle(
-          "active",
-          button.dataset.mobileFilter === activeFilter
+          button.dataset.status === status
         );
       });
 
@@ -1265,40 +2148,53 @@ new QRCode(
   }
 
 
-  /* =========================================
-     EVENTS
-  ========================================= */
+  /* EVENTS */
 
-  loginForm?.addEventListener(
+  $("loginForm").addEventListener(
     "submit",
     async event => {
+
       event.preventDefault();
 
-      showMessage(
-        loginMessage,
+
+      message(
+        $("loginMessage"),
         "Kirilmoqda..."
       );
 
-      try {
+
+      try{
+
         await login(
-          emailInput.value.trim(),
-          passwordInput.value
+          $("email").value.trim(),
+          $("password").value
         );
 
-        await openOperatorPanel();
 
-        loginForm.reset();
+        await openPanel();
 
-        showMessage(
-          loginMessage,
+
+        $("loginForm").reset();
+
+
+        message(
+          $("loginMessage"),
           ""
         );
 
-      } catch (error) {
-        clearSession();
 
-        showMessage(
-          loginMessage,
+      }catch(error){
+
+        console.error(error);
+
+
+        sessionStorage.removeItem(
+          "modex_operator_token"
+        );
+
+
+        message(
+          $("loginMessage"),
           error.message,
           "error"
         );
@@ -1307,60 +2203,71 @@ new QRCode(
   );
 
 
-  logoutBtn?.addEventListener(
+  $("logoutBtn").addEventListener(
     "click",
     () => {
-      clearSession();
 
-      operatorView
-        ?.classList.add("hidden");
+      sessionStorage.removeItem(
+        "modex_operator_token"
+      );
 
-      loginView
-        ?.classList.remove("hidden");
 
-      mobileNav
-        ?.classList.add("hidden");
+      location.reload();
     }
   );
 
 
-  refreshBtn?.addEventListener(
+  $("refreshBtn").addEventListener(
     "click",
     async () => {
-      refreshBtn.disabled = true;
 
-      try {
+      $("refreshBtn").disabled =
+        true;
+
+
+      try{
+
         await loadOrders();
-      } finally {
-        refreshBtn.disabled = false;
+
+      }catch(error){
+
+        alert(error.message);
+
+      }finally{
+
+        $("refreshBtn").disabled =
+          false;
       }
     }
   );
 
 
-  searchInput?.addEventListener(
+  $("searchInput").addEventListener(
     "input",
     renderOrders
   );
 
 
-  clearSearch?.addEventListener(
+  $("clearSearch").addEventListener(
     "click",
     () => {
-      searchInput.value = "";
+
+      $("searchInput").value =
+        "";
+
       renderOrders();
     }
   );
 
 
   document
-    .querySelectorAll(
-      ".operator-filter-btn"
-    )
+    .querySelectorAll(".filter-btn")
     .forEach(button => {
+
       button.addEventListener(
         "click",
         () => {
+
           setFilter(
             button.dataset.status
           );
@@ -1369,82 +2276,49 @@ new QRCode(
     });
 
 
-  document
-    .querySelectorAll(
-      ".operator-mobile-nav-btn"
-    )
-    .forEach(button => {
-      button.addEventListener(
-        "click",
-        () => {
-          setFilter(
-            button.dataset.mobileFilter
-          );
-        }
-      );
-    });
-
-
-  closeDialogBtn?.addEventListener(
+  $("closeDialog").addEventListener(
     "click",
-    closeOrderDialog
+    closeModal
   );
 
 
-  orderForm?.addEventListener(
+  $("orderForm").addEventListener(
     "submit",
     saveOrder
   );
 
 
-  qrBtn?.addEventListener(
+  $("qrBtn").addEventListener(
     "click",
-    createQrLabel
+    qrLabel
   );
 
 
-  /* =========================================
-     INIT
-  ========================================= */
+  /* INIT */
 
-  async function init() {
-    const token =
-      getToken();
+  async function init(){
 
-
-    if (!token) {
-      loginView?.classList.remove(
-        "hidden"
-      );
-
-      operatorView?.classList.add(
-        "hidden"
-      );
-
-      mobileNav?.classList.add(
-        "hidden"
-      );
-
+    if(!token()){
       return;
     }
 
 
-    try {
-      await openOperatorPanel();
+    try{
 
-    } catch (error) {
-      clearSession();
+      await openPanel();
 
-      operatorView?.classList.add(
-        "hidden"
+    }catch(error){
+
+      console.error(error);
+
+
+      sessionStorage.removeItem(
+        "modex_operator_token"
       );
 
-      loginView?.classList.remove(
-        "hidden"
-      );
 
-      showMessage(
-        loginMessage,
+      message(
+        $("loginMessage"),
         "Qayta login qiling.",
         "error"
       );
@@ -1455,3 +2329,7 @@ new QRCode(
   init();
 
 })();
+</script>
+
+</body>
+</html>
