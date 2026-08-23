@@ -1,9 +1,10 @@
 (() => {
   "use strict";
 
-  /* =====================================================
+  /* =========================================================
      MODEX.UZ — ADMIN PANEL
-  ===================================================== */
+     PRODUCTS + ORDERS + OPERATORS + DAILY ACTIVITY
+  ========================================================= */
 
   const config = window.MODEX_CONFIG || {};
 
@@ -11,194 +12,13 @@
   const SUPABASE_KEY = config.SUPABASE_KEY;
 
 
-  /* =====================================================
-     ELEMENTLAR
-  ===================================================== */
-
-  const loginView =
-    document.getElementById("loginView");
-
-  const adminView =
-    document.getElementById("adminView");
-
-  const loginForm =
-    document.getElementById("loginForm");
-
-  const emailInput =
-    document.getElementById("email");
-
-  const passwordInput =
-    document.getElementById("password");
-
-  const loginMessage =
-    document.getElementById("loginMessage");
-
-  const adminEmail =
-    document.getElementById("adminEmail");
-
-  const refreshAdminBtn =
-    document.getElementById("refreshAdminBtn");
-
-  const logoutBtn =
-    document.getElementById("logoutBtn");
-
-
-  /* STAT */
-
-  const aProducts =
-    document.getElementById("aProducts");
-
-  const aOrders =
-    document.getElementById("aOrders");
-
-  const aNew =
-    document.getElementById("aNew");
-
-  const aOperators =
-    document.getElementById("aOperators");
-
-
-  const todayOrdersCount =
-    document.getElementById("todayOrdersCount");
-
-  const newOrdersCount =
-    document.getElementById("newOrdersCount");
-
-  const talkedOrdersCount =
-    document.getElementById("talkedOrdersCount");
-
-  const confirmedOrdersCount =
-    document.getElementById("confirmedOrdersCount");
-
-  const deliveryOrdersCount =
-    document.getElementById("deliveryOrdersCount");
-
-  const doneOrdersCount =
-    document.getElementById("doneOrdersCount");
-
-
-  /* OPERATOR DAILY */
-
-  const operatorDailyStats =
-    document.getElementById("operatorDailyStats");
-
-  const todayOperatorsTotal =
-    document.getElementById("todayOperatorsTotal");
-
-
-  /* PRODUCT */
-
-  const productForm =
-    document.getElementById("productForm");
-
-  const productFormTitle =
-    document.getElementById("productFormTitle");
-
-  const editProductId =
-    document.getElementById("editProductId");
-
-  const pName =
-    document.getElementById("pName");
-
-  const pCategory =
-    document.getElementById("pCategory");
-
-  const pPrice =
-    document.getElementById("pPrice");
-
-  const pOldPrice =
-    document.getElementById("pOldPrice");
-
-  const pDiscount =
-    document.getElementById("pDiscount");
-
-  const pStock =
-    document.getElementById("pStock");
-
-  const pDesc =
-    document.getElementById("pDesc");
-
-  const pImage =
-    document.getElementById("pImage");
-
-  const productSubmitBtn =
-    document.getElementById("productSubmitBtn");
-
-  const cancelEditBtn =
-    document.getElementById("cancelEditBtn");
-
-  const productMessage =
-    document.getElementById("productMessage");
-
-  const adminProducts =
-    document.getElementById("adminProducts");
-
-
-  /* OPERATOR CREATE */
-
-  const operatorCreateForm =
-    document.getElementById("operatorCreateForm");
-
-  const opName =
-    document.getElementById("opName");
-
-  const newOpEmail =
-    document.getElementById("newOpEmail");
-
-  const newOpPassword =
-    document.getElementById("newOpPassword");
-
-  const operatorCreateMessage =
-    document.getElementById("operatorCreateMessage");
-
-  const operatorsList =
-    document.getElementById("operatorsList");
-
-
-  /* ORDERS */
-
-  const ordersBody =
-    document.getElementById("ordersBody");
-
-  const mobileOrders =
-    document.getElementById("mobileOrders");
-
-  const ordersMessage =
-    document.getElementById("ordersMessage");
-
-  const visibleOrderCount =
-    document.getElementById("visibleOrderCount");
-
-  const adminOrderSearch =
-    document.getElementById("adminOrderSearch");
-
-  const clearOrderSearch =
-    document.getElementById("clearOrderSearch");
-
-
-  /* SUPPORT */
-
-  const adminSupportList =
-    document.getElementById("adminSupportList");
-
-
-  /* =====================================================
-     STATE
-  ===================================================== */
-
-  let currentUser = null;
-
-  let products = [];
-  let orders = [];
-  let profiles = [];
-  let supportRequests = [];
-
-  let activeOrderFilter = "all";
-
-
-  /* =====================================================
+  /* =========================================================
      HELPERS
-  ===================================================== */
+  ========================================================= */
+
+  const $ = id =>
+    document.getElementById(id);
+
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -210,28 +30,64 @@
   }
 
 
-  function formatMoney(value) {
-    return Number(value || 0)
-      .toLocaleString("uz-UZ") + " so‘m";
+  function formatPrice(value) {
+    const number = Number(value || 0);
+
+    return new Intl.NumberFormat(
+      "uz-UZ"
+    ).format(number) + " so‘m";
   }
 
 
   function formatDate(value) {
     if (!value) return "—";
 
-    try {
-      return new Date(value)
-        .toLocaleString("uz-UZ", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
+    const date =
+      new Date(value);
 
-    } catch (_) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
       return "—";
     }
+
+    return date.toLocaleString(
+      "uz-UZ",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+  }
+
+
+  function isToday(value) {
+    if (!value) return false;
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return false;
+    }
+
+    const now =
+      new Date();
+
+    return (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate()
+    );
   }
 
 
@@ -243,7 +99,9 @@
     if (!element) return;
 
     element.textContent = text;
-    element.className = "form-message";
+
+    element.className =
+      "admin-message";
 
     if (type) {
       element.classList.add(type);
@@ -251,76 +109,199 @@
   }
 
 
-  function isToday(value) {
-    if (!value) return false;
-
-    const date = new Date(value);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return false;
-    }
-
-    const now = new Date();
-
-    return (
-      date.getFullYear() ===
-        now.getFullYear() &&
-
-      date.getMonth() ===
-        now.getMonth() &&
-
-      date.getDate() ===
-        now.getDate()
-    );
+  function normalizeText(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
   }
 
 
-  /* =====================================================
-     TOKEN
-  ===================================================== */
+  /* =========================================================
+     DOM
+  ========================================================= */
 
-  function saveSession(session) {
-    if (!session?.access_token) return;
+  const adminLoginView =
+    $("adminLoginView");
 
-    sessionStorage.setItem(
-      "modex_admin_token",
-      session.access_token
-    );
+  const adminView =
+    $("adminView");
 
-    sessionStorage.setItem(
-      "modex_admin_refresh",
-      session.refresh_token || ""
-    );
-  }
+  const adminLoginForm =
+    $("adminLoginForm");
 
+  const adminEmail =
+    $("adminEmail");
 
-  function getToken() {
-    return sessionStorage.getItem(
-      "modex_admin_token"
-    );
-  }
+  const adminPassword =
+    $("adminPassword");
 
+  const adminLoginMessage =
+    $("adminLoginMessage");
 
-  function clearSession() {
-    sessionStorage.removeItem(
-      "modex_admin_token"
-    );
+  const adminUserName =
+    $("adminUserName");
 
-    sessionStorage.removeItem(
-      "modex_admin_refresh"
-    );
+  const adminRefreshBtn =
+    $("adminRefreshBtn");
 
-    currentUser = null;
-  }
+  const adminLogoutBtn =
+    $("adminLogoutBtn");
 
 
-  /* =====================================================
+  /* STATS */
+
+  const adminProductCount =
+    $("adminProductCount");
+
+  const adminOrderCount =
+    $("adminOrderCount");
+
+  const adminNewOrderCount =
+    $("adminNewOrderCount");
+
+  const adminOperatorCount =
+    $("adminOperatorCount");
+
+  const adminConfirmedCount =
+    $("adminConfirmedCount");
+
+  const adminDeliveryCount =
+    $("adminDeliveryCount");
+
+  const adminDoneCount =
+    $("adminDoneCount");
+
+  const adminCancelledCount =
+    $("adminCancelledCount");
+
+
+  /* DAILY OPERATOR */
+
+  const todayOperatorsTotal =
+    $("todayOperatorsTotal");
+
+  const operatorDailyStats =
+    $("operatorDailyStats");
+
+
+  /* PRODUCTS */
+
+  const productForm =
+    $("productForm");
+
+  const pId =
+    $("pId");
+
+  const pName =
+    $("pName");
+
+  const pCategory =
+    $("pCategory");
+
+  const pPrice =
+    $("pPrice");
+
+  const pOldPrice =
+    $("pOldPrice");
+
+  const pDiscount =
+    $("pDiscount");
+
+  const pStock =
+    $("pStock");
+
+  const pDescription =
+    $("pDescription");
+
+  const pImage =
+    $("pImage");
+
+  const pActive =
+    $("pActive");
+
+  const productSaveBtn =
+    $("productSaveBtn");
+
+  const productCancelBtn =
+    $("productCancelBtn");
+
+  const productMessage =
+    $("productMessage");
+
+  const adminProducts =
+    $("adminProducts");
+
+
+  /* OPERATORS */
+
+  const operatorCreateForm =
+    $("operatorCreateForm");
+
+  const newOperatorName =
+    $("newOperatorName");
+
+  const newOperatorEmail =
+    $("newOperatorEmail");
+
+  const newOperatorPassword =
+    $("newOperatorPassword");
+
+  const operatorCreateMessage =
+    $("operatorCreateMessage");
+
+  const adminOperators =
+    $("adminOperators");
+
+
+  /* ORDERS */
+
+  const adminOrderSearch =
+    $("adminOrderSearch");
+
+  const adminOrderFilter =
+    $("adminOrderFilter");
+
+  const adminOrders =
+    $("adminOrders");
+
+  const adminMobileOrders =
+    $("adminMobileOrders");
+
+  const adminOrdersMessage =
+    $("adminOrdersMessage");
+
+
+  /* SUPPORT */
+
+  const adminSupport =
+    $("adminSupport");
+
+  const adminSupportMessage =
+    $("adminSupportMessage");
+
+
+  /* =========================================================
+     STATE
+  ========================================================= */
+
+  let currentUser = null;
+
+  let currentProfile = null;
+
+  let allProducts = [];
+
+  let allOrders = [];
+
+  let allProfiles = [];
+
+  let allSupport = [];
+
+  let allActivity = [];
+
+
+  /* =========================================================
      API
-  ===================================================== */
+  ========================================================= */
 
   async function apiRequest(
     path,
@@ -357,7 +338,6 @@
         }
       );
 
-
     if (!response.ok) {
       let message =
         `Server xatosi (${response.status})`;
@@ -375,18 +355,25 @@
             ` — ${data.details}`;
         }
 
+        if (data?.hint) {
+          message +=
+            ` — ${data.hint}`;
+        }
+
+        if (data?.error_description) {
+          message =
+            data.error_description;
+        }
       } catch (_) {}
 
       throw new Error(message);
     }
-
 
     if (
       response.status === 204
     ) {
       return null;
     }
-
 
     const text =
       await response.text();
@@ -399,9 +386,57 @@
   }
 
 
-  /* =====================================================
+  /* =========================================================
+     SESSION
+  ========================================================= */
+
+  function saveSession(session) {
+    if (!session?.access_token) {
+      return;
+    }
+
+    sessionStorage.setItem(
+      "modex_admin_token",
+      session.access_token
+    );
+
+    sessionStorage.setItem(
+      "modex_admin_refresh",
+      session.refresh_token || ""
+    );
+  }
+
+
+  function getToken() {
+    return sessionStorage.getItem(
+      "modex_admin_token"
+    );
+  }
+
+
+  function clearSession() {
+    sessionStorage.removeItem(
+      "modex_admin_token"
+    );
+
+    sessionStorage.removeItem(
+      "modex_admin_refresh"
+    );
+
+    currentUser = null;
+    currentProfile = null;
+
+    allProducts = [];
+    allOrders = [];
+    allProfiles = [];
+    allSupport = [];
+    allActivity = [];
+  }
+
+
+  /* =========================================================
      LOGIN
-  ===================================================== */
+  ========================================================= */
 
   async function login(
     email,
@@ -413,17 +448,17 @@
         {
           method: "POST",
 
-          body: JSON.stringify({
-            email,
-            password
-          })
+          body:
+            JSON.stringify({
+              email,
+              password
+            })
         }
       );
 
-
     if (!data?.access_token) {
       throw new Error(
-        "Login token olinmadi."
+        "Login amalga oshmadi."
       );
     }
 
@@ -434,14 +469,14 @@
 
 
   async function loadCurrentUser() {
-    const token = getToken();
+    const token =
+      getToken();
 
     if (!token) {
       throw new Error(
         "Sessiya topilmadi."
       );
     }
-
 
     const user =
       await apiRequest(
@@ -452,13 +487,11 @@
         token
       );
 
-
     if (!user?.id) {
       throw new Error(
-        "Admin aniqlanmadi."
+        "Foydalanuvchi aniqlanmadi."
       );
     }
-
 
     currentUser = user;
 
@@ -466,25 +499,23 @@
   }
 
 
-  async function checkAdmin() {
-    const token = getToken();
-
+  async function loadAdminProfile() {
+    const token =
+      getToken();
 
     const data =
       await apiRequest(
-        `rest/v1/profiles?id=eq.${encodeURIComponent(currentUser.id)}&select=id,name,role,active`,
+        `rest/v1/profiles?id=eq.${encodeURIComponent(currentUser.id)}&select=*`,
         {
           method: "GET"
         },
         token
       );
 
-
     const profile =
       Array.isArray(data)
         ? data[0]
         : null;
-
 
     if (!profile) {
       throw new Error(
@@ -492,227 +523,200 @@
       );
     }
 
-
-    if (profile.role !== "admin") {
+    if (
+      profile.role !== "admin"
+    ) {
       throw new Error(
-        "Bu akkaunt admin emas."
+        "Bu hisob admin emas."
       );
     }
 
-
-    if (profile.active !== true) {
+    if (
+      profile.active !== true
+    ) {
       throw new Error(
-        "Admin bloklangan."
+        "Admin hisobi bloklangan."
       );
     }
 
+    currentProfile =
+      profile;
 
     return profile;
   }
 
 
-  /* =====================================================
-     ADMIN PANELNI OCHISH
-  ===================================================== */
+  /* =========================================================
+     OPEN PANEL
+  ========================================================= */
 
-  async function openAdmin() {
+  async function openAdminPanel() {
     await loadCurrentUser();
 
-    await checkAdmin();
+    await loadAdminProfile();
 
+    adminLoginView
+      ?.classList.add("hidden");
 
-    loginView?.classList.add(
-      "hidden"
-    );
+    adminView
+      ?.classList.remove("hidden");
 
-    adminView?.classList.remove(
-      "hidden"
-    );
-
-
-    if (adminEmail) {
-      adminEmail.textContent =
-        currentUser.email || "";
+    if (adminUserName) {
+      adminUserName.textContent =
+        currentProfile.name ||
+        currentUser.email ||
+        "Admin";
     }
-
 
     await loadEverything();
   }
 
 
-  /* =====================================================
+  /* =========================================================
      LOAD EVERYTHING
-  ===================================================== */
+  ========================================================= */
 
   async function loadEverything() {
     await Promise.all([
       loadProducts(),
       loadOrders(),
       loadProfiles(),
-      loadSupport()
+      loadSupport(),
+      loadActivity()
     ]);
 
-    updateDashboard();
-    renderOperatorDailyStats();
+    updateGlobalStats();
+
+    renderProducts();
+
+    renderOrders();
+
+    renderOperators();
+
+    renderSupport();
+
+    renderDailyOperatorStats();
   }
 
 
-  /* =====================================================
+  /* =========================================================
      PRODUCTS
-  ===================================================== */
+  ========================================================= */
 
   async function loadProducts() {
-    const token = getToken();
+    const token =
+      getToken();
 
-    try {
-      const data =
-        await apiRequest(
-          "rest/v1/products?select=*&order=id.desc",
-          {
-            method: "GET"
-          },
-          token
-        );
-
-
-      products =
-        Array.isArray(data)
-          ? data
-          : [];
-
-
-      renderProducts();
-
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        productMessage,
-        error.message,
-        "error"
+    const data =
+      await apiRequest(
+        "rest/v1/products?select=*&order=id.desc",
+        {
+          method: "GET"
+        },
+        token
       );
-    }
+
+    allProducts =
+      Array.isArray(data)
+        ? data
+        : [];
   }
 
 
   function renderProducts() {
-    if (!adminProducts) return;
+    if (!adminProducts) {
+      return;
+    }
 
-    adminProducts.innerHTML = "";
+    adminProducts.innerHTML =
+      "";
 
-
-    if (products.length === 0) {
-      adminProducts.innerHTML =
-        "<p>Mahsulot yo‘q.</p>";
+    if (
+      allProducts.length === 0
+    ) {
+      adminProducts.innerHTML = `
+        <p>Mahsulotlar yo‘q.</p>
+      `;
 
       return;
     }
 
-
-    products.forEach(product => {
-      const item =
+    allProducts.forEach(product => {
+      const card =
         document.createElement("article");
 
-      item.className =
-        "product-admin-item";
-
+      card.className =
+        "admin-product-card";
 
       const image =
         product.image_url ||
         product.image ||
         "";
 
-
-      item.innerHTML = `
-
+      card.innerHTML = `
         ${
           image
             ? `
               <img
                 src="${escapeHtml(image)}"
-                alt=""
+                alt="${escapeHtml(product.name)}"
+                class="admin-product-image"
               >
             `
-            : `
-              <div
-                style="
-                  width:64px;
-                  height:80px;
-                  border-radius:10px;
-                  background:#f1f1f5;
-                "
-              ></div>
-            `
+            : ""
         }
 
-
-        <div>
+        <div class="admin-product-body">
 
           <strong>
-            ${escapeHtml(
-              product.name ||
-              "Mahsulot"
-            )}
+            ${escapeHtml(product.name)}
           </strong>
 
-          <div
-            style="
-              margin-top:4px;
-              color:#777783;
-              font-size:11px;
-            "
-          >
-            ${escapeHtml(
-              product.category || ""
-            )}
-          </div>
+          <span>
+            ${escapeHtml(product.category || "—")}
+          </span>
 
-          <div
-            style="
-              margin-top:5px;
-              font-weight:900;
-            "
-          >
-            ${formatMoney(
-              product.price
-            )}
-          </div>
+          <p>
+            ${formatPrice(product.price)}
+          </p>
 
           <small>
-            Omborda:
-            ${Number(
-              product.stock || 0
-            )} dona
+            Ombor:
+            <b>${Number(product.stock || 0)}</b>
           </small>
 
-        </div>
+          ${
+            Number(product.stock || 0) <= 3
+              ? `
+                <div class="low-stock-warning">
+                  ⚠️ Kam qoldi
+                </div>
+              `
+              : ""
+          }
 
+          <div class="admin-product-actions">
 
-        <div class="product-admin-actions">
+            <button
+              type="button"
+              data-edit-product="${product.id}"
+            >
+              Tahrirlash
+            </button>
 
-          <button
-            class="small-btn"
-            type="button"
-            data-edit-product="${product.id}"
-          >
-            Tahrirlash
-          </button>
+            <button
+              type="button"
+              data-delete-product="${product.id}"
+            >
+              O‘chirish
+            </button>
 
-          <button
-            class="small-btn"
-            type="button"
-            data-delete-product="${product.id}"
-          >
-            O‘chirish
-          </button>
+          </div>
 
         </div>
       `;
 
-
-      adminProducts.appendChild(
-        item
-      );
+      adminProducts.appendChild(card);
     });
 
 
@@ -724,7 +728,7 @@
         button.addEventListener(
           "click",
           () => {
-            startEditProduct(
+            editProduct(
               Number(
                 button.dataset.editProduct
               )
@@ -753,96 +757,97 @@
   }
 
 
-  function startEditProduct(id) {
-    const product =
-      products.find(
-        item =>
-          Number(item.id) ===
-          Number(id)
-      );
-
-
-    if (!product) return;
-
-
-    editProductId.value =
-      product.id;
-
-    pName.value =
-      product.name || "";
-
-    pCategory.value =
-      product.category || "";
-
-    pPrice.value =
-      product.price || "";
-
-    pOldPrice.value =
-      product.old_price || "";
-
-    pDiscount.value =
-      product.discount_percent || 0;
-
-    pStock.value =
-      product.stock || 0;
-
-    pDesc.value =
-      product.description || "";
-
-
-    if (productFormTitle) {
-      productFormTitle.textContent =
-        "Mahsulotni tahrirlash";
-    }
-
-
-    if (productSubmitBtn) {
-      productSubmitBtn.textContent =
-        "Saqlash";
-    }
-
-
-    cancelEditBtn?.classList.remove(
-      "hidden"
-    );
-
-
-    productForm?.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }
-
-
   function resetProductForm() {
-    productForm?.reset();
+    if (!productForm) return;
 
-    if (editProductId) {
-      editProductId.value = "";
+    productForm.reset();
+
+    if (pId) {
+      pId.value = "";
     }
 
+    if (pActive) {
+      pActive.checked = true;
+    }
 
-    if (productFormTitle) {
-      productFormTitle.textContent =
+    if (productSaveBtn) {
+      productSaveBtn.textContent =
         "Mahsulot qo‘shish";
     }
-
-
-    if (productSubmitBtn) {
-      productSubmitBtn.textContent =
-        "Mahsulot qo‘shish";
-    }
-
-
-    cancelEditBtn?.classList.add(
-      "hidden"
-    );
-
 
     showMessage(
       productMessage,
       ""
     );
+  }
+
+
+  function editProduct(id) {
+    const product =
+      allProducts.find(
+        item =>
+          Number(item.id) ===
+          Number(id)
+      );
+
+    if (!product) {
+      return;
+    }
+
+    if (pId) {
+      pId.value =
+        product.id;
+    }
+
+    if (pName) {
+      pName.value =
+        product.name || "";
+    }
+
+    if (pCategory) {
+      pCategory.value =
+        product.category || "";
+    }
+
+    if (pPrice) {
+      pPrice.value =
+        product.price || "";
+    }
+
+    if (pOldPrice) {
+      pOldPrice.value =
+        product.old_price || "";
+    }
+
+    if (pDiscount) {
+      pDiscount.value =
+        product.discount_percent || "";
+    }
+
+    if (pStock) {
+      pStock.value =
+        product.stock || 0;
+    }
+
+    if (pDescription) {
+      pDescription.value =
+        product.description || "";
+    }
+
+    if (pActive) {
+      pActive.checked =
+        product.active !== false;
+    }
+
+    if (productSaveBtn) {
+      productSaveBtn.textContent =
+        "Saqlash";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   }
 
 
@@ -852,50 +857,50 @@
     const token =
       getToken();
 
-
     const id =
-      Number(editProductId?.value || 0);
-
+      Number(pId?.value || 0);
 
     const payload = {
       name:
-        pName.value.trim(),
+        pName?.value.trim() || "",
 
       category:
-        pCategory.value.trim(),
+        pCategory?.value.trim() || null,
 
       price:
-        Number(pPrice.value || 0),
+        Number(pPrice?.value || 0),
 
       old_price:
-        pOldPrice.value
+        pOldPrice?.value
           ? Number(pOldPrice.value)
           : null,
 
       discount_percent:
-        Number(pDiscount.value || 0),
+        pDiscount?.value
+          ? Number(pDiscount.value)
+          : 0,
 
       stock:
         Math.max(
           0,
-          Number(pStock.value || 0)
+          Number(pStock?.value || 0)
         ),
 
       description:
-        pDesc.value.trim() || null,
+        pDescription?.value.trim() ||
+        null,
 
-      active: true
+      active:
+        pActive
+          ? pActive.checked
+          : true
     };
 
 
-    if (
-      !payload.name ||
-      !payload.category ||
-      payload.price <= 0
-    ) {
+    if (!payload.name) {
       showMessage(
         productMessage,
-        "Mahsulot nomi, kategoriya va narxni tekshiring.",
+        "Mahsulot nomini kiriting.",
         "error"
       );
 
@@ -910,15 +915,6 @@
 
 
     try {
-
-      /*
-        Hozir rasm URL DB'da oldindan
-        bo‘lsa saqlanadi.
-
-        File upload uchun Storage alohida
-        ulanishi kerak.
-      */
-
       if (id) {
         await apiRequest(
           `rest/v1/products?id=eq.${id}`,
@@ -926,16 +922,17 @@
             method: "PATCH",
 
             headers: {
-              "Prefer":
-                "return=representation"
+              Prefer:
+                "return=minimal"
             },
 
             body:
-              JSON.stringify(payload)
+              JSON.stringify(
+                payload
+              )
           },
           token
         );
-
       } else {
         await apiRequest(
           "rest/v1/products",
@@ -943,38 +940,40 @@
             method: "POST",
 
             headers: {
-              "Prefer":
-                "return=representation"
+              Prefer:
+                "return=minimal"
             },
 
             body:
-              JSON.stringify(payload)
+              JSON.stringify(
+                payload
+              )
           },
           token
         );
       }
 
+      await loadProducts();
 
-      showMessage(
-        productMessage,
-        "✅ Saqlandi",
-        "success"
-      );
+      renderProducts();
 
+      updateGlobalStats();
 
       resetProductForm();
 
-      await loadProducts();
-
-      updateDashboard();
-
+      showMessage(
+        productMessage,
+        "✅ Mahsulot saqlandi.",
+        "success"
+      );
 
     } catch (error) {
       console.error(error);
 
       showMessage(
         productMessage,
-        error.message,
+        error.message ||
+        "Mahsulot saqlanmadi.",
         "error"
       );
     }
@@ -982,13 +981,25 @@
 
 
   async function deleteProduct(id) {
-    const yes =
-      confirm(
-        "Mahsulotni o‘chirasizmi?"
+    const product =
+      allProducts.find(
+        item =>
+          Number(item.id) ===
+          Number(id)
       );
 
-    if (!yes) return;
+    if (!product) {
+      return;
+    }
 
+    const ok =
+      confirm(
+        `"${product.name}" mahsulotini o‘chirasizmi?`
+      );
+
+    if (!ok) {
+      return;
+    }
 
     try {
       await apiRequest(
@@ -999,151 +1010,444 @@
         getToken()
       );
 
-
       await loadProducts();
 
-      updateDashboard();
+      renderProducts();
+
+      updateGlobalStats();
 
     } catch (error) {
       alert(
         error.message ||
-        "Mahsulotni o‘chirib bo‘lmadi."
+        "Mahsulot o‘chirilmadi."
       );
     }
   }
 
 
-  /* =====================================================
-     PROFILES / OPERATORS
-  ===================================================== */
+  /* =========================================================
+     ORDERS
+  ========================================================= */
 
-  async function loadProfiles() {
+  async function loadOrders() {
     const token =
       getToken();
 
-    try {
-      const data =
-        await apiRequest(
-          "rest/v1/profiles?select=id,name,role,active&order=name.asc",
-          {
-            method: "GET"
-          },
-          token
-        );
+    const data =
+      await apiRequest(
+        "rest/v1/orders?select=*&order=id.desc",
+        {
+          method: "GET"
+        },
+        token
+      );
 
-
-      profiles =
-        Array.isArray(data)
-          ? data
-          : [];
-
-
-      renderOperators();
-
-    } catch (error) {
-      console.error(error);
-    }
+    allOrders =
+      Array.isArray(data)
+        ? data
+        : [];
   }
 
 
-  function getOperators() {
-    return profiles.filter(
-      profile =>
-        profile.role === "operator"
+  function getFilteredOrders() {
+    let list =
+      [...allOrders];
+
+    const status =
+      adminOrderFilter?.value ||
+      "all";
+
+    if (
+      status !== "all"
+    ) {
+      list =
+        list.filter(
+          order =>
+            order.status === status
+        );
+    }
+
+    const query =
+      normalizeText(
+        adminOrderSearch?.value
+      );
+
+    if (query) {
+      list =
+        list.filter(order => {
+          const text =
+            normalizeText(`
+              ${order.id}
+              ${order.name}
+              ${order.surname}
+              ${order.phone}
+              ${order.product}
+              ${order.region}
+              ${order.address}
+            `);
+
+          return text.includes(
+            query
+          );
+        });
+    }
+
+    return list;
+  }
+
+
+  function statusName(status) {
+    const map = {
+      new: "🔴 Yangi",
+      talked: "🟠 Gaplashildi",
+      confirmed: "🔵 Qadoqlanmoqda",
+      delivery: "🟣 Yo‘lda",
+      done: "🟢 Yetkazildi",
+      cancelled: "⚪ Bekor"
+    };
+
+    return (
+      map[status] ||
+      status ||
+      "—"
     );
   }
 
 
+  function renderOrders() {
+    const list =
+      getFilteredOrders();
+
+    if (adminOrders) {
+      adminOrders.innerHTML =
+        "";
+
+      if (
+        list.length === 0
+      ) {
+        adminOrders.innerHTML = `
+          <tr>
+            <td colspan="9">
+              Buyurtmalar yo‘q.
+            </td>
+          </tr>
+        `;
+      }
+
+      list.forEach(order => {
+        const tr =
+          document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>#${escapeHtml(order.id)}</td>
+
+          <td>
+            ${escapeHtml(order.name || "—")}
+          </td>
+
+          <td>
+            ${escapeHtml(order.phone || "—")}
+          </td>
+
+          <td>
+            ${escapeHtml(order.product || "—")}
+          </td>
+
+          <td>
+            ${escapeHtml(order.quantity || 1)}
+          </td>
+
+          <td>
+            ${statusName(order.status)}
+          </td>
+
+          <td>
+            ${escapeHtml(order.region || "—")}
+          </td>
+
+          <td>
+            ${formatDate(order.created_at)}
+          </td>
+
+          <td>
+            <button
+              type="button"
+              data-delete-order="${order.id}"
+            >
+              O‘chirish
+            </button>
+          </td>
+        `;
+
+        adminOrders.appendChild(tr);
+      });
+    }
+
+
+    if (adminMobileOrders) {
+      adminMobileOrders.innerHTML =
+        "";
+
+      list.forEach(order => {
+        const card =
+          document.createElement("article");
+
+        card.className =
+          "admin-mobile-order-card";
+
+        card.innerHTML = `
+          <strong>
+            #${escapeHtml(order.id)}
+            —
+            ${escapeHtml(order.name || "Mijoz")}
+          </strong>
+
+          <p>
+            ${escapeHtml(order.product || "Mahsulot")}
+          </p>
+
+          <span>
+            ${statusName(order.status)}
+          </span>
+
+          <small>
+            ${escapeHtml(order.phone || "—")}
+          </small>
+
+          <button
+            type="button"
+            data-delete-order="${order.id}"
+          >
+            O‘chirish
+          </button>
+        `;
+
+        adminMobileOrders.appendChild(
+          card
+        );
+      });
+    }
+
+
+    document
+      .querySelectorAll(
+        "[data-delete-order]"
+      )
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => {
+            deleteOrder(
+              Number(
+                button.dataset.deleteOrder
+              )
+            );
+          }
+        );
+      });
+  }
+
+
+  async function deleteOrder(id) {
+    const order =
+      allOrders.find(
+        item =>
+          Number(item.id) ===
+          Number(id)
+      );
+
+    if (!order) {
+      return;
+    }
+
+    const ok =
+      confirm(
+        `Buyurtma #${id} o‘chirilsinmi?`
+      );
+
+    if (!ok) {
+      return;
+    }
+
+    try {
+      /*
+        Agar stock oldin kamaygan bo‘lsa,
+        buyurtmani o‘chirishdan oldin
+        mahsulot stockini qaytaramiz.
+      */
+
+      if (
+        order.stock_adjusted === true &&
+        order.product_id
+      ) {
+        const product =
+          allProducts.find(
+            item =>
+              Number(item.id) ===
+              Number(order.product_id)
+          );
+
+        if (product) {
+          const newStock =
+            Number(product.stock || 0) +
+            Math.max(
+              1,
+              Number(order.quantity || 1)
+            );
+
+          await apiRequest(
+            `rest/v1/products?id=eq.${product.id}`,
+            {
+              method: "PATCH",
+
+              headers: {
+                Prefer:
+                  "return=minimal"
+              },
+
+              body:
+                JSON.stringify({
+                  stock:
+                    newStock
+                })
+            },
+            getToken()
+          );
+        }
+      }
+
+
+      await apiRequest(
+        `rest/v1/orders?id=eq.${id}`,
+        {
+          method: "DELETE"
+        },
+        getToken()
+      );
+
+
+      await Promise.all([
+        loadOrders(),
+        loadProducts(),
+        loadActivity()
+      ]);
+
+      renderOrders();
+      renderProducts();
+      renderDailyOperatorStats();
+      updateGlobalStats();
+
+    } catch (error) {
+      alert(
+        error.message ||
+        "Buyurtma o‘chirilmadi."
+      );
+    }
+  }
+
+
+  /* =========================================================
+     PROFILES / OPERATORS
+  ========================================================= */
+
+  async function loadProfiles() {
+    const data =
+      await apiRequest(
+        "rest/v1/profiles?select=*&order=name.asc",
+        {
+          method: "GET"
+        },
+        getToken()
+      );
+
+    allProfiles =
+      Array.isArray(data)
+        ? data
+        : [];
+  }
+
+
   function renderOperators() {
-    if (!operatorsList) return;
+    if (!adminOperators) {
+      return;
+    }
 
+    const operators =
+      allProfiles.filter(
+        profile =>
+          profile.role === "operator"
+      );
 
-    const operatorProfiles =
-      getOperators();
-
+    adminOperators.innerHTML =
+      "";
 
     if (
-      operatorProfiles.length === 0
+      operators.length === 0
     ) {
-      operatorsList.innerHTML =
-        "<p>Operator yo‘q.</p>";
+      adminOperators.innerHTML = `
+        <p>Operatorlar yo‘q.</p>
+      `;
 
       return;
     }
 
 
-    operatorsList.innerHTML =
-      operatorProfiles
-        .map(operator => `
+    operators.forEach(operator => {
+      const card =
+        document.createElement("article");
 
-          <div
-            style="
-              padding:12px;
-              margin-top:8px;
-              border:1px solid #e8e8ef;
-              border-radius:13px;
-              background:#fafafd;
-            "
-          >
+      card.className =
+        "admin-operator-card";
 
-            <strong>
-              ${escapeHtml(
-                operator.name ||
-                "Operator"
-              )}
-            </strong>
+      card.innerHTML = `
+        <div>
+          <strong>
+            ${escapeHtml(
+              operator.name ||
+              "Operator"
+            )}
+          </strong>
 
-            <div
-              style="
-                margin-top:4px;
-                font-size:11px;
-                color:${
-                  operator.active
-                    ? "#16835a"
-                    : "#d6455d"
-                };
-              "
-            >
-              ${
-                operator.active
-                  ? "● Faol"
-                  : "● Bloklangan"
-              }
-            </div>
+          <span>
+            ${
+              operator.active
+                ? "🟢 Faol"
+                : "🔴 Bloklangan"
+            }
+          </span>
+        </div>
+      `;
 
-          </div>
-
-        `)
-        .join("");
+      adminOperators.appendChild(
+        card
+      );
+    });
   }
 
 
-  /* =====================================================
-     OPERATOR YARATISH
-  ===================================================== */
-
-  async function createOperator(event) {
+  async function createOperator(
+    event
+  ) {
     event.preventDefault();
 
-
     const name =
-      opName.value.trim();
+      newOperatorName?.value.trim();
 
     const email =
-      newOpEmail.value.trim();
+      newOperatorEmail?.value.trim();
 
     const password =
-      newOpPassword.value;
+      newOperatorPassword?.value;
 
 
     if (
       !name ||
       !email ||
-      password.length < 6
+      !password
     ) {
       showMessage(
         operatorCreateMessage,
-        "Ism, email va kamida 6 belgili parol kiriting.",
+        "Barcha maydonlarni to‘ldiring.",
         "error"
       );
 
@@ -1199,627 +1503,235 @@
       }
 
 
-      operatorCreateForm.reset();
-
-
-      showMessage(
-        operatorCreateMessage,
-        "✅ Operator yaratildi",
-        "success"
-      );
+      operatorCreateForm?.reset();
 
 
       await loadProfiles();
 
-      updateDashboard();
+      renderOperators();
 
+      updateGlobalStats();
+
+
+      showMessage(
+        operatorCreateMessage,
+        "✅ Operator yaratildi.",
+        "success"
+      );
 
     } catch (error) {
       console.error(error);
 
       showMessage(
         operatorCreateMessage,
-        error.message,
+        error.message ||
+        "Operator yaratilmadi.",
         "error"
       );
     }
   }
 
 
-  /* =====================================================
-     ORDERS
-  ===================================================== */
-
-  async function loadOrders() {
-    const token =
-      getToken();
-
-
-    showMessage(
-      ordersMessage,
-      "Buyurtmalar yuklanmoqda..."
-    );
-
-
-    try {
-      const data =
-        await apiRequest(
-          "rest/v1/orders?select=*&order=id.desc",
-          {
-            method: "GET"
-          },
-          token
-        );
-
-
-      orders =
-        Array.isArray(data)
-          ? data
-          : [];
-
-
-      renderOrders();
-
-      showMessage(
-        ordersMessage,
-        ""
-      );
-
-
-    } catch (error) {
-      console.error(error);
-
-      showMessage(
-        ordersMessage,
-        error.message,
-        "error"
-      );
-    }
-  }
-
-
-  function getFilteredOrders() {
-    let list =
-      [...orders];
-
-
-    if (
-      activeOrderFilter !== "all"
-    ) {
-      list =
-        list.filter(
-          order =>
-            order.status ===
-            activeOrderFilter
-        );
-    }
-
-
-    const query =
-      adminOrderSearch?.value
-        ?.trim()
-        ?.toLowerCase() || "";
-
-
-    if (query) {
-      list =
-        list.filter(order => {
-          const text = `
-            ${order.id || ""}
-            ${order.name || ""}
-            ${order.surname || ""}
-            ${order.phone || ""}
-            ${order.product || ""}
-            ${order.region || ""}
-          `.toLowerCase();
-
-
-          return text.includes(
-            query
-          );
-        });
-    }
-
-
-    return list;
-  }
-
-
-  function statusText(status) {
-    const map = {
-      new: "🔴 Yangi",
-      talked: "🟠 Gaplashildi",
-      confirmed: "🔵 Tasdiqlandi",
-      delivery: "🟣 Yo‘lda",
-      done: "🟢 Yakunlandi",
-      cancelled: "⚪ Bekor"
-    };
-
-    return map[status] ||
-      status ||
-      "Yangi";
-  }
-
-
-  function renderOrders() {
-    const list =
-      getFilteredOrders();
-
-
-    if (visibleOrderCount) {
-      visibleOrderCount.textContent =
-        `${list.length} ta`;
-    }
-
-
-    if (ordersBody) {
-      ordersBody.innerHTML =
-        list
-          .map(order => `
-
-            <tr>
-
-              <td>
-                #${escapeHtml(order.id)}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.name || "—"
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.phone || "—"
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.product || "—"
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.quantity || 1
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.size || "—"
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  order.color || "—"
-                )}
-              </td>
-
-              <td>
-                ${statusText(
-                  order.status
-                )}
-              </td>
-
-              <td>
-
-                <button
-                  class="small-btn"
-                  data-delete-order="${order.id}"
-                  type="button"
-                >
-                  O‘chirish
-                </button>
-
-              </td>
-
-            </tr>
-
-          `)
-          .join("");
-    }
-
-
-    renderMobileOrders(list);
-
-
-    document
-      .querySelectorAll(
-        "[data-delete-order]"
-      )
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            deleteOrder(
-              Number(
-                button.dataset.deleteOrder
-              )
-            );
-          }
-        );
-      });
-  }
-
-
-  function renderMobileOrders(list) {
-    if (!mobileOrders) return;
-
-
-    mobileOrders.innerHTML =
-      list
-        .map(order => `
-
-          <article
-            style="
-              padding:13px;
-              border:1px solid #e8e8ef;
-              border-radius:15px;
-              background:#fff;
-            "
-          >
-
-            <small>
-              Buyurtma #${escapeHtml(order.id)}
-            </small>
-
-            <h3
-              style="
-                margin:5px 0;
-              "
-            >
-              ${escapeHtml(
-                order.name || "Mijoz"
-              )}
-            </h3>
-
-            <a
-              href="tel:${escapeHtml(
-                order.phone || ""
-              )}"
-              style="
-                display:block;
-                margin-bottom:7px;
-              "
-            >
-              📞
-              ${escapeHtml(
-                order.phone || "—"
-              )}
-            </a>
-
-            <strong>
-              ${escapeHtml(
-                order.product || "Mahsulot"
-              )}
-            </strong>
-
-            <p>
-              ${statusText(order.status)}
-            </p>
-
-            <button
-              class="small-btn"
-              data-delete-order="${order.id}"
-              type="button"
-            >
-              O‘chirish
-            </button>
-
-          </article>
-
-        `)
-        .join("");
-  }
-
-
-  /* =====================================================
-     ORDER DELETE
-  ===================================================== */
-
-  async function deleteOrder(id) {
-    const order =
-      orders.find(
-        item =>
-          Number(item.id) ===
-          Number(id)
-      );
-
-
-    if (!order) return;
-
-
-    const yes =
-      confirm(
-        `Buyurtma #${id} o‘chirilsinmi?`
-      );
-
-    if (!yes) return;
-
-
-    try {
-
-      /*
-        Agar oldin stock kamaytirilgan
-        bo‘lsa — mahsulotni qaytaramiz.
-      */
-
-      if (
-        order.stock_adjusted === true &&
-        order.product_id
-      ) {
-        const product =
-          products.find(
-            item =>
-              Number(item.id) ===
-              Number(order.product_id)
-          );
-
-
-        if (product) {
-          const newStock =
-            Number(product.stock || 0) +
-            Number(order.quantity || 1);
-
-
-          await apiRequest(
-            `rest/v1/products?id=eq.${order.product_id}`,
-            {
-              method: "PATCH",
-
-              body:
-                JSON.stringify({
-                  stock: newStock
-                })
-            },
-            getToken()
-          );
-        }
-      }
-
-
+  /* =========================================================
+     ORDER ACTIVITY
+  ========================================================= */
+
+  async function loadActivity() {
+    const data =
       await apiRequest(
-        `rest/v1/orders?id=eq.${id}`,
+        "rest/v1/order_activity?select=*&order=created_at.desc",
         {
-          method: "DELETE"
+          method: "GET"
         },
         getToken()
       );
 
-
-      await Promise.all([
-        loadOrders(),
-        loadProducts()
-      ]);
-
-
-      updateDashboard();
-
-      renderOperatorDailyStats();
-
-
-    } catch (error) {
-      alert(
-        error.message ||
-        "Buyurtmani o‘chirib bo‘lmadi."
-      );
-    }
+    allActivity =
+      Array.isArray(data)
+        ? data
+        : [];
   }
 
 
-  /* =====================================================
-     DASHBOARD STAT
-  ===================================================== */
-
-  function updateDashboard() {
-    const operatorProfiles =
-      getOperators();
-
-
-    if (aProducts) {
-      aProducts.textContent =
-        products.length;
-    }
-
-
-    if (aOrders) {
-      aOrders.textContent =
-        orders.length;
-    }
-
-
-    if (aNew) {
-      aNew.textContent =
-        orders.filter(
-          order =>
-            order.status === "new"
-        ).length;
-    }
-
-
-    if (aOperators) {
-      aOperators.textContent =
-        operatorProfiles.length;
-    }
-
-
-    if (todayOrdersCount) {
-      todayOrdersCount.textContent =
-        orders.filter(
-          order =>
-            isToday(order.created_at)
-        ).length;
-    }
-
-
-    if (newOrdersCount) {
-      newOrdersCount.textContent =
-        orders.filter(
-          order =>
-            order.status === "new"
-        ).length;
-    }
-
-
-    if (talkedOrdersCount) {
-      talkedOrdersCount.textContent =
-        orders.filter(
-          order =>
-            order.status === "talked"
-        ).length;
-    }
-
-
-    if (confirmedOrdersCount) {
-      confirmedOrdersCount.textContent =
-        orders.filter(
-          order =>
-            order.status === "confirmed"
-        ).length;
-    }
-
-
-    if (deliveryOrdersCount) {
-      deliveryOrdersCount.textContent =
-        orders.filter(
-          order =>
-            order.status === "delivery"
-        ).length;
-    }
-
-
-    if (doneOrdersCount) {
-      doneOrdersCount.textContent =
-        orders.filter(
-          order =>
-            order.status === "done"
-        ).length;
-    }
-  }
-
-
-  /* =====================================================
-     BUGUNGI OPERATOR NATIJALARI
-  ===================================================== */
-
-  function renderOperatorDailyStats() {
-    if (
-      !operatorDailyStats ||
-      !todayOperatorsTotal
-    ) {
+  function renderDailyOperatorStats() {
+    if (!operatorDailyStats) {
       return;
+    }
+
+
+    const today =
+      allActivity.filter(
+        item =>
+          isToday(
+            item.created_at
+          )
+      );
+
+
+    if (todayOperatorsTotal) {
+      todayOperatorsTotal.textContent =
+        today.length;
     }
 
 
     const operators =
-      getOperators();
-
-
-    /*
-      MUHIM:
-
-      Bu yerda statusga qaramaymiz.
-
-      Sababi operator bugun mijoz bilan
-      gaplashdi, keyin buyurtmani
-      Tasdiqlandi yoki Yo‘lda qilishi mumkin.
-
-      talked_at va operator_id tarixni
-      saqlab turadi.
-    */
-
-    const todayTalkedOrders =
-      orders.filter(order =>
-        order.operator_id &&
-        isToday(order.talked_at)
+      allProfiles.filter(
+        profile =>
+          profile.role === "operator"
       );
 
 
-    todayOperatorsTotal.textContent =
-      `${todayTalkedOrders.length} ta`;
+    const rows =
+      operators.map(operator => {
+        const items =
+          today.filter(
+            item =>
+              item.operator_id ===
+              operator.id
+          );
 
 
-    if (operators.length === 0) {
-      operatorDailyStats.innerHTML =
-        "<p>Operator topilmadi.</p>";
+        return {
+          operator,
+
+          talked:
+            items.filter(
+              item =>
+                item.status === "talked"
+            ).length,
+
+          confirmed:
+            items.filter(
+              item =>
+                item.status === "confirmed"
+            ).length,
+
+          delivery:
+            items.filter(
+              item =>
+                item.status === "delivery"
+            ).length,
+
+          done:
+            items.filter(
+              item =>
+                item.status === "done"
+            ).length,
+
+          cancelled:
+            items.filter(
+              item =>
+                item.status === "cancelled"
+            ).length,
+
+          total:
+            items.length
+        };
+      });
+
+
+    rows.sort(
+      (a, b) =>
+        b.total - a.total
+    );
+
+
+    operatorDailyStats.innerHTML =
+      "";
+
+
+    if (
+      rows.length === 0
+    ) {
+      operatorDailyStats.innerHTML = `
+        <p>
+          Operatorlar topilmadi.
+        </p>
+      `;
 
       return;
     }
 
 
-    const stats =
-      operators
-        .map(operator => {
-
-          const count =
-            todayTalkedOrders
-              .filter(order =>
-                order.operator_id ===
-                operator.id
-              )
-              .length;
-
-
-          return {
-            ...operator,
-            count
-          };
-
-        })
-        .sort(
-          (a, b) =>
-            b.count - a.count
+    rows.forEach(row => {
+      const card =
+        document.createElement(
+          "article"
         );
 
+      card.className =
+        "operator-daily-card";
 
-    operatorDailyStats.innerHTML =
-      stats
-        .map((operator, index) => `
+      card.innerHTML = `
+        <div class="operator-daily-head">
 
-          <article
-            class="operator-daily-card"
-          >
-
-            <span>
-              ${
-                index === 0 &&
-                operator.count > 0
-                  ? "🏆 BUGUNGI NATIJA"
-                  : "OPERATOR"
-              }
-            </span>
+          <div>
 
             <strong>
               ${escapeHtml(
-                operator.name ||
+                row.operator.name ||
                 "Operator"
               )}
             </strong>
 
-            <strong
-              class="operator-daily-number"
-            >
-              ${operator.count}
-            </strong>
-
             <small>
-              ta mijoz bilan gaplashgan
+              ${
+                row.operator.active
+                  ? "🟢 Faol"
+                  : "🔴 Bloklangan"
+              }
             </small>
 
-          </article>
+          </div>
 
-        `)
-        .join("");
+
+          <span class="operator-daily-number">
+            ${row.total}
+          </span>
+
+        </div>
+
+
+        <div class="operator-daily-grid">
+
+          <div>
+            <span>🟠 Gaplashildi</span>
+            <strong>${row.talked}</strong>
+          </div>
+
+          <div>
+            <span>🔵 Qadoqlanmoqda</span>
+            <strong>${row.confirmed}</strong>
+          </div>
+
+          <div>
+            <span>🟣 Yo‘lda</span>
+            <strong>${row.delivery}</strong>
+          </div>
+
+          <div>
+            <span>🟢 Yetkazildi</span>
+            <strong>${row.done}</strong>
+          </div>
+
+          <div>
+            <span>⚪ Bekor</span>
+            <strong>${row.cancelled}</strong>
+          </div>
+
+        </div>
+      `;
+
+      operatorDailyStats.appendChild(
+        card
+      );
+    });
   }
 
 
-  /* =====================================================
+  /* =========================================================
      SUPPORT
-  ===================================================== */
+  ========================================================= */
 
   async function loadSupport() {
     try {
@@ -1832,164 +1744,254 @@
           getToken()
         );
 
-
-      supportRequests =
+      allSupport =
         Array.isArray(data)
           ? data
           : [];
 
-
-      renderSupport();
-
     } catch (error) {
       console.error(error);
+
+      allSupport = [];
     }
   }
 
 
   function renderSupport() {
-    if (!adminSupportList) return;
+    if (!adminSupport) {
+      return;
+    }
 
+    adminSupport.innerHTML =
+      "";
 
     if (
-      supportRequests.length === 0
+      allSupport.length === 0
     ) {
-      adminSupportList.innerHTML =
-        "<p>Murojaatlar yo‘q.</p>";
+      adminSupport.innerHTML = `
+        <p>
+          Support so‘rovlari yo‘q.
+        </p>
+      `;
 
       return;
     }
 
 
-    adminSupportList.innerHTML =
-      supportRequests
-        .map(item => `
+    allSupport.forEach(item => {
+      const card =
+        document.createElement(
+          "article"
+        );
 
-          <article
-            style="
-              padding:13px;
-              margin-bottom:8px;
-              border:1px solid #e8e8ef;
-              border-radius:14px;
-              background:#fafafd;
-            "
-          >
+      card.className =
+        "admin-support-card";
 
-            <strong>
-              ${escapeHtml(
-                item.name || "Mijoz"
-              )}
-            </strong>
+      card.innerHTML = `
+        <strong>
+          ${escapeHtml(
+            item.name ||
+            "Mijoz"
+          )}
+        </strong>
 
-            <a
-              href="tel:${escapeHtml(
-                item.phone || ""
-              )}"
-              style="
-                display:block;
-                margin:5px 0;
-                color:#713cf0;
-                font-weight:800;
-              "
-            >
-              📞
-              ${escapeHtml(
-                item.phone || "—"
-              )}
-            </a>
+        <p>
+          ${escapeHtml(
+            item.phone ||
+            "—"
+          )}
+        </p>
 
-            <p
-              style="
-                margin:6px 0;
-              "
-            >
-              ${escapeHtml(
-                item.message || ""
-              )}
-            </p>
+        <p>
+          ${escapeHtml(
+            item.message ||
+            item.note ||
+            "—"
+          )}
+        </p>
 
-            <small>
-              ${formatDate(
-                item.created_at
-              )}
-            </small>
+        <small>
+          ${formatDate(
+            item.created_at
+          )}
+        </small>
+      `;
 
-          </article>
-
-        `)
-        .join("");
+      adminSupport.appendChild(
+        card
+      );
+    });
   }
 
 
-  /* =====================================================
-     FILTER BUTTONS
-  ===================================================== */
+  /* =========================================================
+     GLOBAL STATS
+  ========================================================= */
 
-  document
-    .querySelectorAll(
-      ".order-filter-btn"
-    )
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          activeOrderFilter =
-            button.dataset.status ||
-            "all";
-
-
-          document
-            .querySelectorAll(
-              ".order-filter-btn"
-            )
-            .forEach(btn => {
-
-              btn.classList.toggle(
-                "active",
-                btn === button
-              );
-
-            });
-
-
-          renderOrders();
-        }
+  function updateGlobalStats() {
+    const operators =
+      allProfiles.filter(
+        profile =>
+          profile.role === "operator"
       );
 
-    });
+
+    if (adminProductCount) {
+      adminProductCount.textContent =
+        allProducts.length;
+    }
 
 
-  /* =====================================================
-     SEARCH
-  ===================================================== */
+    if (adminOrderCount) {
+      adminOrderCount.textContent =
+        allOrders.length;
+    }
 
-  adminOrderSearch
+
+    if (adminNewOrderCount) {
+      adminNewOrderCount.textContent =
+        allOrders.filter(
+          order =>
+            order.status === "new"
+        ).length;
+    }
+
+
+    if (adminOperatorCount) {
+      adminOperatorCount.textContent =
+        operators.length;
+    }
+
+
+    if (adminConfirmedCount) {
+      adminConfirmedCount.textContent =
+        allOrders.filter(
+          order =>
+            order.status ===
+            "confirmed"
+        ).length;
+    }
+
+
+    if (adminDeliveryCount) {
+      adminDeliveryCount.textContent =
+        allOrders.filter(
+          order =>
+            order.status ===
+            "delivery"
+        ).length;
+    }
+
+
+    if (adminDoneCount) {
+      adminDoneCount.textContent =
+        allOrders.filter(
+          order =>
+            order.status ===
+            "done"
+        ).length;
+    }
+
+
+    if (adminCancelledCount) {
+      adminCancelledCount.textContent =
+        allOrders.filter(
+          order =>
+            order.status ===
+            "cancelled"
+        ).length;
+    }
+  }
+
+
+  /* =========================================================
+     EVENTS
+  ========================================================= */
+
+  adminLoginForm
     ?.addEventListener(
-      "input",
-      renderOrders
-    );
+      "submit",
+      async event => {
+        event.preventDefault();
 
+        showMessage(
+          adminLoginMessage,
+          "Kirilmoqda..."
+        );
 
-  clearOrderSearch
-    ?.addEventListener(
-      "click",
-      () => {
+        try {
+          await login(
+            adminEmail.value.trim(),
+            adminPassword.value
+          );
 
-        adminOrderSearch.value = "";
+          await openAdminPanel();
 
-        renderOrders();
+          adminLoginForm.reset();
 
-        adminOrderSearch.focus();
+          showMessage(
+            adminLoginMessage,
+            ""
+          );
 
+        } catch (error) {
+          console.error(error);
+
+          clearSession();
+
+          showMessage(
+            adminLoginMessage,
+            error.message ||
+            "Email yoki parol noto‘g‘ri.",
+            "error"
+          );
+        }
       }
     );
 
 
-  /* =====================================================
-     FORMS
-  ===================================================== */
+  adminLogoutBtn
+    ?.addEventListener(
+      "click",
+      () => {
+        clearSession();
+
+        adminView
+          ?.classList.add(
+            "hidden"
+          );
+
+        adminLoginView
+          ?.classList.remove(
+            "hidden"
+          );
+      }
+    );
+
+
+  adminRefreshBtn
+    ?.addEventListener(
+      "click",
+      async () => {
+        adminRefreshBtn.disabled =
+          true;
+
+        try {
+          await loadEverything();
+        } catch (error) {
+          console.error(error);
+
+          alert(
+            error.message ||
+            "Yangilashda xatolik."
+          );
+        } finally {
+          adminRefreshBtn.disabled =
+            false;
+        }
+      }
+    );
+
 
   productForm
     ?.addEventListener(
@@ -1998,7 +2000,7 @@
     );
 
 
-  cancelEditBtn
+  productCancelBtn
     ?.addEventListener(
       "click",
       resetProductForm
@@ -2012,194 +2014,66 @@
     );
 
 
-  /* =====================================================
-     LOGIN FORM
-  ===================================================== */
-
-  loginForm
+  adminOrderSearch
     ?.addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-
-        const email =
-          emailInput.value.trim();
-
-        const password =
-          passwordInput.value;
-
-
-        showMessage(
-          loginMessage,
-          "Kirilmoqda..."
-        );
-
-
-        try {
-
-          await login(
-            email,
-            password
-          );
-
-
-          await openAdmin();
-
-
-          loginForm.reset();
-
-
-          showMessage(
-            loginMessage,
-            ""
-          );
-
-
-        } catch (error) {
-
-          console.error(error);
-
-          clearSession();
-
-
-          showMessage(
-            loginMessage,
-            error.message ||
-            "Email yoki parol noto‘g‘ri.",
-            "error"
-          );
-
-        }
-
-      }
+      "input",
+      renderOrders
     );
 
 
-  /* =====================================================
-     REFRESH
-  ===================================================== */
-
-  refreshAdminBtn
+  adminOrderFilter
     ?.addEventListener(
-      "click",
-      async () => {
-
-        refreshAdminBtn.disabled =
-          true;
-
-        refreshAdminBtn.textContent =
-          "⏳";
-
-
-        try {
-
-          await loadEverything();
-
-        } finally {
-
-          refreshAdminBtn.disabled =
-            false;
-
-          refreshAdminBtn.textContent =
-            "🔄";
-
-        }
-
-      }
+      "change",
+      renderOrders
     );
 
 
-  /* =====================================================
-     LOGOUT
-  ===================================================== */
-
-  logoutBtn
-    ?.addEventListener(
-      "click",
-      () => {
-
-        clearSession();
-
-
-        adminView
-          ?.classList.add(
-            "hidden"
-          );
-
-
-        loginView
-          ?.classList.remove(
-            "hidden"
-          );
-
-
-        products = [];
-        orders = [];
-        profiles = [];
-        supportRequests = [];
-
-      }
-    );
-
-
-  /* =====================================================
+  /* =========================================================
      INIT
-  ===================================================== */
+  ========================================================= */
 
   async function init() {
     const token =
       getToken();
 
-
     if (!token) {
-
-      loginView
+      adminLoginView
         ?.classList.remove(
           "hidden"
         );
-
 
       adminView
         ?.classList.add(
           "hidden"
         );
-
 
       return;
     }
 
 
     try {
-
-      await openAdmin();
+      await openAdminPanel();
 
     } catch (error) {
-
       console.error(error);
 
       clearSession();
-
 
       adminView
         ?.classList.add(
           "hidden"
         );
 
-
-      loginView
+      adminLoginView
         ?.classList.remove(
           "hidden"
         );
 
-
       showMessage(
-        loginMessage,
+        adminLoginMessage,
         "Qayta login qiling.",
         "error"
       );
-
     }
   }
 
