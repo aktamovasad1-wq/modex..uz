@@ -1,40 +1,27 @@
 <!doctype html>
 <html lang="uz">
-
 <head>
   <meta charset="utf-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <meta
-    name="theme-color"
-    content="#713cf0"
   >
 
   <title>MODEX.UZ — Operator Panel</title>
 
   <link
     rel="stylesheet"
-    href="./operator.css?v=20260816-0030"
+    href="./operator.css?v=20260823-2245"
   >
 </head>
 
-
 <body>
 
-
-  <!-- =====================================================
-       LOGIN
-  ====================================================== -->
-
+  <!-- LOGIN -->
   <section
     id="operatorLoginView"
     class="operator-login-page"
   >
-
     <div class="operator-login-card">
 
       <div class="operator-login-logo">
@@ -45,14 +32,11 @@
         OPERATOR PANEL
       </span>
 
-      <h1>
-        Kirish
-      </h1>
+      <h1>Kirish</h1>
 
       <p class="operator-login-subtitle">
         Buyurtmalar bilan ishlash uchun operator hisobingizga kiring.
       </p>
-
 
       <form
         id="operatorLoginForm"
@@ -61,37 +45,30 @@
 
         <label>
           Email
-
           <input
             id="operatorEmail"
             type="email"
-            placeholder="operator@email.com"
             autocomplete="email"
             required
           >
         </label>
 
-
         <label>
           Parol
-
           <input
             id="operatorPassword"
             type="password"
-            placeholder="Parolingiz"
             autocomplete="current-password"
             required
           >
         </label>
 
-
         <button
-          class="operator-login-submit"
           type="submit"
+          class="operator-login-submit"
         >
           Kirish
         </button>
-
 
         <p
           id="operatorLoginMessage"
@@ -101,25 +78,16 @@
       </form>
 
     </div>
-
   </section>
 
 
-  <!-- =====================================================
-       OPERATOR PANEL
-  ====================================================== -->
-
+  <!-- PANEL -->
   <section
     id="operatorView"
     class="hidden"
   >
 
     <div class="operator-shell">
-
-
-      <!-- =================================================
-           HEADER
-      ================================================== -->
 
       <header class="operator-header">
 
@@ -129,9 +97,7 @@
             MODEX.UZ
           </span>
 
-          <h1>
-            Operator Panel
-          </h1>
+          <h1>Operator Panel</h1>
 
           <p>
             Operator:
@@ -141,7 +107,6 @@
           </p>
 
         </div>
-
 
         <div class="operator-header-actions">
 
@@ -166,112 +131,57 @@
       </header>
 
 
-      <!-- =================================================
-           STATISTIKA
-      ================================================== -->
-
+      <!-- STATS -->
       <section class="operator-stats">
 
-
         <article class="operator-stat operator-stat-new">
-
-          <span class="operator-stat-title">
-            🔴 Yangi
-          </span>
-
-          <strong id="operatorNewCount">
-            0
-          </strong>
-
-          <small>
-            Yangi zayavkalar
-          </small>
-
+          <span>🔴 Yangi</span>
+          <strong id="operatorNewCount">0</strong>
+          <small>Yangi zayavkalar</small>
         </article>
-
 
         <article class="operator-stat operator-stat-talked">
-
-          <span class="operator-stat-title">
-            🟠 Bugun gaplashildi
-          </span>
-
-          <strong id="operatorTalkedCount">
-            0
-          </strong>
-
-          <small>
-            Sizning bugungi natijangiz
-          </small>
-
+          <span>🟠 Bugun gaplashildi</span>
+          <strong id="operatorTalkedCount">0</strong>
+          <small>Bugungi natija</small>
         </article>
-
 
         <article class="operator-stat operator-stat-confirmed">
-
-          <span class="operator-stat-title">
-            🔵 Qadoqlanmoqda
-          </span>
-
-          <strong id="operatorConfirmedCount">
-            0
-          </strong>
-
-          <small>
-            Tasdiqlangan buyurtmalar
-          </small>
-
+          <span>🔵 Qadoqlanmoqda</span>
+          <strong id="operatorConfirmedCount">0</strong>
+          <small>Tasdiqlanganlar</small>
         </article>
 
-
         <article class="operator-stat operator-stat-done">
-
-          <span class="operator-stat-title">
-            🟢 Yetkazildi
-          </span>
-
-          <strong id="operatorDoneCount">
-            0
-          </strong>
-
-          <small>
-            Yakunlangan buyurtmalar
-          </small>
-
+          <span>🟢 Yetkazildi</span>
+          <strong id="operatorDoneCount">0</strong>
+          <small>Yakunlanganlar</small>
         </article>
 
       </section>
 
 
-      <!-- =================================================
-           QIDIRUV + FILTER
-      ================================================== -->
-
+      <!-- SEARCH / FILTER -->
       <section class="operator-tools">
-
 
         <div class="operator-search">
 
           <input
             id="operatorOrderSearch"
             type="search"
-            placeholder="Ism, telefon, mahsulot yoki manzil..."
-            autocomplete="off"
+            placeholder="Ism, telefon, mahsulot, hudud..."
           >
 
           <button
             id="operatorClearSearch"
             type="button"
-            aria-label="Qidiruvni tozalash"
           >
             ×
           </button>
 
         </div>
 
-
         <div class="operator-filters">
-
 
           <button
             class="operator-filter-btn active"
@@ -281,7 +191,6 @@
             Barchasi
           </button>
 
-
           <button
             class="operator-filter-btn"
             data-status="new"
@@ -289,7 +198,6 @@
           >
             🔴 Yangi
           </button>
-
 
           <button
             class="operator-filter-btn"
@@ -299,15 +207,13 @@
             🟠 Bugun gaplashildi
           </button>
 
-
           <button
             class="operator-filter-btn"
             data-status="confirmed"
             type="button"
           >
-            🔵 Qadoqlanmoqda
+            🔵 Qadoq
           </button>
-
 
           <button
             class="operator-filter-btn"
@@ -317,7 +223,6 @@
             🟣 Yo‘lda
           </button>
 
-
           <button
             class="operator-filter-btn"
             data-status="done"
@@ -325,7 +230,6 @@
           >
             🟢 Yetkazildi
           </button>
-
 
           <button
             class="operator-filter-btn"
@@ -335,37 +239,27 @@
             ⚪ Bekor
           </button>
 
-
         </div>
 
       </section>
 
 
-      <!-- =================================================
-           BUYURTMALAR
-      ================================================== -->
-
+      <!-- ORDERS -->
       <section class="operator-orders-section">
-
 
         <div class="operator-orders-head">
 
           <div>
-
             <span class="operator-label">
               ZAYAVKALAR
             </span>
 
-            <h2>
-              Buyurtmalar
-            </h2>
+            <h2>Buyurtmalar</h2>
 
             <p>
-              Kerakli zayavkani ochib, mijoz bilan ishlang.
+              Buyurtmani ochib mijoz bilan ishlang.
             </p>
-
           </div>
-
 
           <span
             id="operatorVisibleCount"
@@ -376,33 +270,24 @@
 
         </div>
 
-
         <div
           id="operatorOrders"
           class="operator-orders"
-        >
-          <!-- operator.js kartalarni shu yerga chiqaradi -->
-        </div>
-
+        ></div>
 
         <p
           id="operatorOrdersMessage"
           class="operator-message"
         ></p>
 
-
       </section>
-
 
     </div>
 
   </section>
 
 
-  <!-- =====================================================
-       ZAYAVKA MODAL
-  ====================================================== -->
-
+  <!-- MODAL -->
   <dialog
     id="operatorOrderDialog"
     class="order-edit-modal"
@@ -410,216 +295,130 @@
 
     <div class="order-edit-box">
 
-
       <button
         id="operatorCloseOrder"
         class="order-edit-close"
         type="button"
-        aria-label="Yopish"
       >
         ×
       </button>
-
 
       <span class="order-edit-label">
         ZAYAVKA
       </span>
 
-
       <h2 id="operatorOrderTitle">
         Buyurtma
       </h2>
-
 
       <form
         id="operatorOrderForm"
         class="order-edit-form"
       >
 
-
         <input
           id="operatorEditOrderId"
           type="hidden"
         >
 
-
-        <!-- ===============================================
-             MIJOZ
-        ================================================ -->
-
         <div class="operator-form-section">
-          👤 Mijoz ma’lumotlari
+          👤 Mijoz
         </div>
-
 
         <div class="order-edit-grid">
 
           <label>
             Ism
-
-            <input
-              id="operatorEditName"
-              type="text"
-              placeholder="Ism"
-            >
+            <input id="operatorEditName">
           </label>
-
 
           <label>
             Familiya
-
-            <input
-              id="operatorEditSurname"
-              type="text"
-              placeholder="Familiya"
-            >
+            <input id="operatorEditSurname">
           </label>
 
         </div>
 
-
         <label>
-          Telefon raqami
-
+          Telefon
           <input
             id="operatorEditPhone"
             type="tel"
-            inputmode="tel"
-            placeholder="+998 90 123 45 67"
           >
         </label>
-
 
         <a
           id="operatorCallCustomer"
           class="operator-big-call"
           href="#"
         >
-          📞 Mijozga qo‘ng‘iroq qilish
+          📞 Mijozga qo‘ng‘iroq
         </a>
-
-
-        <!-- ===============================================
-             MAHSULOT
-        ================================================ -->
 
         <div class="operator-form-section">
           📦 Mahsulot
         </div>
 
-
         <label>
-          Mahsulot nomi
-
+          Mahsulot
           <input
             id="operatorEditProduct"
-            type="text"
             readonly
           >
         </label>
 
-
         <div class="operator-order-mini-grid">
-
 
           <label>
             Soni
-
             <input
               id="operatorEditQuantity"
               type="number"
-              inputmode="numeric"
               min="1"
-              value="1"
             >
           </label>
-
 
           <label>
             Razmer
-
-            <input
-              id="operatorEditSize"
-              type="text"
-              placeholder="Razmer"
-            >
+            <input id="operatorEditSize">
           </label>
-
 
           <label>
             Rang
-
-            <input
-              id="operatorEditColor"
-              type="text"
-              placeholder="Rang"
-            >
+            <input id="operatorEditColor">
           </label>
 
-
         </div>
-
-
-        <!-- ===============================================
-             YETKAZISH
-        ================================================ -->
 
         <div class="operator-form-section">
-          🚚 Yetkazib berish
+          🚚 Yetkazish
         </div>
-
 
         <label>
           Viloyat / shahar
-
-          <input
-            id="operatorEditRegion"
-            type="text"
-            placeholder="Masalan: Toshkent"
-          >
+          <input id="operatorEditRegion">
         </label>
-
 
         <label>
-          Yetkazib berish manzili
-
-          <textarea
-            id="operatorEditAddress"
-            placeholder="Tuman, ko‘cha, uy..."
-          ></textarea>
+          Manzil
+          <textarea id="operatorEditAddress"></textarea>
         </label>
-
-
-        <!-- ===============================================
-             IZOH
-        ================================================ -->
 
         <div class="operator-form-section">
-          📝 Operator izohi
+          📝 Izoh
         </div>
 
-
         <label>
-          Izoh
-
-          <textarea
-            id="operatorEditNote"
-            placeholder="Mijoz bilan gaplashilgan ma’lumot..."
-          ></textarea>
+          Operator izohi
+          <textarea id="operatorEditNote"></textarea>
         </label>
 
-
-        <!-- ===============================================
-             STATUS
-        ================================================ -->
-
         <div class="operator-form-section">
-          📌 Buyurtma holati
+          📌 Status
         </div>
 
-
         <label>
-          Status
+          Holat
 
           <select id="operatorEditStatus">
 
@@ -644,20 +443,14 @@
             </option>
 
             <option value="cancelled">
-              ⚪ Bekor qilindi
+              ⚪ Bekor
             </option>
 
           </select>
 
         </label>
 
-
-        <!-- ===============================================
-             ACTIONS
-        ================================================ -->
-
         <div class="order-edit-actions">
-
 
           <button
             type="submit"
@@ -665,7 +458,6 @@
           >
             💾 Saqlash
           </button>
-
 
           <button
             id="operatorQrBtn"
@@ -675,15 +467,12 @@
             QR etiketka
           </button>
 
-
         </div>
-
 
         <p
           id="operatorOrderMessage"
           class="operator-message"
         ></p>
-
 
       </form>
 
@@ -692,67 +481,8 @@
   </dialog>
 
 
-  <!-- =====================================================
-       MOBILE NAV
-  ====================================================== -->
-
-  <nav
-    id="operatorMobileNav"
-    class="operator-mobile-nav hidden"
-  >
-
-
-    <button
-      class="operator-mobile-nav-btn active"
-      data-mobile-filter="all"
-      type="button"
-    >
-      <span>▦</span>
-      <small>Barchasi</small>
-    </button>
-
-
-    <button
-      class="operator-mobile-nav-btn"
-      data-mobile-filter="new"
-      type="button"
-    >
-      <span>🔴</span>
-      <small>Yangi</small>
-    </button>
-
-
-    <button
-      class="operator-mobile-nav-btn"
-      data-mobile-filter="talked"
-      type="button"
-    >
-      <span>🟠</span>
-      <small>Bugun</small>
-    </button>
-
-
-    <button
-      class="operator-mobile-nav-btn"
-      data-mobile-filter="confirmed"
-      type="button"
-    >
-      <span>🔵</span>
-      <small>Qadoq</small>
-    </button>
-
-
-  </nav>
-
-
-  <!-- =====================================================
-       JAVASCRIPT
-  ====================================================== -->
-
-  <script src="./config.js?v=20260816-0030"></script>
-
-  <script src="./operator.js?v=20260816-0030"></script>
-
+  <script src="./config.js?v=20260823-2245"></script>
+  <script src="./operator.js?v=20260823-2245"></script>
 
 </body>
 </html>
