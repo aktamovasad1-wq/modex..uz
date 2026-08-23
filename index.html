@@ -10,15 +10,21 @@
   >
 
   <meta
+    name="theme-color"
+    content="#713cf0"
+  >
+
+  <meta
     name="description"
-    content="MODEX.UZ — kiyimlar va boshqa mahsulotlarni onlayn buyurtma qilish."
+    content="MODEX.UZ internet do‘koni"
   >
 
   <title>MODEX.UZ — Internet do‘kon</title>
 
+  <!-- ASOSIY DIZAYN -->
   <link
     rel="stylesheet"
-    href="./style.css?v=20260815-0900"
+    href="./style.css?v=20260823-2345"
   >
 </head>
 
@@ -30,31 +36,18 @@
        HEADER
   ====================================================== -->
 
-  <header class="market-header">
+  <header class="site-header">
 
-    <div class="header-inner">
+    <div class="container header-inner">
 
-
-      <!-- LOGO -->
 
       <a
-        href="./index.html"
-        class="brand"
-        aria-label="MODEX.UZ bosh sahifa"
+        href="./"
+        class="logo"
       >
-
-        <small class="brand-mini">
-          ziza.kds
-        </small>
-
-        <span class="brand-main">
-          MODEX<span class="brand-uz">.UZ</span>
-        </span>
-
+        MODEX<span>.UZ</span>
       </a>
 
-
-      <!-- KATALOG -->
 
       <button
         id="catalogBtn"
@@ -65,8 +58,6 @@
       </button>
 
 
-      <!-- DESKTOP SEARCH -->
-
       <div class="header-search">
 
         <input
@@ -76,56 +67,38 @@
           autocomplete="off"
         >
 
-        <button
-          id="searchBtn"
-          type="button"
-          aria-label="Qidirish"
-        >
-          🔍
-        </button>
-
       </div>
 
 
-      <!-- HEADER ACTIONS -->
-
-      <div class="header-buttons">
+      <div class="header-actions">
 
 
         <a
+          class="header-action"
           href="./track.html"
-          class="header-btn"
         >
-          📦
-          <span>Buyurtmam</span>
+          <span>📦</span>
+          Buyurtmam
         </a>
 
 
         <button
           id="favoritesBtn"
-          class="header-btn"
+          class="header-action"
           type="button"
         >
-          ♡
-          <span>Sevimlilar</span>
-
-          <b id="favoriteCount">
-            0
-          </b>
+          <span>♡</span>
+          Sevimlilar
         </button>
 
 
         <button
           id="cartBtn"
-          class="header-btn"
+          class="header-action"
           type="button"
         >
-          🛒
-          <span>Savat</span>
-
-          <b id="cartCount">
-            0
-          </b>
+          <span>🛒</span>
+          Savat
         </button>
 
 
@@ -145,18 +118,9 @@
         autocomplete="off"
       >
 
-      <button
-        id="mobileSearchBtn"
-        type="button"
-        aria-label="Qidirish"
-      >
-        🔍
-      </button>
-
     </div>
 
   </header>
-
 
 
   <!-- =====================================================
@@ -170,295 +134,293 @@
          HERO
     ==================================================== -->
 
-    <section class="market-hero">
+    <section class="hero">
+
+      <div class="container">
+
+        <div class="hero-card">
+
+          <div class="hero-content">
+
+            <span class="hero-badge">
+              MODEX.UZ
+            </span>
 
 
-      <div class="hero-main">
+            <h1>
+              Xaridingizni oson boshlang
+            </h1>
 
-        <div class="hero-text">
 
-          <span class="hero-label">
-            MODEX.UZ
-          </span>
+            <p>
+              Kerakli mahsulotni tanlang va buyurtma qoldiring.
+              Operatorimiz siz bilan bog‘lanib, buyurtmangizni tasdiqlaydi.
+            </p>
 
-          <h1>
-            Xaridingizni oson boshlang
-          </h1>
 
-          <p>
-            Kerakli mahsulotni tanlang va buyurtma qoldiring.
-            Operatorimiz siz bilan bog‘lanib,
-            buyurtmangizni tasdiqlaydi.
-          </p>
+            <div class="hero-actions">
 
-          <a
-            href="#products"
-            class="hero-button"
-          >
-            Xaridni boshlash
+              <a
+                href="#products"
+                class="hero-btn hero-btn-primary"
+              >
+                Xaridni boshlash
+              </a>
+
+
+              <a
+                href="./track.html"
+                class="hero-btn hero-btn-secondary"
+              >
+                Buyurtmani kuzatish
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         TRACKING CTA
+    ==================================================== -->
+
+    <section>
+
+      <div class="container">
+
+        <div class="track-cta">
+
+          <div>
+
+            <h3>
+              📦 Buyurtmangiz qayerda?
+            </h3>
+
+            <p>
+              Buyurtma raqami va telefon orqali hozirgi holatini tekshiring.
+            </p>
+
+          </div>
+
+
+          <a href="./track.html">
+            Buyurtmam
           </a>
 
         </div>
 
       </div>
 
-
-
-      <!-- BUYURTMA KUZATISH -->
-
-      <aside class="hero-side">
-
-        <span>
-          BUYURTMANGIZNI KUZATING
-        </span>
-
-        <strong>
-          Buyurtmangiz qayerda?
-        </strong>
-
-        <p>
-          Buyurtma raqami va telefon orqali
-          hozirgi holatini tekshiring.
-        </p>
-
-        <a
-          href="./track.html"
-          class="main-btn"
-        >
-          📦 Buyurtmam
-        </a>
-
-      </aside>
-
     </section>
 
 
-
     <!-- ===================================================
-         CATEGORIES
+         KATEGORIYALAR
     ==================================================== -->
 
-    <section class="market-section">
+    <section class="section">
 
-      <div class="section-title">
+      <div class="container">
 
-        <h2>
+
+        <h2 class="section-title">
           Kategoriyalar
         </h2>
 
-        <button
-          id="allCategoriesBtn"
-          class="text-btn"
-          type="button"
-        >
-          Barchasi
-        </button>
 
-      </div>
+        <p class="section-subtitle">
+          Kerakli bo‘limni tanlang
+        </p>
 
 
-      <div
-        id="categoryList"
-        class="category-grid"
-      >
-        <!-- app.js -->
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         FILTERS
-    ==================================================== -->
-
-    <section class="filter-section">
-
-      <div class="filter-row">
-
-
-        <select
-          id="categoryFilter"
-          aria-label="Kategoriya"
+        <div
+          id="categoryButtons"
+          class="categories"
         >
 
-          <option value="">
-            Barcha kategoriyalar
-          </option>
+          <button
+            class="category-btn active"
+            type="button"
+            data-category="all"
+          >
+            Barchasi
+          </button>
 
-        </select>
-
-
-        <select
-          id="sortSelect"
-          aria-label="Saralash"
-        >
-
-          <option value="new">
-            Avval yangilari
-          </option>
-
-          <option value="cheap">
-            Narxi arzon
-          </option>
-
-          <option value="expensive">
-            Narxi qimmat
-          </option>
-
-        </select>
-
+        </div>
 
       </div>
 
     </section>
 
 
-
     <!-- ===================================================
-         PRODUCTS
+         MAHSULOTLAR
     ==================================================== -->
 
     <section
       id="products"
-      class="market-section"
+      class="section"
     >
 
-      <div class="section-title">
+      <div class="container">
 
-        <h2>
-          Mahsulotlar
-        </h2>
 
-        <span
-          id="productCount"
-          class="product-count"
+        <div class="products-toolbar">
+
+          <div>
+
+            <h2 class="section-title">
+              Mahsulotlar
+            </h2>
+
+            <p class="section-subtitle">
+              <span id="productCount">
+                0
+              </span>
+              ta mahsulot
+            </p>
+
+          </div>
+
+
+          <div class="products-filter">
+
+
+            <select
+              id="categorySelect"
+              aria-label="Kategoriya"
+            >
+              <option value="all">
+                Barcha kategoriyalar
+              </option>
+            </select>
+
+
+            <select
+              id="sortSelect"
+              aria-label="Saralash"
+            >
+
+              <option value="newest">
+                Avval yangilari
+              </option>
+
+              <option value="price-asc">
+                Narxi: arzon
+              </option>
+
+              <option value="price-desc">
+                Narxi: qimmat
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- APP.JS MAHSULOTLARNI SHU YERGA CHIQARADI -->
+
+        <div
+          id="productsGrid"
+          class="products-grid product-grid"
+        ></div>
+
+
+        <div
+          id="emptyState"
+          class="hidden"
+          style="
+            padding:40px 15px;
+            text-align:center;
+            color:#777784;
+          "
         >
-          0 ta mahsulot
-        </span>
+          Mahsulot topilmadi.
+        </div>
 
-      </div>
-
-
-      <div
-        id="productsGrid"
-        class="market-products"
-      >
-        <!-- app.js -->
-      </div>
-
-
-      <div
-        id="emptyState"
-        class="empty-state hidden"
-      >
-        Mahsulot topilmadi.
       </div>
 
     </section>
 
 
-
     <!-- ===================================================
-         TRACK + SUPPORT
+         SUPPORT
     ==================================================== -->
 
-    <section class="support-section">
+    <section class="section">
+
+      <div class="container">
+
+        <div class="support-section">
 
 
-      <!-- TRACK -->
+          <h2>
+            Yordam kerakmi?
+          </h2>
 
-      <div>
 
-        <span class="market-category">
-          BUYURTMAM
-        </span>
+          <p>
+            Telefon raqamingizni qoldiring.
+            Operatorimiz siz bilan bog‘lanadi.
+          </p>
 
-        <h2>
-          Buyurtmangizni kuzating
-        </h2>
 
-        <p>
-          Buyurtmangiz qabul qilinganmi,
-          qadoqlanmoqdami, yo‘ldami yoki
-          yetkazilganmi — tekshirishingiz mumkin.
-        </p>
+          <form
+            id="supportForm"
+            class="support-form"
+          >
 
-        <a
-          href="./track.html"
-          class="main-btn"
-        >
-          📦 Buyurtmani kuzatish
-        </a>
+
+            <input
+              id="supportName"
+              type="text"
+              placeholder="Ismingiz"
+              autocomplete="name"
+            >
+
+
+            <input
+              id="supportPhone"
+              type="tel"
+              placeholder="+998 90 123 45 67"
+              inputmode="tel"
+              required
+            >
+
+
+            <textarea
+              id="supportMessage"
+              placeholder="Savolingiz yoki izohingiz..."
+            ></textarea>
+
+
+            <button type="submit">
+              So‘rov yuborish
+            </button>
+
+
+            <p
+              id="supportFormMessage"
+              style="
+                grid-column:1/-1;
+                margin:0;
+                font-size:12px;
+              "
+            ></p>
+
+          </form>
+
+        </div>
 
       </div>
-
-
-
-      <!-- SUPPORT FORM -->
-
-      <div>
-
-        <span class="market-category">
-          YORDAM
-        </span>
-
-        <h2>
-          Savolingiz bormi?
-        </h2>
-
-        <p>
-          Telefon raqamingizni qoldiring.
-          Operatorimiz siz bilan bog‘lanadi.
-        </p>
-
-
-        <form
-          id="supportForm"
-          class="support-form"
-        >
-
-          <input
-            id="supportName"
-            type="text"
-            placeholder="Ismingiz"
-            required
-          >
-
-
-          <input
-            id="supportPhone"
-            type="tel"
-            inputmode="tel"
-            placeholder="+998 90 123 45 67"
-            required
-          >
-
-
-          <textarea
-            id="supportMessage"
-            placeholder="Savolingiz..."
-            required
-          ></textarea>
-
-
-          <button
-            class="main-btn"
-            type="submit"
-          >
-            Yuborish
-          </button>
-
-
-          <p
-            id="supportFormMessage"
-            class="form-message"
-          ></p>
-
-        </form>
-
-      </div>
-
 
     </section>
 
@@ -466,22 +428,21 @@
   </main>
 
 
-
   <!-- =====================================================
-       ORDER DIALOG
+       QUICK ORDER DIALOG
   ====================================================== -->
 
-  <dialog id="orderDialog">
+  <dialog
+    id="orderDialog"
+    class="quick-order-dialog"
+  >
 
-    <form
-      id="orderForm"
-      class="order-edit-box"
-    >
+    <div class="quick-order-box">
 
 
       <button
         id="closeDialog"
-        class="order-edit-close"
+        class="dialog-close"
         type="button"
         aria-label="Yopish"
       >
@@ -489,26 +450,50 @@
       </button>
 
 
-      <span class="order-edit-label">
-        TEZ BUYURTMA
+      <span
+        style="
+          display:inline-block;
+          color:#713cf0;
+          font-size:10px;
+          font-weight:900;
+          letter-spacing:.12em;
+          margin-bottom:6px;
+        "
+      >
+        TEZKOR BUYURTMA
       </span>
 
 
-      <h2 id="selectedProductTitle">
+      <h2
+        id="selectedProductTitle"
+        style="
+          margin:0 0 18px;
+        "
+      >
         Mahsulot
       </h2>
 
 
-      <input
-        id="productInput"
-        type="hidden"
+      <form
+        id="orderForm"
+        class="quick-order-form"
       >
 
 
-      <div class="order-edit-form">
+        <input
+          id="productInput"
+          type="hidden"
+        >
+
+
+        <input
+          id="productIdInput"
+          type="hidden"
+        >
 
 
         <label>
+
           Ismingiz
 
           <input
@@ -518,11 +503,13 @@
             autocomplete="name"
             required
           >
+
         </label>
 
 
         <label>
-          Telefon raqami
+
+          Telefon raqamingiz
 
           <input
             id="phoneInput"
@@ -532,38 +519,12 @@
             autocomplete="tel"
             required
           >
+
         </label>
 
 
-        <div class="order-edit-grid">
-
-
-          <label>
-            Razmer
-
-            <input
-              id="sizeInput"
-              type="text"
-              placeholder="Masalan: 140"
-            >
-          </label>
-
-
-          <label>
-            Rang
-
-            <input
-              id="colorInput"
-              type="text"
-              placeholder="Masalan: qora"
-            >
-          </label>
-
-
-        </div>
-
-
         <label>
+
           Soni
 
           <input
@@ -574,12 +535,39 @@
             value="1"
             required
           >
+
+        </label>
+
+
+        <label>
+
+          Razmer
+
+          <input
+            id="sizeInput"
+            type="text"
+            placeholder="Masalan: 110"
+          >
+
+        </label>
+
+
+        <label>
+
+          Rang
+
+          <input
+            id="colorInput"
+            type="text"
+            placeholder="Masalan: qora"
+          >
+
         </label>
 
 
         <button
           id="submitOrder"
-          class="main-btn full-btn"
+          class="quick-order-submit"
           type="submit"
         >
           Buyurtma berish
@@ -588,125 +576,130 @@
 
         <p
           id="formMessage"
-          class="form-message"
+          style="
+            min-height:18px;
+            margin:0;
+            font-size:12px;
+          "
         ></p>
 
 
-      </div>
+        <a
+          id="quickTrackLink"
+          class="hidden"
+          href="./track.html"
+          style="
+            text-align:center;
+            font-size:12px;
+            font-weight:800;
+            color:#713cf0;
+          "
+        >
+          📦 Buyurtmani kuzatish
+        </a>
 
-    </form>
+
+      </form>
+
+    </div>
 
   </dialog>
-
 
 
   <!-- =====================================================
        FAVORITES DRAWER
   ====================================================== -->
 
-  <div
-    id="favoritesOverlay"
-    class="drawer-overlay hidden"
-  ></div>
-
-
   <aside
     id="favoritesDrawer"
-    class="market-drawer hidden"
+    class="drawer hidden"
   >
 
-    <button
-      id="closeFavorites"
-      class="small-btn"
-      type="button"
-    >
-      ✕
-    </button>
+    <div class="drawer-head">
+
+      <h2>
+        Sevimlilar
+      </h2>
+
+      <button
+        id="closeFavorites"
+        class="drawer-close"
+        type="button"
+      >
+        ×
+      </button>
+
+    </div>
 
 
-    <h2>
-      ♡ Sevimlilar
-    </h2>
+    <div id="favoritesList">
 
+      <p style="color:#777784;">
+        Sevimli mahsulotlar yo‘q.
+      </p>
 
-    <div id="favoriteItems">
     </div>
 
   </aside>
-
 
 
   <!-- =====================================================
        CART DRAWER
   ====================================================== -->
 
-  <div
-    id="cartOverlay"
-    class="drawer-overlay hidden"
-  ></div>
-
-
   <aside
     id="cartDrawer"
-    class="market-drawer hidden"
+    class="drawer hidden"
   >
 
-    <button
-      id="closeCart"
-      class="small-btn"
-      type="button"
-    >
-      ✕
-    </button>
+    <div class="drawer-head">
 
+      <h2>
+        Savat
+      </h2>
 
-    <h2>
-      🛒 Savat
-    </h2>
+      <button
+        id="closeCart"
+        class="drawer-close"
+        type="button"
+      >
+        ×
+      </button>
 
-
-    <div id="cartItems">
     </div>
 
 
-    <strong id="cartTotal">
-      0 so‘m
-    </strong>
+    <div id="cartList">
+
+      <p style="color:#777784;">
+        Savat bo‘sh.
+      </p>
+
+    </div>
 
   </aside>
 
 
-
   <!-- =====================================================
-       MOBILE NAVIGATION
+       MOBILE BOTTOM NAV
   ====================================================== -->
 
   <nav class="mobile-bottom-nav">
 
 
-    <a
-      href="./index.html"
-      class="mobile-nav-item active"
-    >
+    <a href="./">
       <span>⌂</span>
       <small>Bosh sahifa</small>
     </a>
 
 
-    <button
-      id="mobileCatalogBtn"
-      class="mobile-nav-item"
-      type="button"
-    >
+    <a href="#products">
       <span>▦</span>
       <small>Katalog</small>
-    </button>
+    </a>
 
 
-    <a
-      href="./track.html"
-      class="mobile-nav-item"
-    >
+    <a href="./track.html">
       <span>📦</span>
       <small>Buyurtmam</small>
     </a>
@@ -714,7 +707,6 @@
 
     <button
       id="mobileFavoritesBtn"
-      class="mobile-nav-item"
       type="button"
     >
       <span>♡</span>
@@ -724,7 +716,6 @@
 
     <button
       id="mobileCartBtn"
-      class="mobile-nav-item"
       type="button"
     >
       <span>🛒</span>
@@ -735,14 +726,13 @@
   </nav>
 
 
-
   <!-- =====================================================
        JAVASCRIPT
   ====================================================== -->
 
-  <script src="./config.js?v=20260815-0900"></script>
+  <script src="./config.js?v=20260823-2345"></script>
 
-  <script src="./app.js?v=20260815-0900"></script>
+  <script src="./app.js?v=20260823-2345"></script>
 
 
 </body>
