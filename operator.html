@@ -5,369 +5,2596 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
   <title>MODEX.UZ Operator</title>
 
   <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#17171d;
+      --muted:#777784;
+      --line:#e7e7ef;
+
+      --primary:#713cf0;
+      --primary-soft:#efe9ff;
+
+      --red:#e5484d;
+      --orange:#f59e0b;
+      --blue:#4f7cff;
+      --purple:#8b5cf6;
+      --green:#20ad68;
+    }
+
     *{
       box-sizing:border-box;
     }
 
     body{
       margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    /* LOGIN */
+
+    .login-page{
       min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
       padding:20px;
-      font-family:Arial,sans-serif;
-      background:#f5f5fa;
+
+      background:
+        radial-gradient(circle at top left,#eee8ff,transparent 40%),
+        var(--bg);
     }
 
-    .box{
+    .login-card{
       width:100%;
-      max-width:420px;
-      background:white;
+      max-width:430px;
       padding:28px;
-      border-radius:22px;
-      box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+
+      box-shadow:
+        0 16px 50px rgba(20,20,35,.09);
     }
 
     .logo{
-      font-size:26px;
+      font-size:27px;
       font-weight:900;
-      margin-bottom:25px;
+      margin-bottom:4px;
     }
 
     .logo span{
-      color:#713cf0;
+      color:var(--primary);
     }
 
-    h1{
-      margin:0 0 20px;
+    .small-label{
+      display:inline-block;
+      margin-top:6px;
+
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.12em;
+
+      color:var(--primary);
+    }
+
+    .login-card h1{
+      margin:18px 0 8px;
+      font-size:30px;
+    }
+
+    .login-card p{
+      color:var(--muted);
+      line-height:1.5;
     }
 
     label{
-      display:block;
-      margin-top:14px;
-      font-size:13px;
-      font-weight:700;
+      display:grid;
+      gap:6px;
+
+      font-size:12px;
+      font-weight:800;
     }
 
-    input{
+    input,
+    select,
+    textarea{
       width:100%;
-      height:48px;
-      margin-top:6px;
-      padding:0 12px;
-      border:1px solid #ddd;
+
+      border:1px solid var(--line);
       border-radius:12px;
+
+      padding:11px 12px;
+
+      background:#fff;
       outline:none;
     }
 
-    input:focus{
-      border-color:#713cf0;
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--primary);
+      box-shadow:
+        0 0 0 4px var(--primary-soft);
     }
 
-    button{
-      width:100%;
-      height:49px;
-      margin-top:20px;
+    textarea{
+      resize:vertical;
+      min-height:85px;
+    }
+
+    .login-form{
+      display:grid;
+      gap:13px;
+      margin-top:18px;
+    }
+
+    .primary-btn{
       border:0;
       border-radius:12px;
-      background:#713cf0;
+
+      padding:12px 15px;
+
+      background:var(--primary);
       color:white;
-      font-weight:800;
-      cursor:pointer;
+
+      font-weight:900;
     }
 
-    button:disabled{
-      opacity:.6;
+    .secondary-btn{
+      border:1px solid var(--line);
+      border-radius:12px;
+
+      padding:11px 14px;
+
+      background:#fff;
+      color:var(--text);
+
+      font-weight:850;
     }
 
-    #message{
-      min-height:20px;
-      margin-top:12px;
-      font-size:13px;
-      font-weight:700;
+    .message{
+      min-height:18px;
+      margin-top:8px;
+
+      font-size:12px;
+      color:var(--muted);
     }
 
-    .error{
-      color:#d32f2f;
+    .message.error{
+      color:#d7353c;
     }
 
-    .success{
+    .message.success{
       color:#159759;
     }
 
-    .info{
-      color:#555;
+    /* PANEL */
+
+    .shell{
+      width:min(1250px,calc(100% - 26px));
+      margin:auto;
+      padding:20px 0 80px;
     }
 
-    #debug{
-      margin-top:14px;
-      padding:10px;
-      background:#f5f5f8;
-      border-radius:10px;
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+
+      gap:15px;
+      margin-bottom:16px;
+    }
+
+    .header h1{
+      margin:5px 0;
+      font-size:29px;
+    }
+
+    .header p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .header-actions{
+      display:flex;
+      gap:8px;
+    }
+
+    /* STATS */
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+
+      margin-bottom:15px;
+    }
+
+    .stat{
+      padding:15px;
+
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+    }
+
+    .stat span{
+      display:block;
+
+      margin-bottom:6px;
+
+      font-size:9px;
+      font-weight:900;
+
+      color:var(--muted);
+    }
+
+    .stat strong{
+      font-size:28px;
+    }
+
+    /* SECTION */
+
+    .section{
+      padding:16px;
+      margin-bottom:15px;
+
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+
+      gap:12px;
+      margin-bottom:13px;
+    }
+
+    .section-head h2{
+      margin:4px 0;
+      font-size:21px;
+    }
+
+    .section-head p{
+      margin:0;
+
       font-size:11px;
-      color:#666;
+      color:var(--muted);
+    }
+
+    /* TOOLS */
+
+    .tools{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+
+      margin-bottom:12px;
+    }
+
+    .filters{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+
+      margin-bottom:12px;
+    }
+
+    .filter-btn{
+      border:1px solid var(--line);
+      border-radius:999px;
+
+      padding:8px 11px;
+
+      background:#fff;
+
+      font-size:10px;
+      font-weight:850;
+    }
+
+    .filter-btn.active{
+      background:var(--primary);
+      border-color:var(--primary);
+      color:#fff;
+    }
+
+    /* ORDER CARDS */
+
+    .orders{
+      display:grid;
+      gap:9px;
+    }
+
+    .order-card{
+      padding:13px;
+
+      border:1px solid var(--line);
+      border-radius:14px;
+
+      background:#fff;
+    }
+
+    .order-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .order-id{
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .order-date{
+      margin-top:3px;
+
+      font-size:9px;
+      color:var(--muted);
+    }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+
+      padding:6px 8px;
+
+      border-radius:999px;
+
+      font-size:9px;
+      font-weight:900;
+    }
+
+    .status-new{
+      background:#ffe9eb;
+      color:#c63238;
+    }
+
+    .status-talked{
+      background:#fff3d6;
+      color:#976600;
+    }
+
+    .status-confirmed{
+      background:#edf2ff;
+      color:#405dc4;
+    }
+
+    .status-delivery{
+      background:#f1eaff;
+      color:#7651bd;
+    }
+
+    .status-done{
+      background:#edf9f2;
+      color:#168650;
+    }
+
+    .status-cancelled{
+      background:#f0f0f3;
+      color:#6c6c75;
+    }
+
+    .order-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+
+      margin-top:12px;
+    }
+
+    .info-box{
+      padding:9px;
+
+      border-radius:10px;
+      background:#f8f8fb;
+    }
+
+    .info-box span{
+      display:block;
+
+      margin-bottom:3px;
+
+      font-size:8px;
+      color:var(--muted);
+    }
+
+    .info-box strong{
+      display:block;
+
+      font-size:11px;
       word-break:break-word;
+    }
+
+    .order-actions{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+
+      margin-top:11px;
+    }
+
+    .order-actions button,
+    .order-actions a{
+      border:1px solid var(--line);
+      border-radius:9px;
+
+      padding:8px 10px;
+
+      background:#fff;
+      color:var(--text);
+
+      text-decoration:none;
+
+      font-size:9px;
+      font-weight:900;
+    }
+
+    .order-actions .edit{
+      background:var(--primary-soft);
+      color:var(--primary);
+      border-color:#ded1ff;
+    }
+
+    .empty{
+      padding:35px 10px;
+      text-align:center;
+
+      color:var(--muted);
+    }
+
+    /* MODAL */
+
+    dialog{
+      width:min(620px,calc(100% - 18px));
+      max-height:92vh;
+
+      border:0;
+      border-radius:20px;
+
+      padding:0;
+
+      box-shadow:
+        0 25px 80px rgba(0,0,0,.2);
+    }
+
+    dialog::backdrop{
+      background:rgba(10,10,20,.55);
+    }
+
+    .modal{
+      padding:18px;
+    }
+
+    .modal-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+
+      margin-bottom:14px;
+    }
+
+    .modal-head h2{
+      margin:4px 0;
+    }
+
+    .close-btn{
+      width:36px;
+      height:36px;
+
+      border:1px solid var(--line);
+      border-radius:10px;
+
+      background:#fff;
+
+      font-size:18px;
+    }
+
+    .form{
+      display:grid;
+      gap:10px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:9px;
+    }
+
+    .form-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+
+      margin-top:4px;
+    }
+
+    .call-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+
+      border:1px solid #caead9;
+      border-radius:12px;
+
+      padding:11px 14px;
+
+      background:#edf9f2;
+      color:#168650;
+
+      text-decoration:none;
+      font-weight:900;
+    }
+
+    /* MOBILE */
+
+    @media(max-width:800px){
+
+      .header{
+        flex-direction:column;
+      }
+
+      .header-actions{
+        width:100%;
+      }
+
+      .header-actions button{
+        flex:1;
+      }
+
+      .stats{
+        grid-template-columns:repeat(2,1fr);
+        gap:7px;
+      }
+
+      .order-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .form-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:500px){
+
+      .shell{
+        width:calc(100% - 14px);
+        padding-top:12px;
+      }
+
+      .login-card{
+        padding:22px;
+      }
+
+      .tools{
+        grid-template-columns:1fr;
+      }
+
+      .order-grid{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .order-actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+      }
+
+      .order-actions button,
+      .order-actions a{
+        text-align:center;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<div class="box">
+<!-- LOGIN -->
 
-  <div class="logo">
-    MODEX<span>.UZ</span>
-  </div>
+<section
+  id="loginView"
+  class="login-page"
+>
 
-  <h1>Operator kirish</h1>
+  <div class="login-card">
 
-  <form id="loginForm">
+    <div class="logo">
+      MODEX<span>.UZ</span>
+    </div>
 
-    <label>
-      Email
+    <span class="small-label">
+      OPERATOR PANEL
+    </span>
 
-      <input
-        id="email"
-        type="email"
-        required
-      >
-    </label>
+    <h1>
+      Operator kirish
+    </h1>
 
-    <label>
-      Parol
+    <p>
+      Operator hisobingiz bilan kiring.
+    </p>
 
-      <input
-        id="password"
-        type="password"
-        required
-      >
-    </label>
-
-    <button
-      id="loginBtn"
-      type="submit"
+    <form
+      id="loginForm"
+      class="login-form"
     >
-      Kirish
-    </button>
 
-  </form>
+      <label>
+        Email
 
-  <div
-    id="message"
-    class="info"
-  >
-    Sahifa tayyor.
+        <input
+          id="email"
+          type="email"
+          required
+          autocomplete="email"
+        >
+      </label>
+
+      <label>
+        Parol
+
+        <input
+          id="password"
+          type="password"
+          required
+          autocomplete="current-password"
+        >
+      </label>
+
+      <button
+        id="loginBtn"
+        class="primary-btn"
+        type="submit"
+      >
+        Kirish
+      </button>
+
+      <div
+        id="loginMessage"
+        class="message"
+      >
+        Sahifa tayyor.
+      </div>
+
+    </form>
+
   </div>
 
-  <div id="debug">
-    Config tekshirilmoqda...
+</section>
+
+
+<!-- PANEL -->
+
+<section
+  id="panelView"
+  class="hidden"
+>
+
+  <div class="shell">
+
+    <header class="header">
+
+      <div>
+
+        <span class="small-label">
+          MODEX.UZ
+        </span>
+
+        <h1>
+          Operator Panel
+        </h1>
+
+        <p>
+          Operator:
+          <strong id="operatorName">
+            —
+          </strong>
+        </p>
+
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          id="refreshBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          🔄 Yangilash
+        </button>
+
+        <button
+          id="logoutBtn"
+          class="secondary-btn"
+          type="button"
+        >
+          Chiqish
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- STATS -->
+
+    <section class="stats">
+
+      <article class="stat">
+        <span>🔴 YANGI</span>
+        <strong id="newCount">0</strong>
+      </article>
+
+      <article class="stat">
+        <span>🟠 GAPLASHILDI</span>
+        <strong id="talkedCount">0</strong>
+      </article>
+
+      <article class="stat">
+        <span>🔵 QADOQLANMOQDA</span>
+        <strong id="confirmedCount">0</strong>
+      </article>
+
+      <article class="stat">
+        <span>🟢 YETKAZILDI</span>
+        <strong id="doneCount">0</strong>
+      </article>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section class="section">
+
+      <div class="section-head">
+
+        <div>
+
+          <span class="small-label">
+            BUYURTMALAR
+          </span>
+
+          <h2>
+            Buyurtmalar
+          </h2>
+
+          <p>
+            Ko‘rinmoqda:
+            <strong id="visibleCount">
+              0
+            </strong>
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="tools">
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="ID, ism, telefon, mahsulot..."
+        >
+
+        <button
+          id="clearSearch"
+          class="secondary-btn"
+          type="button"
+        >
+          Tozalash
+        </button>
+
+      </div>
+
+
+      <div class="filters">
+
+        <button
+          class="filter-btn active"
+          data-filter="all"
+          type="button"
+        >
+          Barchasi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="new"
+          type="button"
+        >
+          🔴 Yangi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="talked"
+          type="button"
+        >
+          🟠 Gaplashildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="confirmed"
+          type="button"
+        >
+          🔵 Qadoq
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="delivery"
+          type="button"
+        >
+          🟣 Yo‘lda
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="done"
+          type="button"
+        >
+          🟢 Yetkazildi
+        </button>
+
+        <button
+          class="filter-btn"
+          data-filter="cancelled"
+          type="button"
+        >
+          ⚪ Bekor
+        </button>
+
+      </div>
+
+
+      <div
+        id="ordersMessage"
+        class="message"
+      ></div>
+
+
+      <div
+        id="orders"
+        class="orders"
+      ></div>
+
+    </section>
+
   </div>
 
-</div>
+</section>
 
 
-<script src="./config.js?v=7777"></script>
+<!-- EDIT MODAL -->
+
+<dialog id="orderDialog">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <div>
+
+        <span class="small-label">
+          BUYURTMA
+        </span>
+
+        <h2 id="modalTitle">
+          Buyurtmani tahrirlash
+        </h2>
+
+      </div>
+
+      <button
+        id="closeDialog"
+        class="close-btn"
+        type="button"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <form
+      id="orderForm"
+      class="form"
+    >
+
+      <input
+        id="editId"
+        type="hidden"
+      >
+
+
+      <div class="form-grid">
+
+        <label>
+          Ism
+          <input id="editName">
+        </label>
+
+        <label>
+          Familiya
+          <input id="editSurname">
+        </label>
+
+        <label>
+          Telefon
+          <input id="editPhone">
+        </label>
+
+        <label>
+          Mahsulot
+          <input
+            id="editProduct"
+            readonly
+          >
+        </label>
+
+        <label>
+          Soni
+          <input
+            id="editQuantity"
+            type="number"
+            min="1"
+          >
+        </label>
+
+        <label>
+          Razmer
+          <input id="editSize">
+        </label>
+
+        <label>
+          Rang
+          <input id="editColor">
+        </label>
+
+        <label>
+          Viloyat / hudud
+          <input id="editRegion">
+        </label>
+
+      </div>
+
+
+      <label>
+        Manzil
+
+        <textarea
+          id="editAddress"
+        ></textarea>
+      </label>
+
+
+      <label>
+        Izoh
+
+        <textarea
+          id="editNote"
+        ></textarea>
+      </label>
+
+
+      <label>
+        Status
+
+        <select id="editStatus">
+
+          <option value="new">
+            🔴 Yangi
+          </option>
+
+          <option value="talked">
+            🟠 Gaplashildi
+          </option>
+
+          <option value="confirmed">
+            🔵 Qadoqlanmoqda
+          </option>
+
+          <option value="delivery">
+            🟣 Yo‘lda
+          </option>
+
+          <option value="done">
+            🟢 Yetkazildi
+          </option>
+
+          <option value="cancelled">
+            ⚪ Bekor
+          </option>
+
+        </select>
+      </label>
+
+
+      <div class="form-actions">
+
+        <button
+          class="primary-btn"
+          type="submit"
+        >
+          Saqlash
+        </button>
+
+        <a
+          id="callBtn"
+          class="call-btn"
+          href="#"
+        >
+          📞 Qo‘ng‘iroq
+        </a>
+
+      </div>
+
+
+      <div
+        id="orderMessage"
+        class="message"
+      ></div>
+
+    </form>
+
+  </div>
+
+</dialog>
+
+
+<!-- FAQAT CONFIG.JS TASHQARIDA -->
+
+<script src="./config.js?v=OPERATOR20000"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
 
-  const form =
-    document.getElementById("loginForm");
-
-  const emailInput =
-    document.getElementById("email");
-
-  const passwordInput =
-    document.getElementById("password");
-
-  const button =
-    document.getElementById("loginBtn");
-
-  const message =
-    document.getElementById("message");
-
-  const debug =
-    document.getElementById("debug");
+    "use strict";
 
 
-  function setMessage(text, type) {
-
-    message.textContent =
-      text;
-
-    message.className =
-      type || "info";
-  }
+    const config =
+      window.MODEX_CONFIG || {};
 
 
-  const config =
-    window.MODEX_CONFIG || {};
+    const SUPABASE_URL =
+      config.SUPABASE_URL || "";
 
 
-  const supabaseUrl =
-    config.SUPABASE_URL || "";
+    const SUPABASE_KEY =
+      config.SUPABASE_KEY || "";
 
 
-  const supabaseKey =
-    config.SUPABASE_KEY || "";
+    const $ =
+      id =>
+        document.getElementById(id);
 
 
-  if (
-    !supabaseUrl ||
-    !supabaseKey
-  ) {
-
-    debug.textContent =
-      "❌ config.js ishlamadi yoki SUPABASE_URL / SUPABASE_KEY topilmadi.";
-
-    setMessage(
-      "Config xatosi.",
-      "error"
-    );
-
-  } else {
-
-    debug.textContent =
-      "✅ config.js yuklandi.";
-
-  }
+    let currentUser =
+      null;
 
 
-  form.addEventListener(
-    "submit",
-    async function (event) {
+    let currentProfile =
+      null;
+
+
+    let allOrders =
+      [];
+
+
+    let activeFilter =
+      "all";
+
+
+    /* ==============================
+       HELPERS
+    ============================== */
+
+    function token(){
+
+      return sessionStorage.getItem(
+        "modex_operator_token"
+      );
+    }
+
+
+    function saveToken(value){
+
+      sessionStorage.setItem(
+        "modex_operator_token",
+        value
+      );
+    }
+
+
+    function clearToken(){
+
+      sessionStorage.removeItem(
+        "modex_operator_token"
+      );
+    }
+
+
+    function escapeHtml(value){
+
+      return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+
+    function message(
+      element,
+      text,
+      type
+    ){
+
+      if(!element){
+        return;
+      }
+
+
+      element.textContent =
+        text || "";
+
+
+      element.className =
+        "message";
+
+
+      if(type){
+        element
+          .classList
+          .add(type);
+      }
+    }
+
+
+    function formatDate(value){
+
+      if(!value){
+        return "—";
+      }
+
+
+      const date =
+        new Date(value);
+
+
+      if(
+        Number.isNaN(
+          date.getTime()
+        )
+      ){
+        return "—";
+      }
+
+
+      return date.toLocaleString(
+        "uz-UZ",
+        {
+          day:"2-digit",
+          month:"2-digit",
+          year:"numeric",
+          hour:"2-digit",
+          minute:"2-digit"
+        }
+      );
+    }
+
+
+    function statusName(status){
+
+      const map = {
+
+        new:
+          "🔴 Yangi",
+
+        talked:
+          "🟠 Gaplashildi",
+
+        confirmed:
+          "🔵 Qadoqlanmoqda",
+
+        delivery:
+          "🟣 Yo‘lda",
+
+        done:
+          "🟢 Yetkazildi",
+
+        cancelled:
+          "⚪ Bekor"
+      };
+
+
+      return (
+        map[status] ||
+        status ||
+        "—"
+      );
+    }
+
+
+    function statusClass(status){
+
+      return (
+        "status-" +
+        (
+          status ||
+          "new"
+        )
+      );
+    }
+
+
+    /* ==============================
+       API
+    ============================== */
+
+    async function api(
+      path,
+      options,
+      accessToken
+    ){
+
+      options =
+        options || {};
+
+
+      accessToken =
+        accessToken ||
+        SUPABASE_KEY;
+
+
+      if(
+        !SUPABASE_URL ||
+        !SUPABASE_KEY
+      ){
+        throw new Error(
+          "config.js ishlamayapti."
+        );
+      }
+
+
+      const response =
+        await fetch(
+          SUPABASE_URL +
+          "/" +
+          path,
+          {
+
+            method:
+              options.method ||
+              "GET",
+
+            headers:{
+
+              "Content-Type":
+                "application/json",
+
+              "apikey":
+                SUPABASE_KEY,
+
+              "Authorization":
+                "Bearer " +
+                accessToken,
+
+              ...(options.headers || {})
+            },
+
+            body:
+              options.body
+          }
+        );
+
+
+      if(!response.ok){
+
+        let errorMessage =
+          "Server xatosi (" +
+          response.status +
+          ")";
+
+
+        try{
+
+          const data =
+            await response.json();
+
+
+          errorMessage =
+            data.message ||
+            data.error_description ||
+            data.error ||
+            errorMessage;
+
+        }catch(error){}
+
+
+        throw new Error(
+          errorMessage
+        );
+      }
+
+
+      if(
+        response.status === 204
+      ){
+        return null;
+      }
+
+
+      const text =
+        await response.text();
+
+
+      if(!text){
+        return null;
+      }
+
+
+      return JSON.parse(text);
+    }
+
+
+    /* ==============================
+       LOGIN
+    ============================== */
+
+    async function login(event){
 
       event.preventDefault();
 
 
-      setMessage(
-        "Kirilmoqda...",
-        "info"
+      const email =
+        $("email")
+          .value
+          .trim();
+
+
+      const password =
+        $("password")
+          .value;
+
+
+      message(
+        $("loginMessage"),
+        "Kirilmoqda..."
       );
 
 
-      button.disabled =
-        true;
+      $("loginBtn")
+        .disabled =
+          true;
 
 
-      try {
+      try{
 
-        if (
-          !supabaseUrl ||
-          !supabaseKey
-        ) {
-
-          throw new Error(
-            "config.js ishlamayapti."
-          );
-
-        }
-
-
-        const email =
-          emailInput.value.trim();
-
-
-        const password =
-          passwordInput.value;
-
-
-        const response =
-          await fetch(
-            supabaseUrl +
-            "/auth/v1/token?grant_type=password",
+        const auth =
+          await api(
+            "auth/v1/token?grant_type=password",
             {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-
-                "apikey":
-                  supabaseKey
-              },
+              method:"POST",
 
               body:
                 JSON.stringify({
-                  email: email,
-                  password: password
+                  email:email,
+                  password:password
                 })
             }
           );
 
 
-        const data =
-          await response.json();
-
-
-        if (!response.ok) {
-
+        if(
+          !auth ||
+          !auth.access_token
+        ){
           throw new Error(
-            data.error_description ||
-            data.message ||
-            data.error ||
-            "Login xatosi"
+            "Token olinmadi."
           );
-
         }
 
 
-        if (!data.access_token) {
-
-          throw new Error(
-            "Access token kelmadi."
-          );
-
-        }
-
-
-        sessionStorage.setItem(
-          "modex_operator_token",
-          data.access_token
+        saveToken(
+          auth.access_token
         );
 
 
-        setMessage(
-          "✅ LOGIN ISHLADI!",
-          "success"
+        await openPanel();
+
+
+        $("loginForm")
+          .reset();
+
+
+        message(
+          $("loginMessage"),
+          ""
         );
 
 
-        debug.textContent =
-          "✅ Supabase Auth ishladi. Keyingi bosqichda operator panelni ochamiz.";
-
-
-      } catch (error) {
+      }catch(error){
 
         console.error(error);
 
 
-        setMessage(
-          "❌ " + error.message,
+        clearToken();
+
+
+        message(
+          $("loginMessage"),
+          "❌ " +
+          (
+            error.message ||
+            "Login xatosi"
+          ),
           "error"
         );
 
 
-        debug.textContent =
-          "Login so‘rovida xato chiqdi.";
+      }finally{
 
-      } finally {
+        $("loginBtn")
+          .disabled =
+            false;
+      }
+    }
 
-        button.disabled =
-          false;
 
+    async function loadUser(){
+
+      currentUser =
+        await api(
+          "auth/v1/user",
+          {
+            method:"GET"
+          },
+          token()
+        );
+
+
+      if(
+        !currentUser ||
+        !currentUser.id
+      ){
+        throw new Error(
+          "Operator aniqlanmadi."
+        );
+      }
+    }
+
+
+    async function loadProfile(){
+
+      const profiles =
+        await api(
+          "rest/v1/profiles?id=eq." +
+          encodeURIComponent(
+            currentUser.id
+          ) +
+          "&select=*",
+          {
+            method:"GET"
+          },
+          token()
+        );
+
+
+      currentProfile =
+        Array.isArray(profiles)
+          ? profiles[0]
+          : null;
+
+
+      if(!currentProfile){
+
+        throw new Error(
+          "Operator profili topilmadi."
+        );
       }
 
-    }
-  );
 
-});
+      if(
+        currentProfile.role !==
+        "operator"
+      ){
+        throw new Error(
+          "Bu hisob operator emas."
+        );
+      }
+
+
+      if(
+        currentProfile.active !==
+        true
+      ){
+        throw new Error(
+          "Operator bloklangan."
+        );
+      }
+    }
+
+
+    async function openPanel(){
+
+      await loadUser();
+
+      await loadProfile();
+
+
+      $("loginView")
+        .classList
+        .add("hidden");
+
+
+      $("panelView")
+        .classList
+        .remove("hidden");
+
+
+      $("operatorName")
+        .textContent =
+          currentProfile.name ||
+          currentUser.email ||
+          "Operator";
+
+
+      await loadOrders();
+    }
+
+
+    /* ==============================
+       ORDERS
+    ============================== */
+
+    async function loadOrders(){
+
+      message(
+        $("ordersMessage"),
+        "Buyurtmalar yuklanmoqda..."
+      );
+
+
+      try{
+
+        const data =
+          await api(
+            "rest/v1/orders?select=*&order=id.desc",
+            {
+              method:"GET"
+            },
+            token()
+          );
+
+
+        allOrders =
+          Array.isArray(data)
+            ? data
+            : [];
+
+
+        updateStats();
+
+        renderOrders();
+
+
+        message(
+          $("ordersMessage"),
+          ""
+        );
+
+
+      }catch(error){
+
+        console.error(error);
+
+
+        message(
+          $("ordersMessage"),
+          "❌ " +
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    function filteredOrders(){
+
+      let list =
+        allOrders.slice();
+
+
+      if(
+        activeFilter !==
+        "all"
+      ){
+
+        list =
+          list.filter(
+            function(order){
+
+              return (
+                order.status ===
+                activeFilter
+              );
+            }
+          );
+      }
+
+
+      const query =
+        $("searchInput")
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      if(query){
+
+        list =
+          list.filter(
+            function(order){
+
+              const text = [
+
+                order.id,
+
+                order.name,
+
+                order.surname,
+
+                order.phone,
+
+                order.product,
+
+                order.size,
+
+                order.color,
+
+                order.region,
+
+                order.address
+
+              ]
+              .join(" ")
+              .toLowerCase();
+
+
+              return text.includes(
+                query
+              );
+            }
+          );
+      }
+
+
+      return list;
+    }
+
+
+    function renderOrders(){
+
+      const list =
+        filteredOrders();
+
+
+      $("visibleCount")
+        .textContent =
+          list.length;
+
+
+      const container =
+        $("orders");
+
+
+      container.innerHTML =
+        "";
+
+
+      if(
+        list.length === 0
+      ){
+
+        container.innerHTML = `
+
+          <div class="empty">
+            Buyurtma topilmadi.
+          </div>
+        `;
+
+        return;
+      }
+
+
+      list.forEach(
+        function(order){
+
+          const card =
+            document.createElement(
+              "article"
+            );
+
+
+          card.className =
+            "order-card";
+
+
+          const fullName =
+            [
+              order.name,
+              order.surname
+            ]
+            .filter(Boolean)
+            .join(" ") ||
+            "Mijoz";
+
+
+          const quantity =
+            Number(
+              order.quantity || 1
+            );
+
+
+          card.innerHTML = `
+
+            <div class="order-top">
+
+              <div>
+
+                <div class="order-id">
+                  #${escapeHtml(order.id)}
+                  —
+                  ${escapeHtml(fullName)}
+                </div>
+
+                <div class="order-date">
+                  ${formatDate(order.created_at)}
+                </div>
+
+              </div>
+
+
+              <span
+                class="
+                  status-badge
+                  ${statusClass(order.status)}
+                "
+              >
+                ${statusName(order.status)}
+              </span>
+
+            </div>
+
+
+            <div class="order-grid">
+
+              <div class="info-box">
+                <span>TELEFON</span>
+                <strong>
+                  ${escapeHtml(order.phone || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>MAHSULOT</span>
+                <strong>
+                  ${escapeHtml(order.product || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>SONI</span>
+                <strong>
+                  ${quantity}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>RAZMER / RANG</span>
+                <strong>
+                  ${escapeHtml(order.size || "—")}
+                  /
+                  ${escapeHtml(order.color || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>HUDUD</span>
+                <strong>
+                  ${escapeHtml(order.region || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>MANZIL</span>
+                <strong>
+                  ${escapeHtml(order.address || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>IZOH</span>
+                <strong>
+                  ${escapeHtml(order.note || "—")}
+                </strong>
+              </div>
+
+              <div class="info-box">
+                <span>STOCK</span>
+                <strong>
+                  ${
+                    order.stock_adjusted
+                      ? "✅ Ayrilgan"
+                      : "—"
+                  }
+                </strong>
+              </div>
+
+            </div>
+
+
+            <div class="order-actions">
+
+              <button
+                type="button"
+                class="edit"
+                data-edit-order="${order.id}"
+              >
+                ✏️ Ochish
+              </button>
+
+
+              ${
+                order.phone
+
+                ? `
+                  <a
+                    href="tel:${escapeHtml(order.phone)}"
+                  >
+                    📞 Qo‘ng‘iroq
+                  </a>
+                `
+
+                : ""
+              }
+
+
+              ${
+                order.status === "new"
+
+                ? `
+                  <button
+                    type="button"
+                    data-fast-status="${order.id}"
+                    data-status="talked"
+                  >
+                    🟠 Gaplashildi
+                  </button>
+                `
+
+                : ""
+              }
+
+
+              ${
+                order.status === "talked"
+
+                ? `
+                  <button
+                    type="button"
+                    data-fast-status="${order.id}"
+                    data-status="confirmed"
+                  >
+                    🔵 Tasdiqlash
+                  </button>
+                `
+
+                : ""
+              }
+
+            </div>
+          `;
+
+
+          container.appendChild(
+            card
+          );
+        }
+      );
+
+
+      container
+        .querySelectorAll(
+          "[data-edit-order]"
+        )
+        .forEach(
+          function(button){
+
+            button.addEventListener(
+              "click",
+              function(){
+
+                openOrder(
+                  Number(
+                    button.dataset.editOrder
+                  )
+                );
+              }
+            );
+          }
+        );
+
+
+      container
+        .querySelectorAll(
+          "[data-fast-status]"
+        )
+        .forEach(
+          function(button){
+
+            button.addEventListener(
+              "click",
+              async function(){
+
+                const id =
+                  Number(
+                    button.dataset.fastStatus
+                  );
+
+
+                const status =
+                  button.dataset.status;
+
+
+                button.disabled =
+                  true;
+
+
+                try{
+
+                  await updateStatus(
+                    id,
+                    status
+                  );
+
+
+                  await loadOrders();
+
+
+                }catch(error){
+
+                  alert(
+                    error.message
+                  );
+
+
+                }finally{
+
+                  button.disabled =
+                    false;
+                }
+              }
+            );
+          }
+        );
+    }
+
+
+    /* ==============================
+       STATS
+    ============================== */
+
+    function updateStats(){
+
+      $("newCount")
+        .textContent =
+          allOrders.filter(
+            function(order){
+              return order.status === "new";
+            }
+          ).length;
+
+
+      $("talkedCount")
+        .textContent =
+          allOrders.filter(
+            function(order){
+              return order.status === "talked";
+            }
+          ).length;
+
+
+      $("confirmedCount")
+        .textContent =
+          allOrders.filter(
+            function(order){
+              return order.status === "confirmed";
+            }
+          ).length;
+
+
+      $("doneCount")
+        .textContent =
+          allOrders.filter(
+            function(order){
+              return order.status === "done";
+            }
+          ).length;
+    }
+
+
+    /* ==============================
+       MODAL
+    ============================== */
+
+    function openOrder(id){
+
+      const order =
+        allOrders.find(
+          function(item){
+
+            return (
+              Number(item.id) ===
+              Number(id)
+            );
+          }
+        );
+
+
+      if(!order){
+        return;
+      }
+
+
+      $("editId").value =
+        order.id;
+
+
+      $("editName").value =
+        order.name || "";
+
+
+      $("editSurname").value =
+        order.surname || "";
+
+
+      $("editPhone").value =
+        order.phone || "";
+
+
+      $("editProduct").value =
+        order.product || "";
+
+
+      $("editQuantity").value =
+        Number(
+          order.quantity || 1
+        );
+
+
+      $("editSize").value =
+        order.size || "";
+
+
+      $("editColor").value =
+        order.color || "";
+
+
+      $("editRegion").value =
+        order.region || "";
+
+
+      $("editAddress").value =
+        order.address || "";
+
+
+      $("editNote").value =
+        order.note || "";
+
+
+      $("editStatus").value =
+        order.status || "new";
+
+
+      $("editQuantity").disabled =
+        order.stock_adjusted === true;
+
+
+      $("modalTitle")
+        .textContent =
+          "Buyurtma #" +
+          order.id;
+
+
+      if(order.phone){
+
+        $("callBtn").href =
+          "tel:" +
+          order.phone;
+
+
+        $("callBtn")
+          .classList
+          .remove("hidden");
+
+      }else{
+
+        $("callBtn")
+          .classList
+          .add("hidden");
+      }
+
+
+      message(
+        $("orderMessage"),
+        ""
+      );
+
+
+      $("orderDialog")
+        .showModal();
+    }
+
+
+    function closeDialog(){
+
+      $("orderDialog")
+        .close();
+    }
+
+
+    /* ==============================
+       STATUS + STOCK RPC
+    ============================== */
+
+    async function updateStatus(
+      orderId,
+      newStatus
+    ){
+
+      return await api(
+        "rest/v1/rpc/update_order_status_with_stock",
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              p_order_id:
+                Number(orderId),
+
+              p_new_status:
+                newStatus,
+
+              p_operator_id:
+                currentUser.id
+            })
+        },
+        token()
+      );
+    }
+
+
+    /* ==============================
+       SAVE ORDER
+    ============================== */
+
+    async function saveOrder(event){
+
+      event.preventDefault();
+
+
+      const id =
+        Number(
+          $("editId").value
+        );
+
+
+      const order =
+        allOrders.find(
+          function(item){
+
+            return (
+              Number(item.id) ===
+              id
+            );
+          }
+        );
+
+
+      if(!order){
+
+        message(
+          $("orderMessage"),
+          "Buyurtma topilmadi.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const newStatus =
+        $("editStatus").value;
+
+
+      const details = {
+
+        name:
+          $("editName")
+            .value
+            .trim() ||
+          null,
+
+        surname:
+          $("editSurname")
+            .value
+            .trim() ||
+          null,
+
+        phone:
+          $("editPhone")
+            .value
+            .trim() ||
+          null,
+
+        size:
+          $("editSize")
+            .value
+            .trim() ||
+          null,
+
+        color:
+          $("editColor")
+            .value
+            .trim() ||
+          null,
+
+        region:
+          $("editRegion")
+            .value
+            .trim() ||
+          null,
+
+        address:
+          $("editAddress")
+            .value
+            .trim() ||
+          null,
+
+        note:
+          $("editNote")
+            .value
+            .trim() ||
+          null,
+
+        updated_at:
+          new Date()
+            .toISOString()
+      };
+
+
+      if(
+        order.stock_adjusted !== true
+      ){
+
+        details.quantity =
+          Math.max(
+            1,
+            Number(
+              $("editQuantity").value ||
+              1
+            )
+          );
+      }
+
+
+      message(
+        $("orderMessage"),
+        "Saqlanmoqda..."
+      );
+
+
+      try{
+
+        /* Avval mijoz ma'lumotlari */
+
+        await api(
+          "rest/v1/orders?id=eq." +
+          id,
+          {
+            method:"PATCH",
+
+            headers:{
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify(
+                details
+              )
+          },
+          token()
+        );
+
+
+        /* Keyin status RPC */
+
+        if(
+          newStatus !==
+          order.status
+        ){
+
+          await updateStatus(
+            id,
+            newStatus
+          );
+        }
+
+
+        message(
+          $("orderMessage"),
+          "✅ Saqlandi.",
+          "success"
+        );
+
+
+        await loadOrders();
+
+
+        setTimeout(
+          function(){
+
+            closeDialog();
+
+          },
+          350
+        );
+
+
+      }catch(error){
+
+        console.error(error);
+
+
+        message(
+          $("orderMessage"),
+          "❌ " +
+          error.message,
+          "error"
+        );
+      }
+    }
+
+
+    /* ==============================
+       FILTERS
+    ============================== */
+
+    document
+      .querySelectorAll(
+        ".filter-btn"
+      )
+      .forEach(
+        function(button){
+
+          button.addEventListener(
+            "click",
+            function(){
+
+              activeFilter =
+                button.dataset.filter;
+
+
+              document
+                .querySelectorAll(
+                  ".filter-btn"
+                )
+                .forEach(
+                  function(item){
+
+                    item
+                      .classList
+                      .remove("active");
+                  }
+                );
+
+
+              button
+                .classList
+                .add("active");
+
+
+              renderOrders();
+            }
+          );
+        }
+      );
+
+
+    /* ==============================
+       EVENTS
+    ============================== */
+
+    $("loginForm")
+      .addEventListener(
+        "submit",
+        login
+      );
+
+
+    $("logoutBtn")
+      .addEventListener(
+        "click",
+        function(){
+
+          clearToken();
+
+          location.reload();
+        }
+      );
+
+
+    $("refreshBtn")
+      .addEventListener(
+        "click",
+        async function(){
+
+          $("refreshBtn")
+            .disabled =
+              true;
+
+
+          try{
+
+            await loadOrders();
+
+          }finally{
+
+            $("refreshBtn")
+              .disabled =
+                false;
+          }
+        }
+      );
+
+
+    $("searchInput")
+      .addEventListener(
+        "input",
+        renderOrders
+      );
+
+
+    $("clearSearch")
+      .addEventListener(
+        "click",
+        function(){
+
+          $("searchInput").value =
+            "";
+
+          renderOrders();
+        }
+      );
+
+
+    $("closeDialog")
+      .addEventListener(
+        "click",
+        closeDialog
+      );
+
+
+    $("orderForm")
+      .addEventListener(
+        "submit",
+        saveOrder
+      );
+
+
+    $("orderDialog")
+      .addEventListener(
+        "click",
+        function(event){
+
+          if(
+            event.target ===
+            $("orderDialog")
+          ){
+
+            closeDialog();
+          }
+        }
+      );
+
+
+    /* ==============================
+       AUTO LOGIN
+    ============================== */
+
+    async function init(){
+
+      if(!token()){
+        return;
+      }
+
+
+      try{
+
+        await openPanel();
+
+
+      }catch(error){
+
+        console.error(error);
+
+        clearToken();
+
+
+        $("panelView")
+          .classList
+          .add("hidden");
+
+
+        $("loginView")
+          .classList
+          .remove("hidden");
+
+
+        message(
+          $("loginMessage"),
+          "Qayta login qiling.",
+          "error"
+        );
+      }
+    }
+
+
+    init();
+
+  }
+);
 </script>
 
 </body>
